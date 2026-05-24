@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Priscila Esfihas v1.2</title>
+    <title>Priscila Esfihas v1.5</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#f59e0b">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -30,7 +30,25 @@
 </head>
 <body class="p-3 max-w-lg mx-auto">
 
-    <!-- APP CONTAINER -->
+    <!-- TELA DE PAGAMENTO PARA O CLIENTE EXTERNO (LANDING PAGE PIX) -->
+    <div id="payment-page" class="hidden fixed inset-0 bg-[#0a0a0a] p-6 flex flex-col items-center justify-center text-center z-[3000] max-w-lg mx-auto">
+        <h1 class="text-3xl font-black text-amber-500 italic uppercase mb-1 leading-none">PRISCILA ESFIHAS</h1>
+        <p class="text-zinc-500 text-[10px] mb-8 uppercase font-black tracking-wider">Poços de Caldas - MG</p>
+        
+        <div class="card w-full p-6 border border-zinc-800 bg-[#161616] shadow-2xl">
+            <span class="text-[10px] text-amber-500 font-black uppercase block mb-3 tracking-widest">Chave Pix E-mail</span>
+            <div class="text-lg font-black text-white bg-black/60 p-4 rounded-xl border border-zinc-900 mb-6 tracking-wide">alanpocos@gmail.com</div>
+            
+            <button id="btn-copiar-landing" class="btn-gold mt-0 py-4 text-base tracking-wide" onclick="copiarPixLanding()">📋 Copiar Chave Pix</button>
+            
+            <div id="msg-copiado" class="hidden text-emerald-500 font-black text-xs uppercase mt-4 italic tracking-wider animate-pulse">
+                ✓ Copiado! Agora abra o app do seu banco.
+            </div>
+        </div>
+        <p class="text-[9px] text-zinc-600 uppercase mt-8 font-bold max-w-xs">Após copiar, abra o aplicativo do seu banco e cole na opção de Chave Pix por E-mail.</p>
+    </div>
+
+    <!-- APP CONTAINER PRINCIPAL DA GESTÃO -->
     <div id="main-app">
         <!-- CABEÇALHO -->
         <div class="flex justify-between items-center mb-5 pt-2">
@@ -174,18 +192,29 @@
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBA4xSi8fgtNXJQxf7-AC8vQQvojxaMH48",
-            authDomain: "priscilas-esfihas.firebaseapp.com",
-            projectId: "priscilas-esfihas",
-            storageBucket: "priscilas-esfihas.firebasestorage.app",
-            messagingSenderId: "33498231694",
-            appId: "1:33498231694:web:5cd7fb0986ae6fa21b2adf",
-            measurementId: "G-E6N425TCGC"
-        };
+        if (window.location.search.includes('p=1')) {
+            document.getElementById('main-app').classList.add('hidden');
+            document.getElementById('payment-page').classList.remove('hidden');
+        }
 
-        // ALTERADO: Agora contém o código Pix Copia e Cola completo e real do Alan, evitando link de e-mail clicável no WhatsApp
-        const CHAVE_PIX_PADRAO = "00020101021126480014br.gov.bcb.pix0119alanpocos@gmail.com5204000053039865802BR5930ALAN DOUGLAS PEREIRA RODRIGUES6005POCOS6304";
+        function copiarPixLanding() {
+            const tempInput = document.createElement("input");
+            tempInput.value = "alanpocos@gmail.com";
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            tempInput.setSelectionRange(0, 99999);
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+
+            const msg = document.getElementById('msg-copiado');
+            msg.classList.remove('hidden');
+            const btn = document.getElementById('btn-copiar-landing');
+            btn.innerText = "✓ CHAVE COPIADA";
+            setTimeout(() => {
+                msg.classList.add('hidden');
+                btn.innerText = "📋 Copiar Chave Pix";
+            }, 3000);
+        }
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
@@ -196,6 +225,8 @@
         const PRECO_BANDEJA = 25.0;
 
         async function init() {
+            if (window.location.search.includes('p=1')) return;
+
             db.collection('clientes').orderBy('nome').onSnapshot(snap => {
                 clientes = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
                 renderClientes();
@@ -205,7 +236,6 @@
                 if(selecionadoId) atualizarTelaModal();
             }, err => {
                 console.error("Erro Firebase Rules:", err);
-                alert("Erro de permissão no Firebase. Certifique-se de que as Regras do Firestore estão como 'if true;'");
             });
 
             db.collection('vendas').orderBy('data', 'desc').onSnapshot(snap => {
@@ -253,11 +283,6 @@
                 if(el) el.classList.toggle('hidden', id !== t);
                 if(btn) btn.classList.toggle('active-tab', id === t);
             });
-            if(t === 'vendas') {
-                document.getElementById('venda-cliente-select').value = "";
-                document.getElementById('venda-qtd').value = 1;
-                updateVendaTotal();
-            }
         }
 
         function calcTotalGeral() {
@@ -283,7 +308,6 @@
             const busca = document.getElementById('search-g').value.toUpperCase();
             const lista = document.getElementById('list-clientes');
             let h = '';
-            
             const filtrados = clientes.filter(c => c.nome.includes(busca));
             
             filtrados.forEach(c => {
@@ -310,7 +334,6 @@
                     </div>
                 </div>`;
             });
-            
             lista.innerHTML = h || '<div class="text-center p-10 text-zinc-600 font-black uppercase italic text-xs">Nenhum cliente cadastrado</div>';
         }
 
@@ -330,11 +353,8 @@
             
             const c = clientes.find(x => x.id === cid);
             const elAlerta = document.getElementById('alerta-limite');
-            if(c && (c.saldo + total) >= 100) {
-                elAlerta.classList.remove('hidden');
-            } else {
-                elAlerta.classList.add('hidden');
-            }
+            if(c && (c.saldo + total) >= 100) elAlerta.classList.remove('hidden');
+            else elAlerta.classList.add('hidden');
         }
         
         const vSel = document.getElementById('venda-cliente-select');
@@ -343,11 +363,10 @@
         async function registrarVenda() {
             const cid = document.getElementById('venda-cliente-select').value;
             const qtd = parseInt(document.getElementById('venda-qtd').value);
-            if(!cid || !qtd || qtd <= 0) return alert("Selecione um cliente e informe uma quantidade válida!");
+            if(!cid || !qtd || qtd <= 0) return alert("Selecione um cliente válido!");
             
             const total = qtd * PRECO_BANDEJA;
             const c = clientes.find(x => x.id === cid);
-            
             const batch = db.batch();
             const cRef = db.collection('clientes').doc(cid);
             
@@ -359,16 +378,11 @@
             
             const vRef = db.collection('vendas').doc();
             batch.set(vRef, {
-                clienteId: cid,
-                clienteNome: c.nome,
-                qtd,
-                valor: total,
-                data: firebase.firestore.FieldValue.serverTimestamp(),
-                tipo: 'venda'
+                clienteId: cid, clienteNome: c.nome, qtd, valor: total, data: firebase.firestore.FieldValue.serverTimestamp(), tipo: 'venda'
             });
             
             await batch.commit();
-            alert(`Entrega de ${qtd} bandeja(s) registrada com sucesso!`);
+            alert(`Entrega registrada!`);
             showTab('clientes');
         }
 
@@ -401,46 +415,33 @@
             }
             
             const btn45 = document.getElementById('btn-cobranca-45');
-            if(exibirAlerta45) {
-                btn45.classList.remove('opacity-30');
-                btn45.style.pointerEvents = 'auto';
-            } else {
-                btn45.classList.add('opacity-30');
-                btn45.style.pointerEvents = 'none';
-            }
+            if(exibirAlerta45) { btn45.classList.remove('opacity-30'); btn45.style.pointerEvents = 'auto'; }
+            else { btn45.classList.add('opacity-30'); btn45.style.pointerEvents = 'none'; }
         }
 
         async function salvarEdicao() {
             if(!selecionadoId) return;
             const novoNome = document.getElementById('edit-nome').value.toUpperCase().trim();
             const novoTel = document.getElementById('edit-tel').value.replace(/\D/g, '');
-            if(!novoNome) return alert("Nome não pode ficar vazio!");
+            if(!novoNome) return alert("Nome obrigatório!");
             
-            await db.collection('clientes').doc(selecionadoId).update({
-                nome: novoNome,
-                tel: novoTel
-            });
+            await db.collection('clientes').doc(selecionadoId).update({ nome: novoNome, tel: novoTel });
             alert("Cadastro updated!");
         }
 
         async function confirmarPagamento() {
             const valor = parseFloat(document.getElementById('pagamento-valor').value);
-            if(!valor || valor <= 0 || !selecionadoId) return alert("Informe um valor de pagamento válido!");
+            if(!valor || valor <= 0 || !selecionadoId) return alert("Valor inválido!");
             
             const c = clientes.find(x => x.id === selecionadoId);
             const batch = db.batch();
             const cRef = db.collection('clientes').doc(selecionadoId);
-            
             const novoSaldo = Math.max(0, c.saldo - valor);
             batch.update(cRef, { saldo: novoSaldo });
             
             const vRef = db.collection('vendas').doc();
             batch.set(vRef, {
-                clienteId: selecionadoId,
-                clienteNome: c.nome,
-                valor: valor,
-                data: firebase.firestore.FieldValue.serverTimestamp(),
-                tipo: 'pagamento'
+                clienteId: selecionadoId, clienteNome: c.nome, valor: valor, data: firebase.firestore.FieldValue.serverTimestamp(), tipo: 'pagamento'
             });
             
             await batch.commit();
@@ -456,31 +457,16 @@
             filtrados.forEach(i => {
                 const dataStr = i.data ? new Date(i.data.seconds * 1000).toLocaleDateString('pt-BR') : 'Processando...';
                 if(i.tipo === 'venda') {
-                    h += `
-                    <div class="hist-item border-l-4 border-l-red-500">
-                        <div class="flex justify-between font-bold">
-                            <span class="text-white">🥟 PEGOU ${i.qtd} BANDEJA(S)</span>
-                            <span class="text-red-400">R$ ${i.valor.toFixed(2)}</span>
-                        </div>
-                        <div class="text-[8px] text-zinc-500 uppercase mt-0.5">${dataStr}</div>
-                    </div>`;
+                    h += `<div class="hist-item border-l-4 border-l-red-500"><div class="flex justify-between font-bold"><span class="text-white">🥟 PEGOU ${i.qtd} BANDEJA(S)</span><span class="text-red-400">R$ ${i.valor.toFixed(2)}</span></div><div class="text-[8px] text-zinc-500 uppercase mt-0.5">${dataStr}</div></div>`;
                 } else {
-                    h += `
-                    <div class="hist-item border-l-4 border-l-emerald-500">
-                        <div class="flex justify-between font-bold">
-                            <span class="text-emerald-400">💰 EFETUOU PAGAMENTO</span>
-                            <span class="text-emerald-400">- R$ ${i.valor.toFixed(2)}</span>
-                        </div>
-                        <div class="text-[8px] text-zinc-500 uppercase mt-0.5">${dataStr}</div>
-                    </div>`;
+                    h += `<div class="hist-item border-l-4 border-l-emerald-500"><div class="flex justify-between font-bold"><span class="text-emerald-400">💰 EFETUOU PAGAMENTO</span><span class="text-emerald-400">- R$ ${i.valor.toFixed(2)}</span></div><div class="text-[8px] text-zinc-500 uppercase mt-0.5">${dataStr}</div></div>`;
                 }
             });
-            container.innerHTML = h || '<div class="text-center py-6 text-zinc-700 italic text-xs font-bold">Nenhuma movimentação registrada</div>';
+            container.innerHTML = h || '<div class="text-center py-6 text-zinc-700 italic text-xs font-bold">Nenhuma movimentação</div>';
         }
 
         function updateRelatorios() {
             if(clientes.length === 0) return;
-            
             const fatTotal = historicoCompleto.filter(h => h.tipo === 'venda').reduce((acc, v) => acc + (v.valor || 0), 0);
             document.getElementById('rep-faturamento-total').innerText = `R$ ${fatTotal.toFixed(2)}`;
             
@@ -495,51 +481,39 @@
             
             const agora = new Date();
             let hSumidos = '';
-            
-            const ordenadosPorInatividade = [...clientes].filter(c => c.ultimaCompra).sort((a,b) => {
-                return a.ultimaCompra.seconds - b.ultimaCompra.seconds;
-            });
+            const ordenadosPorInatividade = [...clientes].filter(c => c.ultimaCompra).sort((a,b) => a.ultimaCompra.seconds - b.ultimaCompra.seconds);
             
             ordenadosPorInatividade.forEach(c => {
                 const dias = Math.floor((agora - new Date(c.ultimaCompra.seconds * 1000)) / (1000 * 60 * 60 * 24));
                 if(dias >= 1) {
-                    hSumidos += `
-                    <div class="flex justify-between items-center bg-zinc-900/60 p-3 rounded-xl border border-zinc-900">
-                        <div>
-                            <div class="font-black text-xs text-white uppercase">${c.nome}</div>
-                            <div class="text-[9px] text-amber-500 font-bold mt-0.5">Sem pedir há ${dias} dias</div>
-                        </div>
-                        <button onclick="enviarMensagemSaudade('${c.id}', ${dias})" class="text-[9px] bg-amber-500 font-black text-black px-3 py-2 rounded-lg uppercase italic">
-                            💬 Chamar
-                        </button>
-                    </div>`;
+                    hSumidos += `<div class="flex justify-between items-center bg-zinc-900/60 p-3 rounded-xl border border-zinc-900"><div><div class="font-black text-xs text-white uppercase">${c.nome}</div><div class="text-[9px] text-amber-500 font-bold mt-0.5">Sem pedir há ${dias} dias</div></div><button onclick="enviarMensagemSaudade('${c.id}', ${dias})" class="text-[9px] bg-amber-500 font-black text-black px-3 py-2 rounded-lg uppercase italic">💬 Chamar</button></div>`;
                 }
             });
-            
-            document.getElementById('rep-sumidos').innerHTML = hSumidos || '<div class="text-center py-6 text-zinc-700 italic text-xs font-bold">Todos os clientes antigos ativos recentemente!</div>';
+            document.getElementById('rep-sumidos').innerHTML = hSumidos || '<div class="text-center py-6 text-zinc-700 italic text-xs font-bold">Todos ativos!</div>';
         }
 
         function enviarExtratoZap() {
             const c = clientes.find(x => x.id === selecionadoId);
             if(!c) return;
-            if(!c.tel) return alert("Cadastre um número de WhatsApp para este cliente primeiro!");
+            if(!c.tel) return alert("Cadastre o WhatsApp!");
             
             const filtrados = historicoCompleto.filter(h => h.clienteId === c.id);
             const agoraMs = Date.now();
             const trintaDiasMs = 30 * 24 * 60 * 60 * 1000;
-            
-            const GlassRecentes = filtrados.filter(h => h.data && (agoraMs - h.data.seconds * 1000) <= trintaDiasMs);
+            const recentes = filtrados.filter(h => h.data && (agoraMs - h.data.seconds * 1000) <= trintaDiasMs);
             const ultimoPgto = filtrados.find(h => h.tipo === 'pagamento');
             
-            let texto = `*Fala, ${c.nome}!* Segue o extrato resumido (últimos 30 dias) das esfihas da Priscila:
+            const linkPagamento = window.location.origin + window.location.pathname + "?p=1";
+            
+            let texto = `*Fala, ${c.nome}!* Segue o extrato (últimos 30 dias) das esfihas da Priscila:
 
 `;
             
-            if(GlassRecentes.length === 0) {
-                texto += `Sem novas movimentações detalhadas neste mês.
+            if(recentes.length === 0) {
+                texto += `Sem movimentações no mês.
 `;
             } else {
-                GlassRecentes.forEach(i => {
+                recentes.forEach(i => {
                     const dataStr = i.data ? new Date(i.data.seconds * 1000).toLocaleDateString('pt-BR') : '';
                     if(i.tipo === 'venda') {
                         texto += `• ${dataStr}: Pegou ${i.qtd} band. (R$ ${i.valor.toFixed(2)})
@@ -554,18 +528,17 @@
             if(ultimoPgto && ultimoPgto.data) {
                 const dataPgtoStr = new Date(ultimoPgto.data.seconds * 1000).toLocaleDateString('pt-BR');
                 texto += `
-*Última data que pagou:* ${dataPgtoStr} (R$ ${ultimoPgto.valor.toFixed(2)})
+*Último pagamento:* ${dataPgtoStr}
 `;
             }
             
             texto += `
-*Total Pendente Atual: R$ ${c.saldo.toFixed(2)}*
+*Total Pendente: R$ ${c.saldo.toFixed(2)}*
 
 `;
             if(c.saldo > 0) {
-                texto += `Caso queira efetuar o acerto, segue a chave Pix Copia e Cola (toque e segure para copiar):
-
-${CHAVE_PIX_PADRAO}`;
+                texto += `Para pagar, clique no link abaixo para copiar a chave Pix com 1 clique:
+${linkPagamento}`;
             }
             
             window.open(`https://api.whatsapp.com/send?phone=55${c.tel}&text=${encodeURIComponent(texto)}`, '_blank');
@@ -574,17 +547,18 @@ ${CHAVE_PIX_PADRAO}`;
         function enviarCobranca45() {
             const c = clientes.find(x => x.id === selecionadoId);
             if(!c) return;
-            if(!c.tel) return alert("Cadastre um número de WhatsApp para este cliente primeiro!");
+            if(!c.tel) return alert("Cadastre o WhatsApp!");
+            
+            const linkPagamento = window.location.origin + window.location.pathname + "?p=1";
             
             const texto = `Olá, ${c.nome}! Tudo bem?
 
-Passando aqui para lembrar do acerto das últimas esfihas fechadas da Priscila. Temos em aberto o valor de *R$ ${c.saldo.toFixed(2)}*.
+Passando para lembrar do acerto das esfihas da Priscila. Temos em aberto o valor de *R$ ${c.saldo.toFixed(2)}*.
 
-Para facilitar para você, segue a nossa chave Pix Copia e Cola (toque e segure para copiar):
+Clique no link abaixo para copiar a chave Pix com 1 clique:
+${linkPagamento}
 
-${CHAVE_PIX_PADRAO}
-
-Muito obrigado pela parceria de sempre! 🙏🥟`;
+Muito obrigado! 🙏`;
             
             window.open(`https://api.whatsapp.com/send?phone=55${c.tel}&text=${encodeURIComponent(texto)}`, '_blank');
         }
@@ -592,32 +566,22 @@ Muito obrigado pela parceria de sempre! 🙏🥟`;
         function enviarMensagemSaudade(id, dias) {
             const c = clientes.find(x => x.id === id);
             if(!c) return;
-            if(!c.tel) return alert("Cadastre um número de WhatsApp para este cliente primeiro!");
+            if(!c.tel) return alert("Cadastre o WhatsApp!");
             
-            const texto = `Oi, ${c.nome}! Tudo bem com você? Bateu saudade daquela esfiha fechada quentinha! 🥟
+            const texto = `Oi, ${c.nome}! Tudo bem? Bateu saudade daquela esfiha fechada quentinha! 🥟
 
-Notamos que já faz uns ${dias} dias desde o seu cái último pedido. A Priscila está preparando uma fornada super fresca hoje. Gostaria de garantir uma bandeja com 5 unidades?
+Notamos que já faz uns ${dias} dias desde o seu último pedido. A Priscila está preparando uma fornada fresca hoje. Gostaria de garantir uma bandeja com 5 unidades?
 
-Se quiser, só me avisar por aqui! Coisa boa!`;
+Se quiser, só me avisar por aqui!`;
             
             window.open(`https://api.whatsapp.com/send?phone=55${c.tel}&text=${encodeURIComponent(texto)}`, '_blank');
         }
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js').then(reg => {
-                    reg.addEventListener('updatefound', () => {
-                        const newWorker = reg.installing;
-                        newWorker.onstatechange = () => {
-                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                window.location.reload();
-                            }
-                        };
-                    });
-                });
+                navigator.serviceWorker.register('./sw.js');
             });
         }
-
         init();
     </script>
 </body>
