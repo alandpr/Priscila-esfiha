@@ -1,8 +1,9 @@
-const CACHE_NAME = 'esfihas-v1.6';
-const assets = ['./', 'index.html', 'manifest.json', 'Icone.jpg'];
+const CACHE_NAME = 'esfihas-v2.0';
+// Deixamos apenas o essencial no cache inicial
+const assets = ['./', 'index.html', 'manifest.json'];
 
 self.addEventListener('install', event => {
-  self.skipWaiting();
+  self.skipWaiting(); // Força a atualização imediata
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       return cache.addAll(assets);
@@ -11,7 +12,8 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(clients.claim());
+  event.waitUntil(clients.claim()); // Toma o controle do navegador na hora
+  // Destrói QUALQUER cache antigo que não seja o v2.0
   event.waitUntil(
     caches.keys().then(keys => Promise.all(
       keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
@@ -19,10 +21,11 @@ self.addEventListener('activate', event => {
   );
 });
 
+// A SUA IDEIA AQUI: Prioriza a Internet. Se falhar (offline), puxa do Cache.
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
+    fetch(event.request).catch(() => {
+      return caches.match(event.request);
     })
   );
 });
