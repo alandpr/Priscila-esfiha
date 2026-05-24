@@ -9,8 +9,8 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "Icone.jpg",
-      "type": "image/jpeg",
+      "src": "https://img.icons8.com/color/512/dumpling",
+      "type": "image/png",
       "sizes": "512x512",
       "purpose": "any"
     }
