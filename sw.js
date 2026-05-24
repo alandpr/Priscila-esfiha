@@ -1,10 +1,17 @@
-const CACHE_NAME = 'esfihas-cache-v1';
-const assets = ['./GestaoEsfihas.html', './manifest.json'];
-
-self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(assets)));
+self.addEventListener('install', event => {
+    self.skipWaiting();
 });
 
-self.addEventListener('fetch', e => {
-  e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
+self.addEventListener('activate', event => {
+    event.waitUntil(clients.claim());
+});
+
+self.addEventListener('fetch', event => {
+    // ESSENCIAL: Este escutador de 'fetch' é o requisito obrigatório que o Chrome e o Brave 
+    // exigem para ativar o botão de "Instalar aplicativo" na tela.
+    event.respondWith(
+        fetch(event.request).catch(() => {
+            return caches.match(event.request);
+        })
+    );
 });
