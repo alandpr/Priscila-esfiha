@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Priscila Esfihas v1.5</title>
+    <title>Priscila Esfihas v1.6</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#f59e0b">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -192,6 +192,17 @@
     </div>
 
     <script>
+        // CONFIGURAÇÃO REAL DO FIREBASE - RESTAURADA COM SUCESSO ABSOLUTO
+        const firebaseConfig = {
+            apiKey: "AIzaSyBA4xSi8fgtNXJQxf7-AC8vQQvojxaMH48",
+            authDomain: "priscilas-esfihas.firebaseapp.com",
+            projectId: "priscilas-esfihas",
+            storageBucket: "priscilas-esfihas.firebasestorage.app",
+            messagingSenderId: "33498231694",
+            appId: "1:33498231694:web:5cd7fb0986ae6fa21b2adf",
+            measurementId: "G-E6N425TCGC"
+        };
+
         if (window.location.search.includes('p=1')) {
             document.getElementById('main-app').classList.add('hidden');
             document.getElementById('payment-page').classList.remove('hidden');
@@ -426,7 +437,7 @@
             if(!novoNome) return alert("Nome obrigatório!");
             
             await db.collection('clientes').doc(selecionadoId).update({ nome: novoNome, tel: novoTel });
-            alert("Cadastro updated!");
+            alert("Cadastro atualizado!");
         }
 
         async function confirmarPagamento() {
