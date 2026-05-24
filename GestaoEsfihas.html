@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Priscila Esfihas v1.1</title>
+    <title>Priscila Esfihas v1.2</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#f59e0b">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -184,7 +184,7 @@
             measurementId: "G-E6N425TCGC"
         };
 
-        const CHAVE_PIX_PADRAO = "alanpocos@gmail.com";
+        const CHAVE_PIX_PADRAO = "00020101021126480014br.gov.bcb.pix0119alanpocos@gmail.com5204000053039865802BR5930ALAN DOUGLAS PEREIRA RODRIGUES6005POCOS6304";
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
@@ -419,7 +419,7 @@
                 nome: novoNome,
                 tel: novoTel
             });
-            alert("Cadastro updated!");
+            alert("Cadastro atualizado!");
         }
 
         async function confirmarPagamento() {
@@ -527,18 +527,18 @@
             const agoraMs = Date.now();
             const trintaDiasMs = 30 * 24 * 60 * 60 * 1000;
             
-            const recentes = filtrados.filter(h => h.data && (agoraMs - h.data.seconds * 1000) <= trintaDiasMs);
+            const GlassRecentes = filtrados.filter(h => h.data && (agoraMs - h.data.seconds * 1000) <= trintaDiasMs);
             const ultimoPgto = filtrados.find(h => h.tipo === 'pagamento');
             
             let texto = `*Fala, ${c.nome}!* Segue o extrato resumido (últimos 30 dias) das esfihas da Priscila:
 
 `;
             
-            if(recentes.length === 0) {
+            if(GlassRecentes.length === 0) {
                 texto += `Sem novas movimentações detalhadas neste mês.
 `;
             } else {
-                recentes.forEach(i => {
+                GlassRecentes.forEach(i => {
                     const dataStr = i.data ? new Date(i.data.seconds * 1000).toLocaleDateString('pt-BR') : '';
                     if(i.tipo === 'venda') {
                         texto += `• ${dataStr}: Pegou ${i.qtd} band. (R$ ${i.valor.toFixed(2)})
@@ -562,8 +562,9 @@
 
 `;
             if(c.saldo > 0) {
-                texto += `Caso queira efetuar o acerto, segue a chave Pix Copia e Cola:
-\`${CHAVE_PIX_PADRAO}\``;
+                texto += `Caso queira efetuar o acerto, segue a chave Pix Copia e Cola (toque e segure para copiar):
+
+${CHAVE_PIX_PADRAO}`;
             }
             
             window.open(`https://api.whatsapp.com/send?phone=55${c.tel}&text=${encodeURIComponent(texto)}`, '_blank');
@@ -578,8 +579,9 @@
 
 Passando aqui para lembrar do acerto das últimas esfihas fechadas da Priscila. Temos em aberto o valor de *R$ ${c.saldo.toFixed(2)}*.
 
-Para facilitar para você, segue a nossa chave Pix Copia e Cola:
-\`${CHAVE_PIX_PADRAO}\`
+Para facilitar para você, segue a nossa chave Pix Copia e Cola (toque e segure para copiar):
+
+${CHAVE_PIX_PADRAO}
 
 Muito obrigado pela parceria de sempre! 🙏🥟`;
             
