@@ -1,5 +1,5 @@
-const CACHE_NAME = 'esfihas-v1.4';
-const assets = ['./', 'index.html', 'manifest.json'];
+const CACHE_NAME = 'esfihas-v1.6';
+const assets = ['./', 'index.html', 'manifest.json', 'Icone.jpg'];
 
 self.addEventListener('install', event => {
   self.skipWaiting();
