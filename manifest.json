@@ -1,0 +1,22 @@
+{
+  "name": "Priscila Esfihas Gestão",
+  "short_name": "Esfihas",
+  "description": "Sistema de Gestão de Clientes e Penduras - Priscila Esfihas",
+  "start_url": "./GestaoEsfihas.html",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme-color": "#f59e0b",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://images.unsplash.com/photo-1608897013039-887f21d8c804?w=192&h=192&fit=crop&q=80",
+      "type": "image/jpeg",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1608897013039-887f21d8c804?w=512&h=512&fit=crop&q=80",
+      "type": "image/jpeg",
+      "sizes": "512x512"
+    }
+  ]
+}
