@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Priscila Esfihas v1.3</title>
+    <title>Priscila Esfihas v1.2</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#f59e0b">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -184,8 +184,8 @@
             measurementId: "G-E6N425TCGC"
         };
 
-        // Chave Pix baseada no e-mail real do Alan
-        const CHAVE_PIX_PADRAO = "alanpocos@gmail.com";
+        // ALTERADO: Agora contém o código Pix Copia e Cola completo e real do Alan, evitando link de e-mail clicável no WhatsApp
+        const CHAVE_PIX_PADRAO = "00020101021126480014br.gov.bcb.pix0119alanpocos@gmail.com5204000053039865802BR5930ALAN DOUGLAS PEREIRA RODRIGUES6005POCOS6304";
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
@@ -519,7 +519,6 @@
             document.getElementById('rep-sumidos').innerHTML = hSumidos || '<div class="text-center py-6 text-zinc-700 italic text-xs font-bold">Todos os clientes antigos ativos recentemente!</div>';
         }
 
-        // FORMATADOR EXCLUSIVO COM BLOCO MONOESPAÇADO DO WHATSAPP (```chave```)
         function enviarExtratoZap() {
             const c = clientes.find(x => x.id === selecionadoId);
             if(!c) return;
@@ -564,8 +563,9 @@
 
 `;
             if(c.saldo > 0) {
-                texto += `Chave Pix E-mail (toque e segure apenas no bloco abaixo para copiar):
-\`\`\`${CHAVE_PIX_PADRAO}\`\`\``;
+                texto += `Caso queira efetuar o acerto, segue a chave Pix Copia e Cola (toque e segure para copiar):
+
+${CHAVE_PIX_PADRAO}`;
             }
             
             window.open(`https://api.whatsapp.com/send?phone=55${c.tel}&text=${encodeURIComponent(texto)}`, '_blank');
@@ -580,8 +580,9 @@
 
 Passando aqui para lembrar do acerto das últimas esfihas fechadas da Priscila. Temos em aberto o valor de *R$ ${c.saldo.toFixed(2)}*.
 
-Chave Pix E-mail (toque e segure apenas no bloco abaixo para copiar):
-\`\`\`${CHAVE_PIX_PADRAO}\`\`\`
+Para facilitar para você, segue a nossa chave Pix Copia e Cola (toque e segure para copiar):
+
+${CHAVE_PIX_PADRAO}
 
 Muito obrigado pela parceria de sempre! 🙏🥟`;
             
@@ -595,7 +596,7 @@ Muito obrigado pela parceria de sempre! 🙏🥟`;
             
             const texto = `Oi, ${c.nome}! Tudo bem com você? Bateu saudade daquela esfiha fechada quentinha! 🥟
 
-Notamos que já faz uns ${dias} dias desde o seu último pedido. A Priscila está preparando uma fornada super fresca hoje. Gostaria de garantir uma bandeja com 5 unidades?
+Notamos que já faz uns ${dias} dias desde o seu cái último pedido. A Priscila está preparando uma fornada super fresca hoje. Gostaria de garantir uma bandeja com 5 unidades?
 
 Se quiser, só me avisar por aqui! Coisa boa!`;
             
