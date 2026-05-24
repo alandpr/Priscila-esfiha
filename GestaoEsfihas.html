@@ -215,7 +215,7 @@
         }
 
         async function puxarContatoAgenda(target) {
-            if (!('select' in navigator && 'contacts' in navigator)) {
+            if (!('contacts' in navigator && 'ContactsManager' in window)) {
                 alert("Seu navegador ou dispositivo não suporta puxar contatos da agenda diretamente.");
                 return;
             }
@@ -419,7 +419,7 @@
                 nome: novoNome,
                 tel: novoTel
             });
-            alert("Cadastro atualizado!");
+            alert("Cadastro updated!");
         }
 
         async function confirmarPagamento() {
