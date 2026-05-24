@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Priscila Esfihas v1.2</title>
+    <title>Priscila Esfihas v1.3</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#f59e0b">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -184,7 +184,8 @@
             measurementId: "G-E6N425TCGC"
         };
 
-        const CHAVE_PIX_PADRAO = "00020101021126480014br.gov.bcb.pix0119alanpocos@gmail.com5204000053039865802BR5930ALAN DOUGLAS PEREIRA RODRIGUES6005POCOS6304";
+        // Chave Pix baseada no e-mail real do Alan
+        const CHAVE_PIX_PADRAO = "alanpocos@gmail.com";
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
@@ -419,7 +420,7 @@
                 nome: novoNome,
                 tel: novoTel
             });
-            alert("Cadastro atualizado!");
+            alert("Cadastro updated!");
         }
 
         async function confirmarPagamento() {
@@ -518,6 +519,7 @@
             document.getElementById('rep-sumidos').innerHTML = hSumidos || '<div class="text-center py-6 text-zinc-700 italic text-xs font-bold">Todos os clientes antigos ativos recentemente!</div>';
         }
 
+        // FORMATADOR EXCLUSIVO COM BLOCO MONOESPAÇADO DO WHATSAPP (```chave```)
         function enviarExtratoZap() {
             const c = clientes.find(x => x.id === selecionadoId);
             if(!c) return;
@@ -562,9 +564,8 @@
 
 `;
             if(c.saldo > 0) {
-                texto += `Caso queira efetuar o acerto, segue a chave Pix Copia e Cola (toque e segure para copiar):
-
-${CHAVE_PIX_PADRAO}`;
+                texto += `Chave Pix E-mail (toque e segure apenas no bloco abaixo para copiar):
+\`\`\`${CHAVE_PIX_PADRAO}\`\`\``;
             }
             
             window.open(`https://api.whatsapp.com/send?phone=55${c.tel}&text=${encodeURIComponent(texto)}`, '_blank');
@@ -579,9 +580,8 @@ ${CHAVE_PIX_PADRAO}`;
 
 Passando aqui para lembrar do acerto das últimas esfihas fechadas da Priscila. Temos em aberto o valor de *R$ ${c.saldo.toFixed(2)}*.
 
-Para facilitar para você, segue a nossa chave Pix Copia e Cola (toque e segure para copiar):
-
-${CHAVE_PIX_PADRAO}
+Chave Pix E-mail (toque e segure apenas no bloco abaixo para copiar):
+\`\`\`${CHAVE_PIX_PADRAO}\`\`\`
 
 Muito obrigado pela parceria de sempre! 🙏🥟`;
             
