@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Priscila Esfihas v1.6</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#f59e0b">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <style>
+        body { background: #0a0a0a; color: #fff; font-family: sans-serif; padding-bottom: 120px; overflow-x: hidden; }
+        .card { background: #161616; border-radius: 18px; padding: 14px; margin-bottom: 12px; border: 1px solid #262626; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+        .label-gold { color: #f59e0b; font-size: 9px; font-weight: 900; text-transform: uppercase; margin-top: 14px; margin-bottom: 4px; margin-left: 4px; letter-spacing: 1px; display: block; }
+        .label-gold:first-child { margin-top: 0; }
+        input, select, textarea { background: #222; border: 2px solid #333; color: #fff; padding: 12px; border-radius: 12px; width: 100%; margin-bottom: 4px; font-size: 16px; font-weight: 900; -webkit-appearance: none; }
+        input:focus, select:focus { border-color: #f59e0b; outline: none; }
+        .btn-gold { background: #f59e0b; color: #000; font-weight: 900; padding: 16px; border-radius: 18px; width: 100%; text-transform: uppercase; font-size: 14px; margin-top: 10px; cursor: pointer; transition: 0.2s; }
+        .btn-gold:active { transform: scale(0.98); background: #d97706; }
+        .tab-btn { background: #111; color: #444; flex: 1; padding: 14px 5px; border-radius: 14px; font-size: 10px; font-weight: 900; margin: 3px; border: 1px solid #222; text-transform: uppercase; }
+        .active-tab { background: #f59e0b; color: #000; border-color: #fbbf24; }
+        #modal-detalhes { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0a; z-index: 2000; padding: 16px; display: flex; flex-direction: column; overflow-y: auto; }
+        .hidden { display: none !important; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .hist-item { background: #111; border: 1px solid #222; padding: 8px 12px; border-radius: 10px; margin-bottom: 6px; font-size: 12px; }
+    </style>
+</head>
+<body class="p-3 max-w-lg mx-auto">
+
+    <!-- TELA DE PAGAMENTO PARA O CLIENTE EXTERNO (LANDING PAGE PIX) -->
+    <div id="payment-page" class="hidden fixed inset-0 bg-[#0a0a0a] p-6 flex flex-col items-center justify-center text-center z-[3000] max-w-lg mx-auto">
+        <h1 class="text-3xl font-black text-amber-500 italic uppercase mb-1 leading-none">PRISCILA ESFIHAS</h1>
+        <p class="text-zinc-500 text-[10px] mb-8 uppercase font-black tracking-wider">Poços de Caldas - MG</p>
+        
+        <div class="card w-full p-6 border border-zinc-800 bg-[#161616] shadow-2xl">
+            <span class="text-[10px] text-amber-500 font-black uppercase block mb-3 tracking-widest">Chave Pix E-mail</span>
+            <div class="text-lg font-black text-white bg-black/60 p-4 rounded-xl border border-zinc-900 mb-6 tracking-wide">alanpocos@gmail.com</div>
+            
+            <button id="btn-copiar-landing" class="btn-gold mt-0 py-4 text-base tracking-wide" onclick="copiarPixLanding()">📋 Copiar Chave Pix</button>
+            
+            <div id="msg-copiado" class="hidden text-emerald-500 font-black text-xs uppercase mt-4 italic tracking-wider animate-pulse">
+                ✓ Copiado! Agora abra o app do seu banco.
+            </div>
+        </div>
+        <p class="text-[9px] text-zinc-600 uppercase mt-8 font-bold max-w-xs">Após copiar, abra o aplicativo do seu banco e cole na opção de Chave Pix por E-mail.</p>
+    </div>
+
+    <!-- APP CONTAINER PRINCIPAL DA GESTÃO -->
+    <div id="main-app">
+        <!-- CABEÇALHO -->
+        <div class="flex justify-between items-center mb-5 pt-2">
+            <div>
+                <h1 class="text-2xl font-black text-amber-500 italic uppercase leading-none">PRISCILA ESFIHAS</h1>
+                <span class="text-[8px] font-black text-zinc-600 uppercase">Gestão Completa de Clientes</span>
+            </div>
+            <div class="text-right">
+                <div id="resumo-total" class="text-xs font-black text-red-500 italic">GERAL: R$ 0,00</div>
+            </div>
+        </div>
+
+        <!-- ABAS/TABS -->
+        <div id="tabs-container" class="flex mb-6 bg-black p-1 rounded-2xl sticky top-2 z-50 border border-zinc-800 shadow-2xl">
+            <button id="btn-clientes" class="tab-btn active-tab" onclick="showTab('clientes')">Clientes</button>
+            <button id="btn-vendas" class="tab-btn" onclick="showTab('vendas')">Nova Venda</button>
+            <button id="btn-relatorios" class="tab-btn" onclick="showTab('relatorios')">Relatórios</button>
+        </div>
+
+        <!-- TAB: CLIENTES -->
+        <div id="tab-clientes">
+            <input type="text" id="search-g" oninput="renderClientes()" class="bg-black border border-zinc-800 p-3 rounded-xl w-full mb-4 text-xs uppercase" placeholder="Filtrar clientes...">
+            <div id="list-clientes" class="space-y-3"></div>
+        </div>
+
+        <!-- TAB: NOVA VENDA -->
+        <div id="tab-vendas" class="hidden">
+            <div class="card">
+                <span class="label-gold">Selecione o Cliente</span>
+                <select id="venda-cliente-select"></select>
+
+                <div class="grid grid-cols-2 gap-3 mt-2">
+                    <div>
+                        <span class="label-gold">Bandejas (5 un)</span>
+                        <input type="number" id="venda-qtd" value="1" min="1" oninput="updateVendaTotal()">
+                    </div>
+                    <div>
+                        <span class="label-gold">Valor (R$ 25,00/cd)</span>
+                        <div id="venda-total-display" class="text-2xl font-black text-amber-500 pt-2 italic">R$ 25,00</div>
+                    </div>
+                </div>
+                
+                <div id="alerta-limite" class="hidden text-[10px] font-bold text-red-500 bg-red-950/40 border border-red-900 p-2 rounded-lg mt-3 text-center uppercase italic">
+                    ⚠️ Atenção: Cliente já possui pendura alta!
+                </div>
+
+                <button class="btn-gold" onclick="registrarVenda()">Lançar Pendura</button>
+            </div>
+
+            <!-- CADASTRO RÁPIDO -->
+            <div class="card bg-zinc-950 border-dashed border-zinc-800">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="label-gold text-zinc-500 mt-0">Novo Cadastro Rápido</span>
+                    <button type="button" onclick="puxarContatoAgenda('novo')" class="text-[9px] bg-zinc-900 border border-amber-600/40 text-amber-500 px-2 py-1 rounded font-black uppercase">👤 Puxar da Agenda</button>
+                </div>
+                <input type="text" id="novo-cliente-nome" placeholder="NOME DO CLIENTE (MAIÚSCULO)" class="mb-2 uppercase">
+                <input type="tel" id="novo-cliente-tel" placeholder="WHATSAPP (Ex: 35999999999)" class="mb-3">
+                <button class="btn-gold bg-zinc-800 text-zinc-400 mt-0 py-3 text-xs" onclick="addCliente()">Cadastrar Novo Cliente</button>
+            </div>
+        </div>
+
+        <!-- TAB: RELATÓRIOS -->
+        <div id="tab-relatorios" class="hidden">
+            <div class="grid grid-cols-2 gap-2 mb-4">
+                <div class="card p-4 text-center flex flex-col justify-between">
+                    <span class="label-gold mt-0">🏆 Top Comprador</span>
+                    <div id="rep-top-cliente" class="text-sm font-black italic text-white truncate mt-2">--</div>
+                    <div id="rep-top-valor" class="text-[10px] text-amber-500 font-bold mt-1">R$ 0,00</div>
+                </div>
+                <div class="card p-4 text-center flex flex-col justify-between">
+                    <span class="label-gold mt-0">📈 Faturamento Total</span>
+                    <div id="rep-faturamento-total" class="text-xl font-black italic text-emerald-500 mt-2">R$ 0,00</div>
+                    <div class="text-[8px] text-zinc-600 font-bold uppercase mt-1">Histórico Acumulado</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <span class="label-gold mt-0 mb-3">🕒 Clientes Sem Pedir (Reativação)</span>
+                <div id="rep-sumidos" class="space-y-2 max-h-[300px] overflow-y-auto no-scrollbar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DETALHES, EDIÇÃO E EXTRATO -->
+    <div id="modal-detalhes" class="hidden">
+        <div class="flex justify-between items-center mb-4 pb-2 border-b border-zinc-900">
+            <h3 class="text-amber-500 font-black italic uppercase text-lg">Ficha do Cliente</h3>
+            <button onclick="closeModal()" class="text-zinc-500 font-black text-sm px-2">X VOLTAR</button>
+        </div>
+
+        <!-- CAMPOS EDITÁVEIS -->
+        <div class="card">
+            <div class="flex justify-between items-center mb-2">
+                <span class="label-gold mt-0">Nome do Cliente</span>
+                <button type="button" onclick="puxarContatoAgenda('edit')" class="text-[9px] bg-zinc-900 border border-amber-600/40 text-amber-500 px-2 py-1 rounded font-black uppercase">👤 Atualizar via Agenda</button>
+            </div>
+            <input type="text" id="edit-nome" class="uppercase">
+            <span class="label-gold">WhatsApp</span>
+            <input type="tel" id="edit-tel" placeholder="35999999999">
+            
+            <div class="grid grid-cols-2 gap-2 mt-3">
+                <div class="bg-zinc-900 p-2 rounded-xl text-center">
+                    <span class="text-[8px] text-zinc-500 font-black uppercase block">Saldo Devedor</span>
+                    <span id="modal-saldo" class="text-base font-black text-red-500 italic">R$ 0,00</span>
+                </div>
+                <div class="bg-zinc-900 p-2 rounded-xl text-center">
+                    <span class="text-[8px] text-zinc-500 font-black uppercase block">Total Histórico</span>
+                    <span id="modal-historico-total" class="text-base font-black text-zinc-400 italic">R$ 0,00</span>
+                </div>
+            </div>
+
+            <button class="btn-gold bg-zinc-800 text-amber-500 text-xs py-2 mt-4" onclick="salvarEdicao()">Salvar Alterações de Cadastro</button>
+        </div>
+
+        <!-- PAGAMENTO -->
+        <div class="card border-emerald-900/40 bg-emerald-950/10">
+            <span class="label-gold text-emerald-500">Registrar Pagamento / Abatimento</span>
+            <div class="flex gap-2">
+                <input type="number" id="pagamento-valor" placeholder="R$ 0,00" step="0.01" class="mb-0">
+                <button class="btn-gold mt-0 w-1/3 bg-emerald-500 text-black text-xs" onclick="confirmarPagamento()">Baixar</button>
+            </div>
+        </div>
+
+        <!-- AÇÕES DO WHATSAPP -->
+        <div class="grid grid-cols-2 gap-2 mb-4">
+            <button class="btn-gold bg-zinc-900 border border-zinc-800 text-white text-[10px] mt-0 py-3 flex flex-col items-center justify-center gap-1" onclick="enviarExtratoZap()">
+                <span>📋 Enviar Extrato</span>
+                <span class="text-[7px] text-zinc-500">Resumo 30 dias + Pix</span>
+            </button>
+            <button id="btn-cobranca-45" class="btn-gold bg-red-950/40 border border-red-900 text-red-400 text-[10px] mt-0 py-3 flex flex-col items-center justify-center gap-1" onclick="enviarCobranca45()">
+                <span>⚠️ Cobrança 45+ Dias</span>
+                <span class="text-[7px] text-red-600 font-black uppercase">Notificar Débito</span>
+            </button>
+        </div>
+
+        <!-- EXTRATO DE DATAS (LINHA DO TEMPO) -->
+        <div class="card flex-1 flex flex-col min-h-[200px]">
+            <span class="label-gold mt-0 mb-2">📅 Linha do Tempo Geral (Histórico Completo)</span>
+            <div id="extrato-linha-tempo" class="space-y-1 overflow-y-auto flex-1 no-scrollbar text-zinc-300"></div>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURAÇÃO REAL DO FIREBASE - RESTAURADA COM SUCESSO ABSOLUTO
+        const firebaseConfig = {
+            apiKey: "AIzaSyBA4xSi8fgtNXJQxf7-AC8vQQvojxaMH48",
+            authDomain: "priscilas-esfihas.firebaseapp.com",
+            projectId: "priscilas-esfihas",
+            storageBucket: "priscilas-esfihas.firebasestorage.app",
+            messagingSenderId: "33498231694",
+            appId: "1:33498231694:web:5cd7fb0986ae6fa21b2adf",
+            measurementId: "G-E6N425TCGC"
+        };
+
+        if (window.location.search.includes('p=1')) {
+            document.getElementById('main-app').classList.add('hidden');
+            document.getElementById('payment-page').classList.remove('hidden');
+        }
+
+        function copiarPixLanding() {
+            const tempInput = document.createElement("input");
+            tempInput.value = "alanpocos@gmail.com";
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            tempInput.setSelectionRange(0, 99999);
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+
+            const msg = document.getElementById('msg-copiado');
+            msg.classList.remove('hidden');
+            const btn = document.getElementById('btn-copiar-landing');
+            btn.innerText = "✓ CHAVE COPIADA";
+            setTimeout(() => {
+                msg.classList.add('hidden');
+                btn.innerText = "📋 Copiar Chave Pix";
+            }, 3000);
+        }
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        
+        let clientes = [];
+        let historicoCompleto = [];
+        let selecionadoId = null;
+        const PRECO_BANDEJA = 25.0;
+
+        async function init() {
+            if (window.location.search.includes('p=1')) return;
+
+            db.collection('clientes').orderBy('nome').onSnapshot(snap => {
+                clientes = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
+                renderClientes();
+                updateSelects();
+                updateRelatorios();
+                calcTotalGeral();
+                if(selecionadoId) atualizarTelaModal();
+            }, err => {
+                console.error("Erro Firebase Rules:", err);
+            });
+
+            db.collection('vendas').orderBy('data', 'desc').onSnapshot(snap => {
+                historicoCompleto = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
+                updateRelatorios();
+                if(selecionadoId) renderExtratoCliente(selecionadoId);
+            });
+        }
+
+        async function puxarContatoAgenda(target) {
+            if (!('contacts' in navigator && 'ContactsManager' in window)) {
+                alert("Seu navegador ou dispositivo não suporta puxar contatos da agenda diretamente.");
+                return;
+            }
+            try {
+                const props = ['name', 'tel'];
+                const opts = { multiple: false };
+                const contacts = await navigator.contacts.select(props, opts);
+                
+                if (contacts && contacts.length > 0) {
+                    const contact = contacts[0];
+                    const nomeOriginal = (contact.name && contact.name[0]) ? contact.name[0] : "";
+                    const telOriginal = (contact.tel && contact.tel[0]) ? contact.tel[0] : "";
+                    
+                    const nomeFormatado = nomeOriginal.toUpperCase().trim();
+                    const telFormatado = telOriginal.replace(/\D/g, '');
+                    
+                    if (target === 'novo') {
+                        document.getElementById('novo-cliente-nome').value = nomeFormatado;
+                        document.getElementById('novo-cliente-tel').value = telFormatado;
+                    } else if (target === 'edit') {
+                        document.getElementById('edit-nome').value = nomeFormatado;
+                        document.getElementById('edit-tel').value = telFormatado;
+                    }
+                }
+            } catch (err) {
+                console.error("Erro ao selecionar contato:", err);
+            }
+        }
+
+        function showTab(t) {
+            ['clientes', 'vendas', 'relatorios'].forEach(id => {
+                const el = document.getElementById('tab-'+id);
+                const btn = document.getElementById('btn-'+id);
+                if(el) el.classList.toggle('hidden', id !== t);
+                if(btn) btn.classList.toggle('active-tab', id === t);
+            });
+        }
+
+        function calcTotalGeral() {
+            const total = clientes.reduce((acc, c) => acc + (c.saldo || 0), 0);
+            document.getElementById('resumo-total').innerText = `DÉBITO TOTAL: R$ ${total.toFixed(2)}`;
+        }
+
+        async function addCliente() {
+            const nome = document.getElementById('novo-cliente-nome').value.toUpperCase().trim();
+            const tel = document.getElementById('novo-cliente-tel').value.replace(/\D/g, '');
+            if(!nome) return alert("O nome do cliente é obrigatório!");
+            
+            await db.collection('clientes').add({
+                nome, tel, saldo: 0, ultimaCompra: null, totalComprado: 0
+            });
+            
+            document.getElementById('novo-cliente-nome').value = "";
+            document.getElementById('novo-cliente-tel').value = "";
+            showTab('clientes');
+        }
+
+        function renderClientes() {
+            const busca = document.getElementById('search-g').value.toUpperCase();
+            const lista = document.getElementById('list-clientes');
+            let h = '';
+            const filtrados = clientes.filter(c => c.nome.includes(busca));
+            
+            filtrados.forEach(c => {
+                let statusTempo = 'Nunca pediu';
+                let alertar45 = false;
+                
+                if(c.ultimaCompra) {
+                    const dias = Math.floor((new Date() - new Date(c.ultimaCompra.seconds * 1000)) / (1000 * 60 * 60 * 24));
+                    statusTempo = dias === 0 ? 'Pediu hoje' : `Inativo há ${dias} dias`;
+                    if(dias >= 45 && c.saldo > 0) alertar45 = true;
+                }
+                
+                h += `
+                <div class="card flex justify-between items-center cursor-pointer active:bg-zinc-900 border-l-4 ${alertar45 ? 'border-l-red-600' : 'border-l-zinc-700'}" onclick="openModal('${c.id}')">
+                    <div class="min-w-0 flex-1 pr-2">
+                        <div class="text-base font-black italic uppercase text-white truncate leading-tight">${c.nome}</div>
+                        <div class="text-[8px] font-bold text-zinc-500 uppercase mt-1 flex items-center gap-1">
+                            ${alertar45 ? '<span class="text-red-500 font-black">⚠️ DÉBITO VELHO 45+ DIAS</span> • ' : ''}
+                            ${statusTempo}
+                        </div>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        <div class="text-lg font-black italic ${c.saldo > 0 ? 'text-red-500' : 'text-emerald-500'}">R$ ${c.saldo.toFixed(2)}</div>
+                    </div>
+                </div>`;
+            });
+            lista.innerHTML = h || '<div class="text-center p-10 text-zinc-600 font-black uppercase italic text-xs">Nenhum cliente cadastrado</div>';
+        }
+
+        function updateSelects() {
+            const sel = document.getElementById('venda-cliente-select');
+            if(!sel) return;
+            let h = '<option value="">SELECIONE O CLIENTE...</option>';
+            clientes.forEach(c => h += `<option value="${c.id}">${c.nome} (Devendo: R$ ${c.saldo.toFixed(2)})</option>`);
+            sel.innerHTML = h;
+        }
+
+        function updateVendaTotal() {
+            const cid = document.getElementById('venda-cliente-select').value;
+            const qtd = parseInt(document.getElementById('venda-qtd').value) || 0;
+            const total = qtd * PRECO_BANDEJA;
+            document.getElementById('venda-total-display').innerText = `R$ ${total.toFixed(2)}`;
+            
+            const c = clientes.find(x => x.id === cid);
+            const elAlerta = document.getElementById('alerta-limite');
+            if(c && (c.saldo + total) >= 100) elAlerta.classList.remove('hidden');
+            else elAlerta.classList.add('hidden');
+        }
+        
+        const vSel = document.getElementById('venda-cliente-select');
+        if (vSel) vSel.addEventListener('change', updateVendaTotal);
+
+        async function registrarVenda() {
+            const cid = document.getElementById('venda-cliente-select').value;
+            const qtd = parseInt(document.getElementById('venda-qtd').value);
+            if(!cid || !qtd || qtd <= 0) return alert("Selecione um cliente válido!");
+            
+            const total = qtd * PRECO_BANDEJA;
+            const c = clientes.find(x => x.id === cid);
+            const batch = db.batch();
+            const cRef = db.collection('clientes').doc(cid);
+            
+            batch.update(cRef, {
+                saldo: (c.saldo || 0) + total,
+                totalComprado: (c.totalComprado || 0) + total,
+                ultimaCompra: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            const vRef = db.collection('vendas').doc();
+            batch.set(vRef, {
+                clienteId: cid, clienteNome: c.nome, qtd, valor: total, data: firebase.firestore.FieldValue.serverTimestamp(), tipo: 'venda'
+            });
+            
+            await batch.commit();
+            alert(`Entrega registrada!`);
+            showTab('clientes');
+        }
+
+        function openModal(id) {
+            selecionadoId = id;
+            atualizarTelaModal();
+            renderExtratoCliente(id);
+            document.getElementById('modal-detalhes').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-detalhes').classList.add('hidden');
+            selecionadoId = null;
+            document.getElementById('pagamento-valor').value = "";
+        }
+
+        function atualizarTelaModal() {
+            const c = clientes.find(x => x.id === selecionadoId);
+            if(!c) return closeModal();
+            
+            document.getElementById('edit-nome').value = c.nome;
+            document.getElementById('edit-tel').value = c.tel || "";
+            document.getElementById('modal-saldo').innerText = `R$ ${c.saldo.toFixed(2)}`;
+            document.getElementById('modal-historico-total').innerText = `R$ ${(c.totalComprado || 0).toFixed(2)}`;
+            
+            let exibirAlerta45 = false;
+            if(c.ultimaCompra) {
+                const dias = Math.floor((new Date() - new Date(c.ultimaCompra.seconds * 1000)) / (1000 * 60 * 60 * 24));
+                if(dias >= 45 && c.saldo > 0) exibirAlerta45 = true;
+            }
+            
+            const btn45 = document.getElementById('btn-cobranca-45');
+            if(exibirAlerta45) { btn45.classList.remove('opacity-30'); btn45.style.pointerEvents = 'auto'; }
+            else { btn45.classList.add('opacity-30'); btn45.style.pointerEvents = 'none'; }
+        }
+
+        async function salvarEdicao() {
+            if(!selecionadoId) return;
+            const novoNome = document.getElementById('edit-nome').value.toUpperCase().trim();
+            const novoTel = document.getElementById('edit-tel').value.replace(/\D/g, '');
+            if(!novoNome) return alert("Nome obrigatório!");
+            
+            await db.collection('clientes').doc(selecionadoId).update({ nome: novoNome, tel: novoTel });
+            alert("Cadastro atualizado!");
+        }
+
+        async function confirmarPagamento() {
+            const valor = parseFloat(document.getElementById('pagamento-valor').value);
+            if(!valor || valor <= 0 || !selecionadoId) return alert("Valor inválido!");
+            
+            const c = clientes.find(x => x.id === selecionadoId);
+            const batch = db.batch();
+            const cRef = db.collection('clientes').doc(selecionadoId);
+            const novoSaldo = Math.max(0, c.saldo - valor);
+            batch.update(cRef, { saldo: novoSaldo });
+            
+            const vRef = db.collection('vendas').doc();
+            batch.set(vRef, {
+                clienteId: selecionadoId, clienteNome: c.nome, valor: valor, data: firebase.firestore.FieldValue.serverTimestamp(), tipo: 'pagamento'
+            });
+            
+            await batch.commit();
+            document.getElementById('pagamento-valor').value = "";
+            alert("Pagamento registrado!");
+        }
+
+        function renderExtratoCliente(cid) {
+            const container = document.getElementById('extrato-linha-tempo');
+            const filtrados = historicoCompleto.filter(h => h.clienteId === cid);
+            let h = '';
+            
+            filtrados.forEach(i => {
+                const dataStr = i.data ? new Date(i.data.seconds * 1000).toLocaleDateString('pt-BR') : 'Processando...';
+                if(i.tipo === 'venda') {
+                    h += `<div class="hist-item border-l-4 border-l-red-500"><div class="flex justify-between font-bold"><span class="text-white">🥟 PEGOU ${i.qtd} BANDEJA(S)</span><span class="text-red-400">R$ ${i.valor.toFixed(2)}</span></div><div class="text-[8px] text-zinc-500 uppercase mt-0.5">${dataStr}</div></div>`;
+                } else {
+                    h += `<div class="hist-item border-l-4 border-l-emerald-500"><div class="flex justify-between font-bold"><span class="text-emerald-400">💰 EFETUOU PAGAMENTO</span><span class="text-emerald-400">- R$ ${i.valor.toFixed(2)}</span></div><div class="text-[8px] text-zinc-500 uppercase mt-0.5">${dataStr}</div></div>`;
+                }
+            });
+            container.innerHTML = h || '<div class="text-center py-6 text-zinc-700 italic text-xs font-bold">Nenhuma movimentação</div>';
+        }
+
+        function updateRelatorios() {
+            if(clientes.length === 0) return;
+            const fatTotal = historicoCompleto.filter(h => h.tipo === 'venda').reduce((acc, v) => acc + (v.valor || 0), 0);
+            document.getElementById('rep-faturamento-total').innerText = `R$ ${fatTotal.toFixed(2)}`;
+            
+            const top = [...clientes].sort((a,b) => (b.totalComprado || 0) - (a.totalComprado || 0))[0];
+            if(top && top.totalComprado > 0) {
+                document.getElementById('rep-top-cliente').innerText = `@${top.nome}`;
+                document.getElementById('rep-top-valor').innerText = `Total comprado: R$ ${top.totalComprado.toFixed(2)}`;
+            } else {
+                document.getElementById('rep-top-cliente').innerText = '--';
+                document.getElementById('rep-top-valor').innerText = 'R$ 0,00';
+            }
+            
+            const agora = new Date();
+            let hSumidos = '';
+            const ordenadosPorInatividade = [...clientes].filter(c => c.ultimaCompra).sort((a,b) => a.ultimaCompra.seconds - b.ultimaCompra.seconds);
+            
+            ordenadosPorInatividade.forEach(c => {
+                const dias = Math.floor((agora - new Date(c.ultimaCompra.seconds * 1000)) / (1000 * 60 * 60 * 24));
+                if(dias >= 1) {
+                    hSumidos += `<div class="flex justify-between items-center bg-zinc-900/60 p-3 rounded-xl border border-zinc-900"><div><div class="font-black text-xs text-white uppercase">${c.nome}</div><div class="text-[9px] text-amber-500 font-bold mt-0.5">Sem pedir há ${dias} dias</div></div><button onclick="enviarMensagemSaudade('${c.id}', ${dias})" class="text-[9px] bg-amber-500 font-black text-black px-3 py-2 rounded-lg uppercase italic">💬 Chamar</button></div>`;
+                }
+            });
+            document.getElementById('rep-sumidos').innerHTML = hSumidos || '<div class="text-center py-6 text-zinc-700 italic text-xs font-bold">Todos ativos!</div>';
+        }
+
+        function enviarExtratoZap() {
+            const c = clientes.find(x => x.id === selecionadoId);
+            if(!c) return;
+            if(!c.tel) return alert("Cadastre o WhatsApp!");
+            
+            const filtrados = historicoCompleto.filter(h => h.clienteId === c.id);
+            const agoraMs = Date.now();
+            const trintaDiasMs = 30 * 24 * 60 * 60 * 1000;
+            const recentes = filtrados.filter(h => h.data && (agoraMs - h.data.seconds * 1000) <= trintaDiasMs);
+            const ultimoPgto = filtrados.find(h => h.tipo === 'pagamento');
+            
+            const linkPagamento = window.location.origin + window.location.pathname + "?p=1";
+            
+            let texto = `*Fala, ${c.nome}!* Segue o extrato (últimos 30 dias) das esfihas da Priscila:
+
+`;
+            
+            if(recentes.length === 0) {
+                texto += `Sem movimentações no mês.
+`;
+            } else {
+                recentes.forEach(i => {
+                    const dataStr = i.data ? new Date(i.data.seconds * 1000).toLocaleDateString('pt-BR') : '';
+                    if(i.tipo === 'venda') {
+                        texto += `• ${dataStr}: Pegou ${i.qtd} band. (R$ ${i.valor.toFixed(2)})
+`;
+                    } else {
+                        texto += `• ${dataStr}: Pagou -R$ ${i.valor.toFixed(2)} ✅
+`;
+                    }
+                });
+            }
+            
+            if(ultimoPgto && ultimoPgto.data) {
+                const dataPgtoStr = new Date(ultimoPgto.data.seconds * 1000).toLocaleDateString('pt-BR');
+                texto += `
+*Último pagamento:* ${dataPgtoStr}
+`;
+            }
+            
+            texto += `
+*Total Pendente: R$ ${c.saldo.toFixed(2)}*
+
+`;
+            if(c.saldo > 0) {
+                texto += `Para pagar, clique no link abaixo para copiar a chave Pix com 1 clique:
+${linkPagamento}`;
+            }
+            
+            window.open(`https://api.whatsapp.com/send?phone=55${c.tel}&text=${encodeURIComponent(texto)}`, '_blank');
+        }
+
+        function enviarCobranca45() {
+            const c = clientes.find(x => x.id === selecionadoId);
+            if(!c) return;
+            if(!c.tel) return alert("Cadastre o WhatsApp!");
+            
+            const linkPagamento = window.location.origin + window.location.pathname + "?p=1";
+            
+            const texto = `Olá, ${c.nome}! Tudo bem?
+
+Passando para lembrar do acerto das esfihas da Priscila. Temos em aberto o valor de *R$ ${c.saldo.toFixed(2)}*.
+
+Clique no link abaixo para copiar a chave Pix com 1 clique:
+${linkPagamento}
+
+Muito obrigado! 🙏`;
+            
+            window.open(`https://api.whatsapp.com/send?phone=55${c.tel}&text=${encodeURIComponent(texto)}`, '_blank');
+        }
+
+        function enviarMensagemSaudade(id, dias) {
+            const c = clientes.find(x => x.id === id);
+            if(!c) return;
+            if(!c.tel) return alert("Cadastre o WhatsApp!");
+            
+            const texto = `Oi, ${c.nome}! Tudo bem? Bateu saudade daquela esfiha fechada quentinha! 🥟
+
+Notamos que já faz uns ${dias} dias desde o seu último pedido. A Priscila está preparando uma fornada fresca hoje. Gostaria de garantir uma bandeja com 5 unidades?
+
+Se quiser, só me avisar por aqui!`;
+            
+            window.open(`https://api.whatsapp.com/send?phone=55${c.tel}&text=${encodeURIComponent(texto)}`, '_blank');
+        }
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js');
+            });
+        }
+        init();
+    </script>
+</body>
+</html>
