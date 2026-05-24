@@ -9,13 +9,13 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "https://images.unsplash.com/photo-1608897013039-887f21d8c804?w=192&h=192&fit=crop&q=80",
-      "type": "image/jpeg",
+      "src": "https://img.icons8.com/color/192/dumpling.png",
+      "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "https://images.unsplash.com/photo-1608897013039-887f21d8c804?w=512&h=512&fit=crop&q=80",
-      "type": "image/jpeg",
+      "src": "https://img.icons8.com/color/512/dumpling.png",
+      "type": "image/png",
       "sizes": "512x512"
     }
   ]
