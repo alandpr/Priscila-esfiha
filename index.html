@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Priscila Esfihas v1.6</title>
+    <title>Priscila Esfihas v1.7</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#f59e0b">
-    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -126,9 +125,15 @@
                 </div>
             </div>
 
+            <!-- NOVA SEÇÃO: HISTÓRICO DE PAGAMENTOS RECEBIDOS -->
+            <div class="card mb-4">
+                <span class="label-gold mt-0 mb-3">💰 Últimos Pagamentos Recebidos</span>
+                <div id="rep-pagamentos" class="space-y-2 max-h-[180px] overflow-y-auto no-scrollbar"></div>
+            </div>
+
             <div class="card">
                 <span class="label-gold mt-0 mb-3">🕒 Clientes Sem Pedir (Reativação)</span>
-                <div id="rep-sumidos" class="space-y-2 max-h-[300px] overflow-y-auto no-scrollbar"></div>
+                <div id="rep-sumidos" class="space-y-2 max-h-[220px] overflow-y-auto no-scrollbar"></div>
             </div>
         </div>
     </div>
@@ -193,7 +198,6 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO REAL DO FIREBASE - RESTAURADA COM SUCESSO ABSOLUTO
         const firebaseConfig = {
             apiKey: "AIzaSyBA4xSi8fgtNXJQxf7-AC8vQQvojxaMH48",
             authDomain: "priscilas-esfihas.firebaseapp.com",
@@ -491,6 +495,22 @@
                 document.getElementById('rep-top-valor').innerText = 'R$ 0,00';
             }
             
+            // ATUALIZAÇÃO RECENTE: LISTAGEM DA LOG DOS ÚLTIMOS 10 PAGAMENTOS RECEBIDOS
+            const pagamentos = historicoCompleto.filter(h => h.tipo === 'pagamento').slice(0, 10);
+            let hPagamentos = '';
+            pagamentos.forEach(p => {
+                const dataStr = p.data ? new Date(p.data.seconds * 1000).toLocaleDateString('pt-BR') : '...';
+                hPagamentos += `
+                <div class="flex justify-between items-center bg-zinc-900/60 p-2.5 rounded-xl border border-zinc-900 text-xs">
+                    <div>
+                        <div class="font-black text-white uppercase leading-tight">${p.clienteNome}</div>
+                        <div class="text-[9px] text-zinc-500 mt-0.5">${dataStr}</div>
+                    </div>
+                    <div class="font-black text-emerald-500 italic">R$ ${p.valor.toFixed(2)}</div>
+                </div>`;
+            });
+            document.getElementById('rep-pagamentos').innerHTML = hPagamentos || '<div class="text-center py-4 text-zinc-700 italic text-xs font-bold uppercase">Nenhum pagamento recebido recente</div>';
+
             const agora = new Date();
             let hSumidos = '';
             const ordenadosPorInatividade = [...clientes].filter(c => c.ultimaCompra).sort((a,b) => a.ultimaCompra.seconds - b.ultimaCompra.seconds);
@@ -502,91 +522,6 @@
                 }
             });
             document.getElementById('rep-sumidos').innerHTML = hSumidos || '<div class="text-center py-6 text-zinc-700 italic text-xs font-bold">Todos ativos!</div>';
-        }
-
-        function enviarExtratoZap() {
-            const c = clientes.find(x => x.id === selecionadoId);
-            if(!c) return;
-            if(!c.tel) return alert("Cadastre o WhatsApp!");
-            
-            const filtrados = historicoCompleto.filter(h => h.clienteId === c.id);
-            const agoraMs = Date.now();
-            const trintaDiasMs = 30 * 24 * 60 * 60 * 1000;
-            const recentes = filtrados.filter(h => h.data && (agoraMs - h.data.seconds * 1000) <= trintaDiasMs);
-            const ultimoPgto = filtrados.find(h => h.tipo === 'pagamento');
-            
-            const linkPagamento = window.location.origin + window.location.pathname + "?p=1";
-            
-            let texto = `*Fala, ${c.nome}!* Segue o extrato (últimos 30 dias) das esfihas da Priscila:
-
-`;
-            
-            if(recentes.length === 0) {
-                texto += `Sem movimentações no mês.
-`;
-            } else {
-                recentes.forEach(i => {
-                    const dataStr = i.data ? new Date(i.data.seconds * 1000).toLocaleDateString('pt-BR') : '';
-                    if(i.tipo === 'venda') {
-                        texto += `• ${dataStr}: Pegou ${i.qtd} band. (R$ ${i.valor.toFixed(2)})
-`;
-                    } else {
-                        texto += `• ${dataStr}: Pagou -R$ ${i.valor.toFixed(2)} ✅
-`;
-                    }
-                });
-            }
-            
-            if(ultimoPgto && ultimoPgto.data) {
-                const dataPgtoStr = new Date(ultimoPgto.data.seconds * 1000).toLocaleDateString('pt-BR');
-                texto += `
-*Último pagamento:* ${dataPgtoStr}
-`;
-            }
-            
-            texto += `
-*Total Pendente: R$ ${c.saldo.toFixed(2)}*
-
-`;
-            if(c.saldo > 0) {
-                texto += `Para pagar, clique no link abaixo para copiar a chave Pix com 1 clique:
-${linkPagamento}`;
-            }
-            
-            window.open(`https://api.whatsapp.com/send?phone=55${c.tel}&text=${encodeURIComponent(texto)}`, '_blank');
-        }
-
-        function enviarCobranca45() {
-            const c = clientes.find(x => x.id === selecionadoId);
-            if(!c) return;
-            if(!c.tel) return alert("Cadastre o WhatsApp!");
-            
-            const linkPagamento = window.location.origin + window.location.pathname + "?p=1";
-            
-            const texto = `Olá, ${c.nome}! Tudo bem?
-
-Passando para lembrar do acerto das esfihas da Priscila. Temos em aberto o valor de *R$ ${c.saldo.toFixed(2)}*.
-
-Clique no link abaixo para copiar a chave Pix com 1 clique:
-${linkPagamento}
-
-Muito obrigado! 🙏`;
-            
-            window.open(`https://api.whatsapp.com/send?phone=55${c.tel}&text=${encodeURIComponent(texto)}`, '_blank');
-        }
-
-        function enviarMensagemSaudade(id, dias) {
-            const c = clientes.find(x => x.id === id);
-            if(!c) return;
-            if(!c.tel) return alert("Cadastre o WhatsApp!");
-            
-            const texto = `Oi, ${c.nome}! Tudo bem? Bateu saudade daquela esfiha fechada quentinha! 🥟
-
-Notamos que já faz uns ${dias} dias desde o seu último pedido. A Priscila está preparando uma fornada fresca hoje. Gostaria de garantir uma bandeja com 5 unidades?
-
-Se quiser, só me avisar por aqui!`;
-            
-            window.open(`https://api.whatsapp.com/send?phone=55${c.tel}&text=${encodeURIComponent(texto)}`, '_blank');
         }
 
         if ('serviceWorker' in navigator) {
