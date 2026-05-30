@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Priscila Esfihas v1.7</title>
+    <title>Priscila Esfihas v2.0</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#f59e0b">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -20,7 +20,7 @@
         input:focus, select:focus { border-color: #f59e0b; outline: none; }
         .btn-gold { background: #f59e0b; color: #000; font-weight: 900; padding: 16px; border-radius: 18px; width: 100%; text-transform: uppercase; font-size: 14px; margin-top: 10px; cursor: pointer; transition: 0.2s; }
         .btn-gold:active { transform: scale(0.98); background: #d97706; }
-        .tab-btn { background: #111; color: #444; flex: 1; padding: 14px 5px; border-radius: 14px; font-size: 10px; font-weight: 900; margin: 3px; border: 1px solid #222; text-transform: uppercase; }
+        .tab-btn { background: #111; color: #444; flex: 1; padding: 14px 2px; border-radius: 14px; font-size: 9px; font-weight: 900; margin: 2px; border: 1px solid #222; text-transform: uppercase; text-align: center; }
         .active-tab { background: #f59e0b; color: #000; border-color: #fbbf24; }
         #modal-detalhes { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0a; z-index: 2000; padding: 16px; display: flex; flex-direction: column; overflow-y: auto; }
         .hidden { display: none !important; }
@@ -30,51 +30,29 @@
 </head>
 <body class="p-3 max-w-lg mx-auto">
 
-    <!-- TELA DE PAGAMENTO PARA O CLIENTE EXTERNO (LANDING PAGE PIX) -->
-    <div id="payment-page" class="hidden fixed inset-0 bg-[#0a0a0a] p-6 flex flex-col items-center justify-center text-center z-[3000] max-w-lg mx-auto">
-        <h1 class="text-3xl font-black text-amber-500 italic uppercase mb-1 leading-none">PRISCILA ESFIHAS</h1>
-        <p class="text-zinc-500 text-[10px] mb-8 uppercase font-black tracking-wider">Poços de Caldas - MG</p>
-        
-        <div class="card w-full p-6 border border-zinc-800 bg-[#161616] shadow-2xl">
-            <span class="text-[10px] text-amber-500 font-black uppercase block mb-3 tracking-widest">Chave Pix E-mail</span>
-            <div class="text-lg font-black text-white bg-black/60 p-4 rounded-xl border border-zinc-900 mb-6 tracking-wide">alanpocos@gmail.com</div>
-            
-            <button id="btn-copiar-landing" class="btn-gold mt-0 py-4 text-base tracking-wide" onclick="copiarPixLanding()">📋 Copiar Chave Pix</button>
-            
-            <div id="msg-copiado" class="hidden text-emerald-500 font-black text-xs uppercase mt-4 italic tracking-wider animate-pulse">
-                ✓ Copiado! Agora abra o app do seu banco.
-            </div>
-        </div>
-        <p class="text-[9px] text-zinc-600 uppercase mt-8 font-bold max-w-xs">Após copiar, abra o aplicativo do seu banco e cole na opção de Chave Pix por E-mail.</p>
-    </div>
-
-    <!-- APP CONTAINER PRINCIPAL DA GESTÃO -->
     <div id="main-app">
-        <!-- CABEÇALHO -->
         <div class="flex justify-between items-center mb-5 pt-2">
             <div>
                 <h1 class="text-2xl font-black text-amber-500 italic uppercase leading-none">PRISCILA ESFIHAS</h1>
-                <span class="text-[8px] font-black text-zinc-600 uppercase">Gestão Completa de Clientes</span>
+                <span class="text-[8px] font-black text-zinc-600 uppercase">Gestão Completa & Estoque Inteligente</span>
             </div>
             <div class="text-right">
-                <div id="resumo-total" class="text-xs font-black text-red-500 italic">GERAL: R$ 0,00</div>
+                <div id="resumo-total" class="text-xs font-black text-red-500 italic">DÉBITO TOTAL: R$ 0,00</div>
             </div>
         </div>
 
-        <!-- ABAS/TABS -->
         <div id="tabs-container" class="flex mb-6 bg-black p-1 rounded-2xl sticky top-2 z-50 border border-zinc-800 shadow-2xl">
             <button id="btn-clientes" class="tab-btn active-tab" onclick="showTab('clientes')">Clientes</button>
             <button id="btn-vendas" class="tab-btn" onclick="showTab('vendas')">Nova Venda</button>
+            <button id="btn-custos" class="tab-btn" onclick="showTab('custos')">Custos & Estoque</button>
             <button id="btn-relatorios" class="tab-btn" onclick="showTab('relatorios')">Relatórios</button>
         </div>
 
-        <!-- TAB: CLIENTES -->
         <div id="tab-clientes">
             <input type="text" id="search-g" oninput="renderClientes()" class="bg-black border border-zinc-800 p-3 rounded-xl w-full mb-4 text-xs uppercase" placeholder="Filtrar clientes...">
             <div id="list-clientes" class="space-y-3"></div>
         </div>
 
-        <!-- TAB: NOVA VENDA -->
         <div id="tab-vendas" class="hidden">
             <div class="card">
                 <span class="label-gold">Selecione o Cliente</span>
@@ -98,7 +76,6 @@
                 <button class="btn-gold" onclick="registrarVenda()">Lançar Pendura</button>
             </div>
 
-            <!-- CADASTRO RÁPIDO -->
             <div class="card bg-zinc-950 border-dashed border-zinc-800">
                 <div class="flex justify-between items-center mb-2">
                     <span class="label-gold text-zinc-500 mt-0">Novo Cadastro Rápido</span>
@@ -110,7 +87,76 @@
             </div>
         </div>
 
-        <!-- TAB: RELATÓRIOS -->
+        <div id="tab-custos" class="hidden">
+            <div class="grid grid-cols-2 gap-2 mb-4">
+                <div class="card p-3 text-center bg-zinc-900/40">
+                    <span class="label-gold mt-0">Custo p/ Massa</span>
+                    <div id="custo-massa-total" class="text-lg font-black italic text-red-400">R$ 0,00</div>
+                    <span class="text-[7px] text-zinc-500 uppercase block mt-0.5">Rende 4 Bandejas (20 Esfihas)</span>
+                </div>
+                <div class="card p-3 text-center bg-zinc-900/40">
+                    <span class="label-gold mt-0">Lucro Real p/ Bandeja</span>
+                    <div id="lucro-bandeja-total" class="text-lg font-black italic text-emerald-400">R$ 0,00</div>
+                    <span class="text-[7px] text-zinc-500 uppercase block mt-0.5">Preço: R$ 25,00</span>
+                </div>
+            </div>
+
+            <div class="card bg-amber-950/20 border-amber-500/30 text-center py-3">
+                <span class="label-gold mt-0 text-amber-500">Saldo de Bandejas Prontas (Hoje)</span>
+                <div id="saldo-bandejas-display" class="text-3xl font-black text-white italic mt-1">0</div>
+                <span class="text-[8px] text-zinc-400 uppercase block mt-1">Gatilha novas massas inteiras automaticamente ao vender!</span>
+            </div>
+
+            <div class="card bg-zinc-950 border-zinc-800">
+                <span class="label-gold mt-0 mb-2 text-zinc-400">📝 Lançar/Atualizar Insumo de Estoque</span>
+                <select id="insumo-select" onchange="selecionarInsumoPreDefinido()">
+                    <option value="farinha">Farinha de Trigo (Usa 600g)</option>
+                    <option value="ovos">Ovos (Usa 2 unidades)</option>
+                    <option value="leite">Leite (Usa 250ml)</option>
+                    <option value="margarina">Margarina (Usa 45g)</option>
+                    <option value="oleo">Óleo (Usa 36ml)</option>
+                    <option value="acucar">Açúcar (Usa 30g)</option>
+                    <option value="sal">Sal (Usa 3g)</option>
+                    <option value="fermento">Fermento Seco (Usa 10g)</option>
+                    <option value="carne">Carne Moída (Usa 500g)</option>
+                </select>
+
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                    <div>
+                        <span class="label-gold">Qtd do Pacote Comprado</span>
+                        <input type="number" id="insumo-tamanho-pacote" placeholder="Ex: 1000 ou 150" step="any">
+                    </div>
+                    <div>
+                        <span class="label-gold">Unidade de Medida</span>
+                        <select id="insumo-unidade">
+                            <option value="g">Gramas (g)</option>
+                            <option value="ml">Mililitros (ml)</option>
+                            <option value="un">Unidades (un)</option>
+                            <option value="kg">Quilos (kg)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 mt-1">
+                    <div>
+                        <span class="label-gold">Valor Pago (R$)</span>
+                        <input type="number" id="insumo-preco-pacote" placeholder="Ex: 15.50" step="any">
+                    </div>
+                    <div>
+                        <span class="label-gold">Pacotes Comprados</span>
+                        <input type="number" id="insumo-qtd-comprada" value="1" min="1">
+                    </div>
+                </div>
+
+                <button class="btn-gold bg-amber-600 text-black py-3 mt-3 text-xs" onclick="salvarInsumoEstoque()">Salvar Compra e Atualizar Estoque</button>
+            </div>
+
+            <div class="card">
+                <span class="label-gold mt-0 mb-3">📦 Status Atual dos Ingredientes & Custos</span>
+                <div id="lista-estoque-status" class="space-y-2"></div>
+            </div>
+        </div>
+
         <div id="tab-relatorios" class="hidden">
             <div class="grid grid-cols-2 gap-2 mb-4">
                 <div class="card p-4 text-center flex flex-col justify-between">
@@ -125,27 +171,46 @@
                 </div>
             </div>
 
-            <!-- NOVA SEÇÃO: HISTÓRICO DE PAGAMENTOS RECEBIDOS -->
-            <div class="card mb-4">
-                <span class="label-gold mt-0 mb-3">💰 Últimos Pagamentos Recebidos</span>
-                <div id="rep-pagamentos" class="space-y-2 max-h-[180px] overflow-y-auto no-scrollbar"></div>
-            </div>
-
             <div class="card">
                 <span class="label-gold mt-0 mb-3">🕒 Clientes Sem Pedir (Reativação)</span>
-                <div id="rep-sumidos" class="space-y-2 max-h-[220px] overflow-y-auto no-scrollbar"></div>
+                <div id="rep-sumidos" class="space-y-2 max-h-[300px] overflow-y-auto no-scrollbar"></div>
             </div>
+
+            <div class="card mt-4">
+                <span class="label-gold mt-0 mb-3">💰 Últimos Pagamentos Recebidos</span>
+                <div id="rep-pagamentos" class="space-y-2 max-h-[300px] overflow-y-auto no-scrollbar"></div>
+            </div>
+
         </div>
     </div>
 
-    <!-- MODAL DETALHES, EDIÇÃO E EXTRATO -->
+    <!-- TELA PIX: abre quando o link ?pix é acessado pelo cliente -->
+    <div id="pix-page" class="hidden fixed inset-0 z-[9999] flex flex-col items-center justify-center p-6" style="background:#0a0a0a;">
+        <div class="text-amber-500 font-black italic uppercase text-2xl mb-1 text-center">🥟 Priscila Esfihas</div>
+        <div class="text-zinc-500 text-[10px] uppercase font-bold mb-8 tracking-widest">Pagamento via Pix</div>
+
+        <div class="w-full max-w-sm bg-zinc-900 border border-zinc-700 rounded-2xl p-6 text-center mb-4 shadow-2xl">
+            <div class="text-[9px] text-zinc-500 uppercase font-black tracking-widest mb-1">Tipo da Chave</div>
+            <div class="text-amber-500 font-bold text-xs mb-5">E-mail</div>
+            <div class="text-[9px] text-zinc-500 uppercase font-black tracking-widest mb-2">Chave Pix</div>
+            <div id="pix-key-display" class="text-xl font-black text-white break-all leading-tight">alanpocos@gmail.com</div>
+        </div>
+
+        <button onclick="copiarChavePix()" id="btn-copiar-pix"
+            class="w-full max-w-sm bg-amber-500 text-black font-black text-sm py-4 rounded-2xl uppercase tracking-wide transition-all active:scale-95">
+            📋 Copiar Chave Pix
+        </button>
+        <div id="pix-copiado" class="hidden text-emerald-400 font-black text-xs mt-4 uppercase tracking-widest">✅ Chave copiada com sucesso!</div>
+
+        <div class="mt-10 text-[8px] text-zinc-700 uppercase text-center font-bold">Após copiar, abra seu banco e<br>cole na área de Pix › Pagar › Chave</div>
+    </div>
+
     <div id="modal-detalhes" class="hidden">
         <div class="flex justify-between items-center mb-4 pb-2 border-b border-zinc-900">
             <h3 class="text-amber-500 font-black italic uppercase text-lg">Ficha do Cliente</h3>
             <button onclick="closeModal()" class="text-zinc-500 font-black text-sm px-2">X VOLTAR</button>
         </div>
 
-        <!-- CAMPOS EDITÁVEIS -->
         <div class="card">
             <div class="flex justify-between items-center mb-2">
                 <span class="label-gold mt-0">Nome do Cliente</span>
@@ -169,7 +234,6 @@
             <button class="btn-gold bg-zinc-800 text-amber-500 text-xs py-2 mt-4" onclick="salvarEdicao()">Salvar Alterações de Cadastro</button>
         </div>
 
-        <!-- PAGAMENTO -->
         <div class="card border-emerald-900/40 bg-emerald-950/10">
             <span class="label-gold text-emerald-500">Registrar Pagamento / Abatimento</span>
             <div class="flex gap-2">
@@ -178,7 +242,6 @@
             </div>
         </div>
 
-        <!-- AÇÕES DO WHATSAPP -->
         <div class="grid grid-cols-2 gap-2 mb-4">
             <button class="btn-gold bg-zinc-900 border border-zinc-800 text-white text-[10px] mt-0 py-3 flex flex-col items-center justify-center gap-1" onclick="enviarExtratoZap()">
                 <span>📋 Enviar Extrato</span>
@@ -190,7 +253,6 @@
             </button>
         </div>
 
-        <!-- EXTRATO DE DATAS (LINHA DO TEMPO) -->
         <div class="card flex-1 flex flex-col min-h-[200px]">
             <span class="label-gold mt-0 mb-2">📅 Linha do Tempo Geral (Histórico Completo)</span>
             <div id="extrato-linha-tempo" class="space-y-1 overflow-y-auto flex-1 no-scrollbar text-zinc-300"></div>
@@ -208,40 +270,60 @@
             measurementId: "G-E6N425TCGC"
         };
 
-        if (window.location.search.includes('p=1')) {
-            document.getElementById('main-app').classList.add('hidden');
-            document.getElementById('payment-page').classList.remove('hidden');
-        }
+        const CHAVE_PIX_PADRAO = "alanpocos@gmail.com";
+        const PRECO_BANDEJA = 25.0;
 
-        function copiarPixLanding() {
-            const tempInput = document.createElement("input");
-            tempInput.value = "alanpocos@gmail.com";
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            tempInput.setSelectionRange(0, 99999);
-            document.execCommand("copy");
-            document.body.removeChild(tempInput);
+        const receitaProporcao = {
+            farinha: 600,   // g
+            ovos: 2,        // un
+            leite: 250,     // ml
+            margarina: 45,  // g
+            oleo: 36,       // ml
+            acucar: 30,     // g
+            sal: 3,         // g
+            fermento: 10,   // g
+            carne: 500        // g
+        };
 
-            const msg = document.getElementById('msg-copiado');
-            msg.classList.remove('hidden');
-            const btn = document.getElementById('btn-copiar-landing');
-            btn.innerText = "✓ CHAVE COPIADA";
-            setTimeout(() => {
-                msg.classList.add('hidden');
-                btn.innerText = "📋 Copiar Chave Pix";
-            }, 3000);
-        }
+        const nomesInsumos = {
+            farinha: "Farinha de Trigo",
+            ovos: "Ovos",
+            leite: "Leite",
+            margarina: "Margarina",
+            oleo: "Óleo",
+            acucar: "Açúcar",
+            sal: "Sal",
+            fermento: "Fermento Seco",
+            carne: "Carne Moída"
+        };
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         
         let clientes = [];
         let historicoCompleto = [];
+        let estoqueInsumos = {};
         let selecionadoId = null;
-        const PRECO_BANDEJA = 25.0;
+
+        // Controle Local de Massa Inteligente
+        let controleProducaoDia = {
+            data: new Date().toLocaleDateString('pt-BR'),
+            saldoBandejas: 0
+        };
+
+        // Carrega o estado de produção guardado
+        if(localStorage.getItem('controleProducaoDia')) {
+            const salvo = JSON.parse(localStorage.getItem('controleProducaoDia'));
+            if(salvo.data === new Date().toLocaleDateString('pt-BR')) {
+                controleProducaoDia = salvo;
+            } else {
+                // Virou o dia: o que sobrou virou consumo/desperdício automático
+                localStorage.setItem('controleProducaoDia', JSON.stringify(controleProducaoDia));
+            }
+        }
 
         async function init() {
-            if (window.location.search.includes('p=1')) return;
+            document.getElementById('saldo-bandejas-display').innerText = controleProducaoDia.saldoBandejas;
 
             db.collection('clientes').orderBy('nome').onSnapshot(snap => {
                 clientes = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
@@ -250,8 +332,6 @@
                 updateRelatorios();
                 calcTotalGeral();
                 if(selecionadoId) atualizarTelaModal();
-            }, err => {
-                console.error("Erro Firebase Rules:", err);
             });
 
             db.collection('vendas').orderBy('data', 'desc').onSnapshot(snap => {
@@ -259,6 +339,14 @@
                 updateRelatorios();
                 if(selecionadoId) renderExtratoCliente(selecionadoId);
             });
+
+            db.collection('estoque').onSnapshot(snap => {
+                estoqueInsumos = {};
+                snap.docs.forEach(doc => { estoqueInsumos[doc.id] = doc.data(); });
+                renderEstoqueECustos();
+            });
+
+            selecionarInsumoPreDefinido();
         }
 
         async function puxarContatoAgenda(target) {
@@ -293,12 +381,17 @@
         }
 
         function showTab(t) {
-            ['clientes', 'vendas', 'relatorios'].forEach(id => {
+            ['clientes', 'vendas', 'custos', 'relatorios'].forEach(id => {
                 const el = document.getElementById('tab-'+id);
                 const btn = document.getElementById('btn-'+id);
                 if(el) el.classList.toggle('hidden', id !== t);
                 if(btn) btn.classList.toggle('active-tab', id === t);
             });
+            if(t === 'vendas') {
+                document.getElementById('venda-cliente-select').value = "";
+                document.getElementById('venda-qtd').value = 1;
+                updateVendaTotal();
+            }
         }
 
         function calcTotalGeral() {
@@ -372,34 +465,171 @@
             if(c && (c.saldo + total) >= 100) elAlerta.classList.remove('hidden');
             else elAlerta.classList.add('hidden');
         }
-        
-        const vSel = document.getElementById('venda-cliente-select');
-        if (vSel) vSel.addEventListener('change', updateVendaTotal);
 
+        // LÓGICA REESTRUTURADA: GATILHO AUTOMÁTICO DE MASSA INTEIRA
         async function registrarVenda() {
             const cid = document.getElementById('venda-cliente-select').value;
             const qtd = parseInt(document.getElementById('venda-qtd').value);
-            if(!cid || !qtd || qtd <= 0) return alert("Selecione um cliente válido!");
+            if(!cid || !qtd || qtd <= 0) return alert("Selecione um cliente e quantidade válida!");
             
+            // Verifica e resguarda mudança de dia antes de calcular o saldo
+            const hojeStr = new Date().toLocaleDateString('pt-BR');
+            if(controleProducaoDia.data !== hojeStr) {
+                controleProducaoDia.data = hojeStr;
+                controleProducaoDia.saldoBandejas = 0;
+            }
+
+            let bandejasNecessarias = qtd;
+            let massasABater = 0;
+
+            // Se o saldo de bandejas prontas de hoje não for suficiente para cobrir a venda:
+            if (controleProducaoDia.saldoBandejas < bandejasNecessarias) {
+                let falta = bandejasNecessarias - controleProducaoDia.saldoBandejas;
+                // Cada massa batida gera 4 bandejas
+                massasABater = Math.ceil(falta / 4);
+                controleProducaoDia.saldoBandejas += (massasABater * 4);
+            }
+
+            // Consome do saldo do dia
+            controleProducaoDia.saldoBandejas -= bandejasNecessarias;
+            localStorage.setItem('controleProducaoDia', JSON.stringify(controleProducaoDia));
+            document.getElementById('saldo-bandejas-display').innerText = controleProducaoDia.saldoBandejas;
+
             const total = qtd * PRECO_BANDEJA;
             const c = clientes.find(x => x.id === cid);
             const batch = db.batch();
-            const cRef = db.collection('clientes').doc(cid);
             
+            // 1. Atualizar ficha do cliente
+            const cRef = db.collection('clientes').doc(cid);
             batch.update(cRef, {
                 saldo: (c.saldo || 0) + total,
                 totalComprado: (c.totalComprado || 0) + total,
                 ultimaCompra: firebase.firestore.FieldValue.serverTimestamp()
             });
             
+            // 2. Gravar histórico da venda
             const vRef = db.collection('vendas').doc();
             batch.set(vRef, {
-                clienteId: cid, clienteNome: c.nome, qtd, valor: total, data: firebase.firestore.FieldValue.serverTimestamp(), tipo: 'venda'
+                clienteId: cid, clienteNome: c.nome, qtd, valor: total, data: firebase.firestore.FieldValue.serverTimestamp(), tipo: 'venda', massasProduzidas: massasABater
             });
             
+            // 3. DEDUÇÃO DO ESTOQUE (Se disparou novas massas inteiras)
+            if(massasABater > 0) {
+                Object.keys(receitaProporcao).forEach(key => {
+                    if(estoqueInsumos[key]) {
+                        const gastoTotalIngrediente = receitaProporcao[key] * massasABater;
+                        const estoqueAtual = estoqueInsumos[key].estoqueAtual || 0;
+                        const novoEstoque = Math.max(0, estoqueAtual - gastoTotalIngrediente);
+                        
+                        const estRef = db.collection('estoque').doc(key);
+                        batch.update(estRef, { estoqueAtual: novoEstoque });
+                    }
+                });
+            }
+            
             await batch.commit();
-            alert(`Entrega registrada!`);
+            alert(`Venda registrada! ` + (massasABater > 0 ? `Abatido ${massasABater} massa(s) inteira(s) do estoque.` : `Usou saldo de massa já pronta de hoje.`));
             showTab('clientes');
+        }
+
+        function selecionarInsumoPreDefinido() {
+            const tipo = document.getElementById('insumo-select').value;
+            const tamPacote = document.getElementById('insumo-tamanho-pacote');
+            const unMedida = document.getElementById('insumo-unidade');
+            const precoPacote = document.getElementById('insumo-preco-pacote');
+            
+            if(tipo === 'farinha') { tamPacote.value = "1000"; unMedida.value = "g"; precoPacote.value = "5.50"; }
+            else if(tipo === 'ovos') { tamPacote.value = "30"; unMedida.value = "un"; precoPacote.value = "18.00"; }
+            else if(tipo === 'leite') { tamPacote.value = "1000"; unMedida.value = "ml"; precoPacote.value = "4.80"; }
+            else if(tipo === 'margarina') { tamPacote.value = "500"; unMedida.value = "g"; precoPacote.value = "6.50"; }
+            else if(tipo === 'oleo') { tamPacote.value = "900"; unMedida.value = "ml"; precoPacote.value = "7.00"; }
+            else if(tipo === 'acucar') { tamPacote.value = "1000"; unMedida.value = "g"; precoPacote.value = "4.20"; }
+            else if(tipo === 'sal') { tamPacote.value = "1000"; unMedida.value = "g"; precoPacote.value = "3.00"; }
+            else if(tipo === 'fermento') { tamPacote.value = "150"; unMedida.value = "g"; precoPacote.value = "14.00"; }
+            else if(tipo === 'carne') { tamPacote.value = "1"; unMedida.value = "kg"; precoPacote.value = "38.00"; }
+        }
+
+        async function salvarInsumoEstoque() {
+            const tipo = document.getElementById('insumo-select').value;
+            const tamanhoPacote = parseFloat(document.getElementById('insumo-tamanho-pacote').value);
+            const unidade = document.getElementById('insumo-unidade').value;
+            const precoPacote = parseFloat(document.getElementById('insumo-preco-pacote').value);
+            const qtdComprada = parseInt(document.getElementById('insumo-qtd-comprada').value) || 1;
+
+            if(!tamanhoPacote || !precoPacote || tamanhoPacote <= 0 || precoPacote <= 0) {
+                return alert("Insira valores válidos!");
+            }
+
+            const totalInjetadoEstoque = tamanhoPacote * qtdComprada;
+            const custoPorUnidadeMedida = precoPacote / tamanhoPacote;
+
+            const dadosExistentes = estoqueInsumos[tipo] || { estoqueAtual: 0 };
+            const novoEstoqueAtual = (dadosExistentes.estoqueAtual || 0) + totalInjetadoEstoque;
+
+            await db.collection('estoque').doc(tipo).set({
+                nome: nomesInsumos[tipo],
+                tamanhoPacote,
+                unidade,
+                precoPacote,
+                custoPorUnidadeMedida,
+                estoqueAtual: novoEstoqueAtual,
+                ultimaCompra: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            alert(`${nomesInsumos[tipo]} atualizado no estoque!`);
+            document.getElementById('insumo-qtd-comprada').value = "1";
+        }
+
+        function renderEstoqueECustos() {
+            let totalCustoMassa = 0;
+            let container = document.getElementById('lista-estoque-status');
+            let h = '';
+
+            Object.keys(receitaProporcao).forEach(key => {
+                const usaNaReceita = receitaProporcao[key];
+                const insumo = estoqueInsumos[key];
+                
+                let precoFracaoReceita = 0;
+                let estoqueTexto = 'Sem cadastro';
+                let unidade = key === 'ovos' ? 'un' : (key === 'leite' || key === 'oleo' ? 'ml' : (key === 'carne' ? 'kg' : 'g'));
+                let corAlertaEstoque = 'text-zinc-500';
+
+                if(insumo) {
+                    precoFracaoReceita = insumo.custoPorUnidadeMedida * usaNaReceita;
+                    totalCustoMassa += precoFracaoReceita;
+                    unidade = insumo.unidade;
+                    
+                    const estAtual = insumo.estoqueAtual || 0;
+                    estoqueTexto = `${estAtual.toFixed(0)} ${unidade} em estoque`;
+                    
+                    if(estAtual < usaNaReceita) {
+                        corAlertaEstoque = 'text-red-500 font-bold animate-pulse';
+                        estoqueTexto += ' ⚠️ BAIXO!';
+                    } else {
+                        corAlertaEstoque = 'text-zinc-400';
+                    }
+                }
+
+                h += `
+                <div class="flex justify-between items-center bg-zinc-900/60 p-2.5 rounded-xl border border-zinc-900 text-xs">
+                    <div>
+                        <div class="font-black text-white uppercase">${nomesInsumos[key]}</div>
+                        <div class="text-[9px] ${corAlertaEstoque} mt-0.5">${estoqueTexto}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-black text-amber-500">R$ ${precoFracaoReceita.toFixed(2)}</div>
+                        <div class="text-[7px] text-zinc-600 uppercase">Usa ${usaNaReceita}${unidade} na receita</div>
+                    </div>
+                </div>`;
+            });
+
+            container.innerHTML = h;
+
+            const custoPorBandeja = totalCustoMassa / 4;
+            const lucroPorBandeja = PRECO_BANDEJA - custoPorBandeja;
+
+            document.getElementById('custo-massa-total').innerText = `R$ ${totalCustoMassa.toFixed(2)}`;
+            document.getElementById('lucro-bandeja-total').innerText = `R$ ${lucroPorBandeja.toFixed(2)}`;
         }
 
         function openModal(id) {
@@ -481,6 +711,7 @@
             container.innerHTML = h || '<div class="text-center py-6 text-zinc-700 italic text-xs font-bold">Nenhuma movimentação</div>';
         }
 
+        // CORREÇÃO DO ESCOPO DO BOTÃO CHAMAR (Injetando strings de forma limpa e segura)
         function updateRelatorios() {
             if(clientes.length === 0) return;
             const fatTotal = historicoCompleto.filter(h => h.tipo === 'venda').reduce((acc, v) => acc + (v.valor || 0), 0);
@@ -488,48 +719,180 @@
             
             const top = [...clientes].sort((a,b) => (b.totalComprado || 0) - (a.totalComprado || 0))[0];
             if(top && top.totalComprado > 0) {
-                document.getElementById('rep-top-cliente').innerText = `@${top.nome}`;
+                document.getElementById('rep-top-cliente').innerText = `${top.nome}`;
                 document.getElementById('rep-top-valor').innerText = `Total comprado: R$ ${top.totalComprado.toFixed(2)}`;
             } else {
                 document.getElementById('rep-top-cliente').innerText = '--';
                 document.getElementById('rep-top-valor').innerText = 'R$ 0,00';
             }
             
-            // ATUALIZAÇÃO RECENTE: LISTAGEM DA LOG DOS ÚLTIMOS 10 PAGAMENTOS RECEBIDOS
-            const pagamentos = historicoCompleto.filter(h => h.tipo === 'pagamento').slice(0, 10);
-            let hPagamentos = '';
-            pagamentos.forEach(p => {
-                const dataStr = p.data ? new Date(p.data.seconds * 1000).toLocaleDateString('pt-BR') : '...';
-                hPagamentos += `
-                <div class="flex justify-between items-center bg-zinc-900/60 p-2.5 rounded-xl border border-zinc-900 text-xs">
-                    <div>
-                        <div class="font-black text-white uppercase leading-tight">${p.clienteNome}</div>
-                        <div class="text-[9px] text-zinc-500 mt-0.5">${dataStr}</div>
-                    </div>
-                    <div class="font-black text-emerald-500 italic">R$ ${p.valor.toFixed(2)}</div>
-                </div>`;
-            });
-            document.getElementById('rep-pagamentos').innerHTML = hPagamentos || '<div class="text-center py-4 text-zinc-700 italic text-xs font-bold uppercase">Nenhum pagamento recebido recente</div>';
-
             const agora = new Date();
             let hSumidos = '';
             const ordenadosPorInatividade = [...clientes].filter(c => c.ultimaCompra).sort((a,b) => a.ultimaCompra.seconds - b.ultimaCompra.seconds);
             
+            const containerSumidos = document.getElementById('rep-sumidos');
+            if(!containerSumidos) return;
+
+            containerSumidos.innerHTML = '';
+
             ordenadosPorInatividade.forEach(c => {
                 const dias = Math.floor((agora - new Date(c.ultimaCompra.seconds * 1000)) / (1000 * 60 * 60 * 24));
                 if(dias >= 1) {
-                    hSumidos += `<div class="flex justify-between items-center bg-zinc-900/60 p-3 rounded-xl border border-zinc-900"><div><div class="font-black text-xs text-white uppercase">${c.nome}</div><div class="text-[9px] text-amber-500 font-bold mt-0.5">Sem pedir há ${dias} dias</div></div><button onclick="enviarMensagemSaudade('${c.id}', ${dias})" class="text-[9px] bg-amber-500 font-black text-black px-3 py-2 rounded-lg uppercase italic">💬 Chamar</button></div>`;
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = "flex justify-between items-center bg-zinc-900/60 p-3 rounded-xl border border-zinc-900";
+                    
+                    itemDiv.innerHTML = `
+                        <div>
+                            <div class="font-black text-xs text-white uppercase">${c.nome}</div>
+                            <div class="text-[9px] text-amber-500 font-bold mt-0.5">Sem pedir há ${dias} dias</div>
+                        </div>
+                    `;
+
+                    const btnChamar = document.createElement('button');
+                    btnChamar.className = "text-[9px] bg-amber-500 font-black text-black px-3 py-2 rounded-lg uppercase italic";
+                    btnChamar.innerText = "💬 Chamar";
+                    btnChamar.onclick = function() {
+                        enviarMensagemSaudadeDireto(c.nome, c.tel || '', dias);
+                    };
+
+                    itemDiv.appendChild(btnChamar);
+                    containerSumidos.appendChild(itemDiv);
                 }
             });
-            document.getElementById('rep-sumidos').innerHTML = hSumidos || '<div class="text-center py-6 text-zinc-700 italic text-xs font-bold">Todos ativos!</div>';
+
+
+            const pagamentos = historicoCompleto
+                .filter(h => h.tipo === 'pagamento')
+                .sort((a,b) => {
+                    const da = a.data ? a.data.seconds : 0;
+                    const db = b.data ? b.data.seconds : 0;
+                    return db - da;
+                })
+                .slice(0, 15);
+
+            const pagamentosContainer = document.getElementById('rep-pagamentos');
+            if(pagamentosContainer) {
+                let pagamentosHtml = '';
+
+                pagamentos.forEach(p => {
+                    const dataPg = p.data ? new Date(p.data.seconds * 1000).toLocaleDateString('pt-BR') : 'Processando...';
+
+                    pagamentosHtml += `
+                    <div class="flex justify-between items-center bg-zinc-900/60 p-3 rounded-xl border border-zinc-900">
+                        <div>
+                            <div class="font-black text-xs text-white uppercase">${p.clienteNome}</div>
+                            <div class="text-[9px] text-emerald-400 font-bold mt-0.5">Pagou R$ ${p.valor.toFixed(2)}</div>
+                        </div>
+                        <div class="text-[9px] text-zinc-500 font-black uppercase">
+                            ${dataPg}
+                        </div>
+                    </div>`;
+                });
+
+                pagamentosContainer.innerHTML = pagamentosHtml || '<div class="text-center py-6 text-zinc-700 italic text-xs font-bold">Nenhum pagamento registrado</div>';
+            }
+
+
+            if(containerSumidos.innerHTML === '') {
+                containerSumidos.innerHTML = '<div class="text-center py-6 text-zinc-700 italic text-xs font-bold">Todos ativos!</div>';
+            }
         }
 
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js');
+        function enviarMensagemSaudadeDireto(nome, tel, dias) {
+            if(!tel || tel.trim() === "") return alert("Este cliente não possui telefone cadastrado!");
+            
+            const texto = `Oi, ${nome}! Tudo bem? Bateu saudade daquela esfiha fechada quentinha! 🥟\n\nNotamos que já faz uns ${dias} dias desde o seu último pedido. A Priscila está preparando uma fornada fresca hoje. Gostaria de garantir uma bandeja com 5 unidades?\n\nSe quiser, só me avisar por aqui!`;
+            
+            window.open(`https://api.whatsapp.com/send?phone=55${tel}&text=${encodeURIComponent(texto)}`, '_blank');
+        }
+
+        function enviarExtratoZap() {
+            const c = clientes.find(x => x.id === selecionadoId);
+            if(!c) return;
+            if(!c.tel) return alert("Cadastre o WhatsApp!");
+            
+            const filtrados = historicoCompleto.filter(h => h.clienteId === c.id);
+            const agoraMs = Date.now();
+            const trintaDiasMs = 30 * 24 * 60 * 60 * 1000;
+            const recentes = filtrados.filter(h => h.data && (agoraMs - h.data.seconds * 1000) <= trintaDiasMs);
+            const ultimoPgto = filtrados.find(h => h.tipo === 'pagamento');
+            
+            let texto = `*Fala, ${c.nome}!* Segue o extrato (últimos 30 dias) das esfihas da Priscila:\n\n`;
+            
+            if(recentes.length === 0) {
+                texto += `Sem movimentações no mês.\n`;
+            } else {
+                recentes.forEach(i => {
+                    const dataStr = i.data ? new Date(i.data.seconds * 1000).toLocaleDateString('pt-BR') : '';
+                    if(i.tipo === 'venda') {
+                        texto += `• ${dataStr}: Pegou ${i.qtd} band. (R$ ${i.valor.toFixed(2)})\n`;
+                    } else {
+                        texto += `• ${dataStr}: Pagou -R$ ${i.valor.toFixed(2)} ✅\n`;
+                    }
+                });
+            }
+            
+            if(ultimoPgto && ultimoPgto.data) {
+                const dataPgtoStr = new Date(ultimoPgto.data.seconds * 1000).toLocaleDateString('pt-BR');
+                texto += `\n*Último pagamento:* ${dataPgtoStr}\n`;
+            }
+            
+            texto += `\n*Total Pendente: R$ ${c.saldo.toFixed(2)}*\n\n`;
+            if(c.saldo > 0) {
+                const pixLink = window.location.origin + window.location.pathname + '?pix';
+                texto += `👆 Toque no link abaixo para copiar a chave Pix:\n${pixLink}`;
+            }
+            
+            window.open(`https://api.whatsapp.com/send?phone=55${c.tel}&text=${encodeURIComponent(texto)}`, '_blank');
+        }
+
+        function enviarCobranca45() {
+            const c = clientes.find(x => x.id === selecionadoId);
+            if(!c) return;
+            if(!c.tel) return alert("Cadastre o WhatsApp!");
+            
+            const pixLink = window.location.origin + window.location.pathname + '?pix';
+            const texto = `Olá, ${c.nome}! Tudo bem?\n\nPassando para lembrar do acerte das esfihas da Priscila. Temos em aberto o valor de *R$ ${c.saldo.toFixed(2)}*.\n\n👆 Toque no link abaixo para copiar a chave Pix:\n${pixLink}\n\nMuito obrigado! 🙏`;
+            
+            window.open(`https://api.whatsapp.com/send?phone=55${c.tel}&text=${encodeURIComponent(texto)}`, '_blank');
+        }
+
+        function copiarChavePix() {
+            const chave = document.getElementById('pix-key-display').innerText;
+            navigator.clipboard.writeText(chave).then(() => {
+                const btn = document.getElementById('btn-copiar-pix');
+                const confirm = document.getElementById('pix-copiado');
+                btn.innerText = '✅ Copiado!';
+                btn.style.background = '#10b981';
+                confirm.classList.remove('hidden');
+                setTimeout(() => {
+                    btn.innerText = '📋 Copiar Chave Pix';
+                    btn.style.background = '';
+                    confirm.classList.add('hidden');
+                }, 3000);
+            }).catch(() => {
+                // Fallback para browsers mais antigos
+                const el = document.createElement('textarea');
+                el.value = chave;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+                document.getElementById('btn-copiar-pix').innerText = '✅ Copiado!';
+                document.getElementById('pix-copiado').classList.remove('hidden');
             });
         }
-        init();
+
+        // Detecta se o cliente acessou o link ?pix
+        if(new URLSearchParams(window.location.search).has('pix')) {
+            document.getElementById('pix-page').classList.remove('hidden');
+            document.getElementById('main-app').classList.add('hidden');
+        } else {
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js'); });
+            }
+            init();
+        }
     </script>
 </body>
 </html>
