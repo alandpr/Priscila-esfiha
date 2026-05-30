@@ -546,7 +546,7 @@
             else if(tipo === 'acucar') { tamPacote.value = "1000"; unMedida.value = "g"; precoPacote.value = "4.20"; }
             else if(tipo === 'sal') { tamPacote.value = "1000"; unMedida.value = "g"; precoPacote.value = "3.00"; }
             else if(tipo === 'fermento') { tamPacote.value = "150"; unMedida.value = "g"; precoPacote.value = "14.00"; }
-            else if(tipo === 'carne') { tamPacote.value = "1"; unMedida.value = "kg"; precoPacote.value = "38.00"; }
+            else if(tipo === 'carne') { tamPacote.value = "1000"; unMedida.value = "g"; precoPacote.value = "38.00"; }
         }
 
         async function salvarInsumoEstoque() {
@@ -815,7 +815,9 @@
             const agoraMs = Date.now();
             const trintaDiasMs = 30 * 24 * 60 * 60 * 1000;
             const recentes = filtrados.filter(h => h.data && (agoraMs - h.data.seconds * 1000) <= trintaDiasMs);
-            const ultimoPgto = filtrados.find(h => h.tipo === 'pagamento');
+            const ultimoPgto = filtrados
+                .filter(h => h.tipo === 'pagamento')
+                .sort((a, b) => (b.data ? b.data.seconds : 0) - (a.data ? a.data.seconds : 0))[0];
             
             let texto = `*Fala, ${c.nome}!* Segue o extrato (últimos 30 dias) das esfihas da Priscila:\n\n`;
             
