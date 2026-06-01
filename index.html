@@ -158,16 +158,21 @@
         </div>
 
         <div id="tab-relatorios" class="hidden">
-            <div class="grid grid-cols-2 gap-2 mb-4">
-                <div class="card p-4 text-center flex flex-col justify-between">
-                    <span class="label-gold mt-0">🏆 Top Comprador</span>
-                    <div id="rep-top-cliente" class="text-sm font-black italic text-white truncate mt-2">--</div>
-                    <div id="rep-top-valor" class="text-[10px] text-amber-500 font-bold mt-1">R$ 0,00</div>
+            <div class="grid grid-cols-3 gap-2 mb-4">
+                <div class="card p-3 text-center flex flex-col justify-between">
+                    <span class="label-gold mt-0 text-[9px]">🏆 Top Comprador</span>
+                    <div id="rep-top-cliente" class="text-xs font-black italic text-white truncate mt-2">--</div>
+                    <div id="rep-top-valor" class="text-[9px] text-amber-500 font-bold mt-1 leading-tight">R$ 0,00</div>
                 </div>
-                <div class="card p-4 text-center flex flex-col justify-between">
-                    <span class="label-gold mt-0">📈 Faturamento Total</span>
-                    <div id="rep-faturamento-total" class="text-xl font-black italic text-emerald-500 mt-2">R$ 0,00</div>
-                    <div class="text-[8px] text-zinc-600 font-bold uppercase mt-1">Histórico Acumulado</div>
+                <div class="card p-3 text-center flex flex-col justify-between cursor-pointer active:scale-95 transition-transform" onclick="abrirExtratoAnual()">
+                    <span class="label-gold mt-0 text-[9px]">📈 Fat. Anual</span>
+                    <div id="rep-faturamento-total" class="text-sm font-black italic text-emerald-500 mt-2">R$ 0,00</div>
+                    <div class="text-[7px] text-zinc-600 font-bold uppercase mt-1">Toque p/ ver</div>
+                </div>
+                <div class="card p-3 text-center flex flex-col justify-between">
+                    <span class="label-gold mt-0 text-[9px]">📅 Fat. Mensal</span>
+                    <div id="rep-faturamento-mensal" class="text-sm font-black italic text-sky-400 mt-2">R$ 0,00</div>
+                    <div id="rep-faturamento-mensal-periodo" class="text-[7px] text-zinc-600 font-bold uppercase mt-1 leading-tight">--</div>
                 </div>
             </div>
 
@@ -182,6 +187,19 @@
             </div>
 
         </div>
+    </div>
+
+    <!-- MODAL EXTRATO ANUAL -->
+    <div id="modal-extrato-anual" class="hidden fixed inset-0 z-[999] flex flex-col" style="background:rgba(0,0,0,0.92);">
+        <div class="flex items-center justify-between px-4 pt-5 pb-3 border-b border-zinc-800">
+            <div>
+                <div class="text-amber-500 font-black uppercase text-sm tracking-wide">📈 Faturamento Anual</div>
+                <div id="extrato-anual-titulo" class="text-zinc-500 text-[9px] uppercase font-bold tracking-widest mt-0.5"></div>
+            </div>
+            <button onclick="document.getElementById('modal-extrato-anual').classList.add('hidden')"
+                class="text-zinc-500 font-black text-lg w-8 h-8 flex items-center justify-center rounded-full bg-zinc-800">✕</button>
+        </div>
+        <div class="flex-1 overflow-y-auto px-4 py-3 space-y-2 no-scrollbar" id="extrato-anual-lista"></div>
     </div>
 
     <!-- TELA PIX: abre quando o link ?pix é acessado pelo cliente -->
@@ -711,11 +729,78 @@
             container.innerHTML = h || '<div class="text-center py-6 text-zinc-700 italic text-xs font-bold">Nenhuma movimentação</div>';
         }
 
+        function abrirExtratoAnual() {
+            const anoAtual = new Date().getFullYear();
+            const hoje = new Date();
+            const fmt = d => d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+            const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+            // Gera todos os ciclos 7→6 do ano atual que já começaram
+            const ciclos = [];
+            for(let m = 0; m < 12; m++) {
+                const inicio = new Date(anoAtual, m, 7);
+                const fim    = new Date(anoAtual, m + 1, 6, 23, 59, 59);
+                if(inicio > hoje) break;
+                ciclos.push({ inicio, fim, label: `${meses[m]}/${anoAtual}` });
+            }
+            ciclos.reverse(); // mais recente primeiro
+
+            let totalAnual = 0;
+            let html = '';
+            ciclos.forEach(c => {
+                const valor = historicoCompleto
+                    .filter(h => h.tipo === 'venda' && h.data &&
+                        new Date(h.data.seconds * 1000) >= c.inicio &&
+                        new Date(h.data.seconds * 1000) <= c.fim)
+                    .reduce((acc, v) => acc + (v.valor || 0), 0);
+                totalAnual += valor;
+                const isCicloAtual = c.inicio <= hoje && hoje <= c.fim;
+                html += `
+                    <div class="flex items-center justify-between py-3 border-b border-zinc-800/60">
+                        <div>
+                            <div class="text-white font-black text-xs uppercase">${c.label}${isCicloAtual ? ' <span class="text-amber-500 text-[8px]">● atual</span>' : ''}</div>
+                            <div class="text-zinc-600 text-[9px] font-bold mt-0.5">${fmt(c.inicio)} – ${fmt(c.fim)}</div>
+                        </div>
+                        <div class="text-emerald-400 font-black text-sm">${valor > 0 ? 'R$ ' + valor.toFixed(2) : '<span class="text-zinc-700">—</span>'}</div>
+                    </div>`;
+            });
+
+            // Rodapé com total
+            html += `<div class="flex items-center justify-between py-3 mt-1">
+                        <div class="text-amber-500 font-black text-xs uppercase">Total ${anoAtual}</div>
+                        <div class="text-amber-500 font-black text-sm">R$ ${totalAnual.toFixed(2)}</div>
+                     </div>`;
+
+            document.getElementById('extrato-anual-titulo').innerText = `Ciclos de ${anoAtual}`;
+            document.getElementById('extrato-anual-lista').innerHTML = html;
+            document.getElementById('modal-extrato-anual').classList.remove('hidden');
+        }
+
         // CORREÇÃO DO ESCOPO DO BOTÃO CHAMAR (Injetando strings de forma limpa e segura)
         function updateRelatorios() {
             if(clientes.length === 0) return;
-            const fatTotal = historicoCompleto.filter(h => h.tipo === 'venda').reduce((acc, v) => acc + (v.valor || 0), 0);
-            document.getElementById('rep-faturamento-total').innerText = `R$ ${fatTotal.toFixed(2)}`;
+            const anoAtual = new Date().getFullYear();
+            const fatAnual = historicoCompleto
+                .filter(h => h.tipo === 'venda' && h.data && new Date(h.data.seconds * 1000).getFullYear() === anoAtual)
+                .reduce((acc, v) => acc + (v.valor || 0), 0);
+            document.getElementById('rep-faturamento-total').innerText = `R$ ${fatAnual.toFixed(2)}`;
+
+            // Faturamento mensal: ciclo do dia 7 ao dia 6 do mês seguinte
+            const hoje = new Date();
+            let inicioMensal, fimMensal;
+            if(hoje.getDate() >= 7) {
+                inicioMensal = new Date(hoje.getFullYear(), hoje.getMonth(), 7);
+                fimMensal    = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 6, 23, 59, 59);
+            } else {
+                inicioMensal = new Date(hoje.getFullYear(), hoje.getMonth() - 1, 7);
+                fimMensal    = new Date(hoje.getFullYear(), hoje.getMonth(), 6, 23, 59, 59);
+            }
+            const fatMensal = historicoCompleto
+                .filter(h => h.tipo === 'venda' && h.data && new Date(h.data.seconds * 1000) >= inicioMensal && new Date(h.data.seconds * 1000) <= fimMensal)
+                .reduce((acc, v) => acc + (v.valor || 0), 0);
+            const fmt = d => d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+            document.getElementById('rep-faturamento-mensal').innerText = `R$ ${fatMensal.toFixed(2)}`;
+            document.getElementById('rep-faturamento-mensal-periodo').innerText = `${fmt(inicioMensal)} – ${fmt(fimMensal)}`;
             
             const top = [...clientes].sort((a,b) => (b.totalComprado || 0) - (a.totalComprado || 0))[0];
             if(top && top.totalComprado > 0) {
