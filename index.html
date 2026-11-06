@@ -897,31 +897,37 @@
             if(!c.tel) return alert("Cadastre o WhatsApp!");
             
             const filtrados = historicoCompleto.filter(h => h.clienteId === c.id);
-            const agoraMs = Date.now();
-            const trintaDiasMs = 30 * 24 * 60 * 60 * 1000;
-            const recentes = filtrados.filter(h => h.data && (agoraMs - h.data.seconds * 1000) <= trintaDiasMs);
             const ultimoPgto = filtrados
                 .filter(h => h.tipo === 'pagamento')
                 .sort((a, b) => (b.data ? b.data.seconds : 0) - (a.data ? a.data.seconds : 0))[0];
+
+            // Extrato desde o último pagamento (ou tudo, se nunca pagou)
+            const segDe = h => h.data ? h.data.seconds : Date.now() / 1000;
+            const recentes = ultimoPgto
+                ? filtrados.filter(h => segDe(h) >= segDe(ultimoPgto))
+                : filtrados;
+            const vendasDepois = recentes.filter(h => h.tipo === 'venda').reduce((acc, v) => acc + (v.valor || 0), 0);
+            const saldoAnterior = ultimoPgto ? Math.round(((c.saldo || 0) - vendasDepois) * 100) / 100 : 0;
             
-            let texto = `*Fala, ${c.nome}!* Segue o extrato (últimos 30 dias) das esfihas da Priscila:\n\n`;
+            let texto = `*Fala, ${c.nome}!* Segue o extrato das esfihas da Priscila:\n\n`;
             
-            if(recentes.length === 0) {
-                texto += `Sem movimentações no mês.\n`;
-            } else {
-                recentes.forEach(i => {
-                    const dataStr = i.data ? new Date(i.data.seconds * 1000).toLocaleDateString('pt-BR') : '';
-                    if(i.tipo === 'venda') {
-                        texto += `• ${dataStr}: Pegou ${i.qtd} band. (R$ ${i.valor.toFixed(2)})\n`;
-                    } else {
-                        texto += `• ${dataStr}: Pagou -R$ ${i.valor.toFixed(2)} ✅\n`;
-                    }
-                });
+            if(ultimoPgto) {
+                const dataPgtoStr = ultimoPgto.data ? new Date(ultimoPgto.data.seconds * 1000).toLocaleDateString('pt-BR') : '';
+                texto += `*Último pagamento:* ${dataPgtoStr} - R$ ${ultimoPgto.valor.toFixed(2)} ✅\n\n`;
             }
             
-            if(ultimoPgto && ultimoPgto.data) {
-                const dataPgtoStr = new Date(ultimoPgto.data.seconds * 1000).toLocaleDateString('pt-BR');
-                texto += `\n*Último pagamento:* ${dataPgtoStr}\n`;
+            // Pendências em ordem cronológica (mais antiga primeiro)
+            const pendentes = recentes.filter(h => h.tipo === 'venda').reverse();
+            if(pendentes.length === 0 && saldoAnterior <= 0.009) {
+                if(!ultimoPgto) texto += `Sem movimentações.\n`;
+            } else {
+                if(saldoAnterior > 0.009) {
+                    texto += `• Saldo pendente do último pagamento: R$ ${saldoAnterior.toFixed(2)}\n`;
+                }
+                pendentes.forEach(i => {
+                    const dataStr = i.data ? new Date(i.data.seconds * 1000).toLocaleDateString('pt-BR') : '';
+                    texto += `• ${dataStr}: Pegou ${i.qtd} band. (R$ ${i.valor.toFixed(2)})\n`;
+                });
             }
             
             texto += `\n*Total Pendente: R$ ${c.saldo.toFixed(2)}*\n\n`;
