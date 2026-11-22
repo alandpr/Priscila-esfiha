@@ -3,131 +3,380 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Priscila Esfihas v2.0</title>
+    <title>Priscila Esfihas • Gestão Enterprise</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#f59e0b">
+    <meta name="theme-color" content="#09090b">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <style>
-        body { background: #0a0a0a; color: #fff; font-family: sans-serif; padding-bottom: 120px; overflow-x: hidden; }
-        .card { background: #161616; border-radius: 18px; padding: 14px; margin-bottom: 12px; border: 1px solid #262626; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
-        .label-gold { color: #f59e0b; font-size: 9px; font-weight: 900; text-transform: uppercase; margin-top: 14px; margin-bottom: 4px; margin-left: 4px; letter-spacing: 1px; display: block; }
-        .label-gold:first-child { margin-top: 0; }
-        input, select, textarea { background: #222; border: 2px solid #333; color: #fff; padding: 12px; border-radius: 12px; width: 100%; margin-bottom: 4px; font-size: 16px; font-weight: 900; -webkit-appearance: none; }
-        input:focus, select:focus { border-color: #f59e0b; outline: none; }
-        .btn-gold { background: #f59e0b; color: #000; font-weight: 900; padding: 16px; border-radius: 18px; width: 100%; text-transform: uppercase; font-size: 14px; margin-top: 10px; cursor: pointer; transition: 0.2s; }
-        .btn-gold:active { transform: scale(0.98); background: #d97706; }
-        .tab-btn { background: #111; color: #444; flex: 1; padding: 14px 2px; border-radius: 14px; font-size: 9px; font-weight: 900; margin: 2px; border: 1px solid #222; text-transform: uppercase; text-align: center; }
-        .active-tab { background: #f59e0b; color: #000; border-color: #fbbf24; }
-        #modal-detalhes { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0a; z-index: 2000; padding: 16px; display: flex; flex-direction: column; overflow-y: auto; }
+        :root {
+            --bg-main: #09090b;
+            --bg-card: #121215;
+            --border-subtle: #27272a;
+            --gold-primary: #f59e0b;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            background-color: var(--bg-main);
+            color: #fafafa;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            padding-bottom: 110px;
+            overflow-x: hidden;
+        }
+        .glass-header {
+            background: rgba(9, 9, 11, 0.85);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+        .card-pro {
+            background: linear-gradient(145deg, #16161a 0%, #101013 100%);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.7);
+        }
+        .label-pro {
+            color: #a1a1aa;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .label-gold {
+            color: #f59e0b;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 6px;
+            display: block;
+        }
+        input, select, textarea {
+            background: #18181b;
+            border: 1.5px solid #27272a;
+            color: #ffffff;
+            padding: 13px 14px;
+            border-radius: 14px;
+            width: 100%;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            -webkit-appearance: none;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #f59e0b;
+            background: #1f1f23;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #09090b;
+            font-weight: 800;
+            padding: 15px 18px;
+            border-radius: 16px;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            box-shadow: 0 8px 20px -4px rgba(245, 158, 11, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-primary:active { transform: scale(0.97); }
+        .btn-secondary {
+            background: #18181b;
+            border: 1px solid #27272a;
+            color: #e4e4e7;
+            font-weight: 700;
+            padding: 13px 16px;
+            border-radius: 14px;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .btn-secondary:active { transform: scale(0.97); background: #27272a; }
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 4px;
+            border-radius: 14px;
+            color: #71717a;
+            font-size: 10px;
+            font-weight: 700;
+            transition: all 0.2s ease;
+            gap: 3px;
+        }
+        .nav-item.active {
+            background: rgba(245, 158, 11, 0.14);
+            color: #f59e0b;
+        }
+        .filter-pill {
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            background: #18181b;
+            border: 1px solid #27272a;
+            color: #a1a1aa;
+            white-space: nowrap;
+            transition: all 0.15s ease;
+        }
+        .filter-pill.active {
+            background: #f59e0b;
+            color: #09090b;
+            border-color: #f59e0b;
+        }
         .hidden { display: none !important; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .hist-item { background: #111; border: 1px solid #222; padding: 8px 12px; border-radius: 10px; margin-bottom: 6px; font-size: 12px; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Toast Notification */
+        #toast-container {
+            position: fixed;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            width: 92%;
+            max-width: 420px;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .toast-msg {
+            background: #18181b;
+            border: 1px solid #3f3f46;
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.85);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-16px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
     </style>
 </head>
-<body class="p-3 max-w-lg mx-auto">
+<body class="max-w-lg mx-auto px-3.5 pt-2">
 
+    <!-- SISTEMA DE NOTIFICAÇÕES PROFISSIONAIS (TOAST) -->
+    <div id="toast-container"></div>
+
+    <!-- MODAL DE CONFIRMAÇÃO CUSTOMIZADO -->
+    <div id="modal-confirm" class="hidden fixed inset-0 z-[9500] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 w-full max-w-sm shadow-2xl">
+            <h4 id="confirm-title" class="text-white font-extrabold text-base mb-1.5">Confirmar Ação</h4>
+            <p id="confirm-desc" class="text-zinc-400 text-xs leading-relaxed mb-5">Deseja continuar com esta operação?</p>
+            <div class="grid grid-cols-2 gap-2.5">
+                <button id="confirm-cancel" class="btn-secondary py-2.5">Cancelar</button>
+                <button id="confirm-ok" class="btn-primary py-2.5">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP PRINCIPAL -->
     <div id="main-app">
-        <div class="flex justify-between items-center mb-5 pt-2">
-            <div>
-                <h1 class="text-2xl font-black text-amber-500 italic uppercase leading-none">PRISCILA ESFIHAS</h1>
-                <span class="text-[8px] font-black text-zinc-600 uppercase">Gestão Completa & Estoque Inteligente</span>
-            </div>
-            <div class="text-right">
-                <div id="resumo-total" class="text-xs font-black text-red-500 italic">DÉBITO TOTAL: R$ 0,00</div>
-            </div>
-        </div>
-
-        <div id="tabs-container" class="flex mb-6 bg-black p-1 rounded-2xl sticky top-2 z-50 border border-zinc-800 shadow-2xl">
-            <button id="btn-clientes" class="tab-btn active-tab" onclick="showTab('clientes')">Clientes</button>
-            <button id="btn-vendas" class="tab-btn" onclick="showTab('vendas')">Nova Venda</button>
-            <button id="btn-custos" class="tab-btn" onclick="showTab('custos')">Custos & Estoque</button>
-            <button id="btn-relatorios" class="tab-btn" onclick="showTab('relatorios')">Relatórios</button>
-        </div>
-
-        <div id="tab-clientes">
-            <input type="text" id="search-g" oninput="renderClientes()" class="bg-black border border-zinc-800 p-3 rounded-xl w-full mb-4 text-xs uppercase" placeholder="Filtrar clientes...">
-            <div id="list-clientes" class="space-y-3"></div>
-        </div>
-
-        <div id="tab-vendas" class="hidden">
-            <div class="card">
-                <span class="label-gold">Selecione o Cliente</span>
-                <select id="venda-cliente-select"></select>
-
-                <div class="grid grid-cols-2 gap-3 mt-2">
-                    <div>
-                        <span class="label-gold">Bandejas (5 un)</span>
-                        <input type="number" id="venda-qtd" value="1" min="1" oninput="updateVendaTotal()">
+        <!-- HEADER CORPORATIVO -->
+        <header class="glass-header sticky top-0 z-40 py-3 mb-3 border-b border-zinc-800/80 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-zinc-950 font-black text-lg shadow-lg shadow-amber-500/20">
+                    🥟
+                </div>
+                <div>
+                    <div class="flex items-center gap-1.5">
+                        <h1 class="text-base font-black tracking-tight text-white uppercase">Priscila Esfihas</h1>
+                        <span class="text-[9px] font-extrabold bg-amber-500/15 text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded-md">PRO</span>
                     </div>
-                    <div>
-                        <span class="label-gold">Valor (R$ 25,00/cd)</span>
-                        <div id="venda-total-display" class="text-2xl font-black text-amber-500 pt-2 italic">R$ 25,00</div>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span id="sync-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="text-[10px] font-medium text-zinc-400">Gestão & Estoque Inteligente</span>
                     </div>
+                </div>
+            </div>
+            <div class="text-right bg-zinc-900/90 border border-zinc-800 px-3 py-1.5 rounded-xl">
+                <span class="text-[9px] font-bold text-zinc-500 uppercase block leading-none mb-1">A Receber</span>
+                <div id="resumo-total" class="text-xs font-black text-rose-400 tracking-tight">R$ 0,00</div>
+            </div>
+        </header>
+
+        <!-- ABA 1: CARTEIRA DE CLIENTES -->
+        <section id="tab-clientes">
+            <!-- Barra de Busca e Filtros Rápidos -->
+            <div class="mb-3">
+                <div class="relative mb-2.5">
+                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">🔍</span>
+                    <input type="text" id="search-g" oninput="renderClientes()" class="pl-10 pr-4 py-3 text-xs uppercase tracking-wide bg-zinc-900/90 border-zinc-800" placeholder="Buscar cliente por nome ou telefone...">
+                </div>
+                <div class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
+                    <button onclick="setFiltroCliente('todos')" id="filtro-todos" class="filter-pill active">Todos (<span id="count-todos">0</span>)</button>
+                    <button onclick="setFiltroCliente('devedores')" id="filtro-devedores" class="filter-pill">Com Saldo (<span id="count-devedores">0</span>)</button>
+                    <button onclick="setFiltroCliente('atrasados')" id="filtro-atrasados" class="filter-pill">⚠️ 45+ Dias (<span id="count-atrasados">0</span>)</button>
+                    <button onclick="setFiltroCliente('quitados')" id="filtro-quitados" class="filter-pill">Em Dia</button>
+                </div>
+            </div>
+
+            <div id="list-clientes" class="space-y-2.5"></div>
+        </section>
+
+        <!-- ABA 2: PDV / NOVA VENDA -->
+        <section id="tab-vendas" class="hidden">
+            <div class="card-pro">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="label-gold mb-0">🛒 Lançamento de Pedido</span>
+                    <span class="text-[10px] font-bold text-zinc-400 bg-zinc-900 px-2 py-1 rounded-lg border border-zinc-800">R$ 25,00 / band.</span>
+                </div>
+
+                <label class="label-pro">Cliente</label>
+                <select id="venda-cliente-select" onchange="updateVendaTotal()" class="mb-3"></select>
+
+                <!-- Tipo de Pagamento (Novidade Enterprise) -->
+                <label class="label-pro">Modalidade da Venda</label>
+                <div class="grid grid-cols-2 gap-2 mb-3">
+                    <button type="button" id="modo-pendura" onclick="setModoVenda('pendura')" class="py-2.5 px-3 rounded-xl border border-amber-500 bg-amber-500/15 text-amber-400 font-extrabold text-xs uppercase transition-all">
+                        📝 Pendura (Fiado)
+                    </button>
+                    <button type="button" id="modo-avista" onclick="setModoVenda('avista')" class="py-2.5 px-3 rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-400 font-extrabold text-xs uppercase transition-all">
+                        💸 Pago na Hora
+                    </button>
+                </div>
+
+                <!-- Seletor Rápido de Quantidade -->
+                <label class="label-pro">Quantidade de Bandejas (5 esfihas/band.)</label>
+                <div class="flex items-center gap-2 mb-3">
+                    <button type="button" onclick="ajustarQtdVenda(-1)" class="w-12 h-12 rounded-xl bg-zinc-800 border border-zinc-700 text-white font-black text-xl active:scale-95">-</button>
+                    <input type="number" id="venda-qtd" value="1" min="1" oninput="updateVendaTotal()" class="text-center text-lg font-black mb-0">
+                    <button type="button" onclick="ajustarQtdVenda(1)" class="w-12 h-12 rounded-xl bg-zinc-800 border border-zinc-700 text-white font-black text-xl active:scale-95">+</button>
+                </div>
+
+                <!-- Atalhos de Quantidade -->
+                <div class="grid grid-cols-4 gap-1.5 mb-4">
+                    <button type="button" onclick="setQtdVenda(1)" class="py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-zinc-300 active:bg-zinc-800">1 band.</button>
+                    <button type="button" onclick="setQtdVenda(2)" class="py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-zinc-300 active:bg-zinc-800">2 band.</button>
+                    <button type="button" onclick="setQtdVenda(4)" class="py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-amber-400/90 active:bg-zinc-800">4 (1 Massa)</button>
+                    <button type="button" onclick="setQtdVenda(8)" class="py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-zinc-300 active:bg-zinc-800">8 band.</button>
+                </div>
+
+                <!-- Resumo Financeiro da Venda -->
+                <div class="bg-zinc-950/90 border border-zinc-800/90 rounded-2xl p-3.5 flex justify-between items-center mb-3">
+                    <div>
+                        <span class="text-[10px] font-bold text-zinc-500 uppercase block">Total do Pedido</span>
+                        <span id="venda-esfihas-count" class="text-[11px] font-semibold text-zinc-400">5 esfihas fechadas</span>
+                    </div>
+                    <div id="venda-total-display" class="text-2xl font-black text-amber-400 tracking-tight">R$ 25,00</div>
                 </div>
                 
-                <div id="alerta-limite" class="hidden text-[10px] font-bold text-red-500 bg-red-950/40 border border-red-900 p-2 rounded-lg mt-3 text-center uppercase italic">
-                    ⚠️ Atenção: Cliente já possui pendura alta!
+                <div id="alerta-limite" class="hidden text-[11px] font-bold text-rose-400 bg-rose-950/40 border border-rose-800/60 p-2.5 rounded-xl mb-3 text-center">
+                    ⚠️ Atenção: O saldo devedor deste cliente ultrapassará R$ 100,00!
                 </div>
 
-                <button class="btn-gold" onclick="registrarVenda()">Lançar Pendura</button>
+                <button class="btn-primary" id="btn-registrar-venda" onclick="registrarVenda()">
+                    <span>Confirmar Lançamento</span>
+                </button>
             </div>
 
-            <div class="card bg-zinc-950 border-dashed border-zinc-800">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="label-gold text-zinc-500 mt-0">Novo Cadastro Rápido</span>
-                    <button type="button" onclick="puxarContatoAgenda('novo')" class="text-[9px] bg-zinc-900 border border-amber-600/40 text-amber-500 px-2 py-1 rounded font-black uppercase">👤 Puxar da Agenda</button>
+            <!-- Cadastro Rápido -->
+            <div class="card-pro border-dashed border-zinc-800 bg-zinc-950/50">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="label-pro mb-0 text-zinc-300">➕ Novo Cliente Rápido</span>
+                    <button type="button" onclick="puxarContatoAgenda('novo')" class="text-[10px] bg-amber-500/10 border border-amber-500/30 text-amber-400 px-2.5 py-1.5 rounded-lg font-extrabold uppercase flex items-center gap-1 active:scale-95">
+                        <span>👤 Agenda</span>
+                    </button>
                 </div>
-                <input type="text" id="novo-cliente-nome" placeholder="NOME DO CLIENTE (MAIÚSCULO)" class="mb-2 uppercase">
+                <input type="text" id="novo-cliente-nome" placeholder="NOME COMPLETO DO CLIENTE" class="mb-2.5 uppercase">
                 <input type="tel" id="novo-cliente-tel" placeholder="WHATSAPP (Ex: 35999999999)" class="mb-3">
-                <button class="btn-gold bg-zinc-800 text-zinc-400 mt-0 py-3 text-xs" onclick="addCliente()">Cadastrar Novo Cliente</button>
+                <button class="btn-secondary text-amber-400 border-zinc-700" onclick="addCliente()">Salvar Novo Cliente</button>
             </div>
-        </div>
+        </section>
 
-        <div id="tab-custos" class="hidden">
-            <div class="grid grid-cols-2 gap-2 mb-4">
-                <div class="card p-3 text-center bg-zinc-900/40">
-                    <span class="label-gold mt-0">Custo p/ Massa</span>
-                    <div id="custo-massa-total" class="text-lg font-black italic text-red-400">R$ 0,00</div>
-                    <span class="text-[7px] text-zinc-500 uppercase block mt-0.5">Rende 4 Bandejas (20 Esfihas)</span>
+        <!-- ABA 3: ENGENHARIA DE CUSTOS & ESTOQUE -->
+        <section id="tab-custos" class="hidden">
+            <!-- KPIs de Produção e Lucratividade -->
+            <div class="grid grid-cols-3 gap-2 mb-3">
+                <div class="card-pro p-3 mb-0 text-center">
+                    <span class="text-[9px] font-bold text-zinc-400 uppercase block">Custo Massa</span>
+                    <div id="custo-massa-total" class="text-sm font-black text-rose-400 mt-1">R$ 0,00</div>
+                    <span class="text-[8px] text-zinc-500 block mt-0.5">4 bandejas</span>
                 </div>
-                <div class="card p-3 text-center bg-zinc-900/40">
-                    <span class="label-gold mt-0">Lucro Real p/ Bandeja</span>
-                    <div id="lucro-bandeja-total" class="text-lg font-black italic text-emerald-400">R$ 0,00</div>
-                    <span class="text-[7px] text-zinc-500 uppercase block mt-0.5">Preço: R$ 25,00</span>
+                <div class="card-pro p-3 mb-0 text-center">
+                    <span class="text-[9px] font-bold text-zinc-400 uppercase block">Lucro / Band.</span>
+                    <div id="lucro-bandeja-total" class="text-sm font-black text-emerald-400 mt-1">R$ 0,00</div>
+                    <span id="margem-lucro-badge" class="text-[8px] text-emerald-500/80 font-bold block mt-0.5">Margem 0%</span>
+                </div>
+                <div class="card-pro p-3 mb-0 text-center border-amber-500/30 bg-amber-500/5">
+                    <span class="text-[9px] font-bold text-amber-400 uppercase block">Capacidade</span>
+                    <div id="capacidade-massas-display" class="text-sm font-black text-white mt-1">0 massas</div>
+                    <span id="capacidade-bandejas-sub" class="text-[8px] text-zinc-400 block mt-0.5">0 bandejas</span>
                 </div>
             </div>
 
-            <div class="card bg-amber-950/20 border-amber-500/30 text-center py-3">
-                <span class="label-gold mt-0 text-amber-500">Saldo de Bandejas Prontas (Hoje)</span>
-                <div id="saldo-bandejas-display" class="text-3xl font-black text-white italic mt-1">0</div>
-                <span class="text-[8px] text-zinc-400 uppercase block mt-1">Gatilha novas massas inteiras automaticamente ao vender!</span>
+            <!-- Controle de Bancada / Saldo do Dia -->
+            <div class="card-pro bg-gradient-to-r from-amber-950/30 via-zinc-900 to-zinc-900 border-amber-500/30 flex items-center justify-between">
+                <div>
+                    <span class="label-gold mb-0.5">🔥 Saldo Prontas (Hoje)</span>
+                    <p class="text-[10px] text-zinc-400 leading-tight max-w-[200px]">
+                        Ao zerar, a venda abate automaticamente 1 massa inteira do estoque.
+                    </p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="ajustarSaldoBancada(-1)" class="w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-300 font-black text-sm active:scale-95">-</button>
+                    <div id="saldo-bandejas-display" class="text-2xl font-black text-white w-8 text-center">0</div>
+                    <button onclick="ajustarSaldoBancada(1)" class="w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700 text-amber-400 font-black text-sm active:scale-95">+</button>
+                </div>
             </div>
 
-            <div class="card bg-zinc-950 border-zinc-800">
-                <span class="label-gold mt-0 mb-2 text-zinc-400">📝 Lançar/Atualizar Insumo de Estoque</span>
-                <select id="insumo-select" onchange="selecionarInsumoPreDefinido()">
-                    <option value="farinha">Farinha de Trigo (Usa 600g)</option>
-                    <option value="ovos">Ovos (Usa 2 unidades)</option>
-                    <option value="leite">Leite (Usa 250ml)</option>
-                    <option value="margarina">Margarina (Usa 45g)</option>
-                    <option value="oleo">Óleo (Usa 36ml)</option>
-                    <option value="acucar">Açúcar (Usa 30g)</option>
-                    <option value="sal">Sal (Usa 3g)</option>
-                    <option value="fermento">Fermento Seco (Usa 10g)</option>
-                    <option value="carne">Carne Moída (Usa 500g)</option>
+            <!-- Lançamento de Compra de Insumos -->
+            <div class="card-pro">
+                <span class="label-gold mb-3">📦 Entrada de Mercadoria / Insumos</span>
+                <select id="insumo-select" onchange="selecionarInsumoPreDefinido()" class="mb-3">
+                    <option value="farinha">Farinha de Trigo (Receita: 600g)</option>
+                    <option value="ovos">Ovos (Receita: 2 un)</option>
+                    <option value="leite">Leite (Receita: 250ml)</option>
+                    <option value="margarina">Margarina (Receita: 45g)</option>
+                    <option value="oleo">Óleo (Receita: 36ml)</option>
+                    <option value="acucar">Açúcar (Receita: 30g)</option>
+                    <option value="sal">Sal (Receita: 3g)</option>
+                    <option value="fermento">Fermento Seco (Receita: 10g)</option>
+                    <option value="carne">Carne Moída (Receita: 500g)</option>
                 </select>
 
-                <div class="grid grid-cols-2 gap-2 mt-2">
+                <div class="grid grid-cols-2 gap-2.5 mb-2.5">
                     <div>
-                        <span class="label-gold">Qtd do Pacote Comprado</span>
-                        <input type="number" id="insumo-tamanho-pacote" placeholder="Ex: 1000 ou 150" step="any">
+                        <label class="label-pro">Tamanho Embalagem</label>
+                        <input type="number" id="insumo-tamanho-pacote" placeholder="Ex: 1000" step="any">
                     </div>
                     <div>
-                        <span class="label-gold">Unidade de Medida</span>
+                        <label class="label-pro">Unidade</label>
                         <select id="insumo-unidade">
                             <option value="g">Gramas (g)</option>
                             <option value="ml">Mililitros (ml)</option>
@@ -137,143 +386,224 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2 mt-1">
+                <div class="grid grid-cols-2 gap-2.5 mb-3">
                     <div>
-                        <span class="label-gold">Valor Pago (R$)</span>
-                        <input type="number" id="insumo-preco-pacote" placeholder="Ex: 15.50" step="any">
+                        <label class="label-pro">Valor Pago (Pacote)</label>
+                        <input type="number" id="insumo-preco-pacote" placeholder="R$ 0,00" step="any">
                     </div>
                     <div>
-                        <span class="label-gold">Pacotes Comprados</span>
+                        <label class="label-pro">Qtd. Pacotes</label>
                         <input type="number" id="insumo-qtd-comprada" value="1" min="1">
                     </div>
                 </div>
 
-                <button class="btn-gold bg-amber-600 text-black py-3 mt-3 text-xs" onclick="salvarInsumoEstoque()">Salvar Compra e Atualizar Estoque</button>
+                <button class="btn-primary py-3 text-xs" onclick="salvarInsumoEstoque()">Atualizar Estoque & Custo</button>
             </div>
 
-            <div class="card">
-                <span class="label-gold mt-0 mb-3">📦 Status Atual dos Ingredientes & Custos</span>
-                <div id="lista-estoque-status" class="space-y-2"></div>
-            </div>
-        </div>
-
-        <div id="tab-relatorios" class="hidden">
-            <div class="grid grid-cols-3 gap-2 mb-4">
-                <div class="card p-3 text-center flex flex-col justify-between">
-                    <span class="label-gold mt-0 text-[9px]">🏆 Top Comprador</span>
-                    <div id="rep-top-cliente" class="text-xs font-black italic text-white truncate mt-2">--</div>
-                    <div id="rep-top-valor" class="text-[9px] text-amber-500 font-bold mt-1 leading-tight">R$ 0,00</div>
+            <!-- Lista de Insumos e Níveis -->
+            <div class="card-pro">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="label-gold mb-0">📊 Inventário & Custo por Receita</span>
+                    <span class="text-[9px] text-zinc-500 font-bold uppercase">1 Massa = 20 Esfihas</span>
                 </div>
-                <div class="card p-3 text-center flex flex-col justify-between cursor-pointer active:scale-95 transition-transform" onclick="abrirExtratoAnual()">
-                    <span class="label-gold mt-0 text-[9px]">📈 Fat. Anual</span>
-                    <div id="rep-faturamento-total" class="text-sm font-black italic text-emerald-500 mt-2">R$ 0,00</div>
-                    <div class="text-[7px] text-zinc-600 font-bold uppercase mt-1">Toque p/ ver</div>
+                <div id="lista-estoque-status" class="space-y-2.5"></div>
+            </div>
+        </section>
+
+        <!-- ABA 4: BUSINESS INTELLIGENCE & RELATÓRIOS -->
+        <section id="tab-relatorios" class="hidden">
+            <!-- KPIs Principais -->
+            <div class="grid grid-cols-2 gap-2.5 mb-3">
+                <div class="card-pro p-3.5 mb-0 cursor-pointer active:scale-98 transition-transform" onclick="abrirExtratoAnual()">
+                    <div class="flex justify-between items-start">
+                        <span class="label-pro mb-0">📈 Fat. Anual</span>
+                        <span class="text-[9px] text-amber-400 font-bold">Ver ciclos ›</span>
+                    </div>
+                    <div id="rep-faturamento-total" class="text-lg font-black text-emerald-400 mt-1.5">R$ 0,00</div>
+                    <div class="text-[9px] text-zinc-500 font-medium mt-0.5">Toque para detalhar</div>
                 </div>
-                <div class="card p-3 text-center flex flex-col justify-between">
-                    <span class="label-gold mt-0 text-[9px]">📅 Fat. Mensal</span>
-                    <div id="rep-faturamento-mensal" class="text-sm font-black italic text-sky-400 mt-2">R$ 0,00</div>
-                    <div id="rep-faturamento-mensal-periodo" class="text-[7px] text-zinc-600 font-bold uppercase mt-1 leading-tight">--</div>
+
+                <div class="card-pro p-3.5 mb-0">
+                    <span class="label-pro mb-0">📅 Ciclo Mensal</span>
+                    <div id="rep-faturamento-mensal" class="text-lg font-black text-sky-400 mt-1.5">R$ 0,00</div>
+                    <div id="rep-faturamento-mensal-periodo" class="text-[9px] text-zinc-500 font-medium mt-0.5">--</div>
                 </div>
             </div>
 
-            <div class="card">
-                <span class="label-gold mt-0 mb-3">🕒 Clientes Sem Pedir (Reativação)</span>
-                <div id="rep-sumidos" class="space-y-2 max-h-[300px] overflow-y-auto no-scrollbar"></div>
+            <!-- Meta Mensal de Faturamento (Novidade Enterprise) -->
+            <div class="card-pro">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="label-gold mb-0">🎯 Meta do Ciclo Mensal</span>
+                    <button onclick="editarMetaMensal()" class="text-[10px] text-zinc-400 underline font-bold">Editar Meta</button>
+                </div>
+                <div class="flex justify-between items-end mb-1.5">
+                    <span id="meta-progresso-texto" class="text-xs font-extrabold text-white">R$ 0,00 / R$ 2.000,00</span>
+                    <span id="meta-porcentagem-texto" class="text-xs font-black text-amber-400">0%</span>
+                </div>
+                <div class="w-full h-2.5 bg-zinc-800 rounded-full overflow-hidden">
+                    <div id="meta-barra-progresso" class="h-full bg-gradient-to-r from-amber-500 to-emerald-400 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
             </div>
 
-            <div class="card mt-4">
-                <span class="label-gold mt-0 mb-3">💰 Últimos Pagamentos Recebidos</span>
-                <div id="rep-pagamentos" class="space-y-2 max-h-[300px] overflow-y-auto no-scrollbar"></div>
+            <!-- Destaque VIP -->
+            <div class="card-pro flex items-center justify-between bg-gradient-to-r from-zinc-900 to-amber-950/20 border-amber-500/20">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-lg flex-shrink-0">🏆</div>
+                    <div class="min-w-0">
+                        <span class="text-[9px] font-bold text-amber-400 uppercase block">Cliente VIP #1</span>
+                        <div id="rep-top-cliente" class="text-sm font-black text-white uppercase truncate">--</div>
+                        <div id="rep-top-valor" class="text-[10px] text-zinc-400 font-semibold">R$ 0,00 em compras</div>
+                    </div>
+                </div>
+                <button onclick="exportarBackupCSV()" class="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-200 text-[10px] font-bold px-3 py-2 rounded-xl uppercase flex-shrink-0 active:scale-95">
+                    📥 Backup CSV
+                </button>
             </div>
 
-        </div>
+            <!-- Reativação de Clientes -->
+            <div class="card-pro">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="label-gold mb-0">🕒 Reativação (Clientes Inativos)</span>
+                    <span class="text-[9px] text-zinc-500 font-bold">Toque p/ WhatsApp</span>
+                </div>
+                <div id="rep-sumidos" class="space-y-2 max-h-[280px] overflow-y-auto no-scrollbar"></div>
+            </div>
+
+            <!-- Últimos Recebimentos -->
+            <div class="card-pro">
+                <span class="label-gold mb-3">💰 Últimos Recebimentos</span>
+                <div id="rep-pagamentos" class="space-y-2 max-h-[280px] overflow-y-auto no-scrollbar"></div>
+            </div>
+        </section>
+
+        <!-- BARRA DE NAVEGAÇÃO INFERIOR FIXA (ESTILO APP NATIVO) -->
+        <nav class="fixed bottom-0 left-0 right-0 z-50 glass-header border-t border-zinc-800/90 px-3 py-2">
+            <div class="max-w-lg mx-auto flex items-center justify-between gap-1">
+                <button id="btn-clientes" class="nav-item active" onclick="showTab('clientes')">
+                    <span class="text-base">👥</span>
+                    <span>Clientes</span>
+                </button>
+                <button id="btn-vendas" class="nav-item" onclick="showTab('vendas')">
+                    <span class="text-base">🥟</span>
+                    <span>Vender</span>
+                </button>
+                <button id="btn-custos" class="nav-item" onclick="showTab('custos')">
+                    <span class="text-base">📦</span>
+                    <span>Estoque</span>
+                </button>
+                <button id="btn-relatorios" class="nav-item" onclick="showTab('relatorios')">
+                    <span class="text-base">📊</span>
+                    <span>Gestão</span>
+                </button>
+            </div>
+        </nav>
     </div>
 
     <!-- MODAL EXTRATO ANUAL -->
-    <div id="modal-extrato-anual" class="hidden fixed inset-0 z-[999] flex flex-col" style="background:rgba(0,0,0,0.92);">
-        <div class="flex items-center justify-between px-4 pt-5 pb-3 border-b border-zinc-800">
+    <div id="modal-extrato-anual" class="hidden fixed inset-0 z-[999] flex flex-col bg-zinc-950">
+        <div class="flex items-center justify-between px-4 pt-5 pb-3 border-b border-zinc-800 bg-zinc-900/50">
             <div>
-                <div class="text-amber-500 font-black uppercase text-sm tracking-wide">📈 Faturamento Anual</div>
-                <div id="extrato-anual-titulo" class="text-zinc-500 text-[9px] uppercase font-bold tracking-widest mt-0.5"></div>
+                <div class="text-amber-400 font-black uppercase text-sm tracking-wide">📈 Faturamento Anual</div>
+                <div id="extrato-anual-titulo" class="text-zinc-400 text-[10px] uppercase font-bold tracking-wider mt-0.5"></div>
             </div>
             <button onclick="document.getElementById('modal-extrato-anual').classList.add('hidden')"
-                class="text-zinc-500 font-black text-lg w-8 h-8 flex items-center justify-center rounded-full bg-zinc-800">✕</button>
+                class="text-zinc-400 font-black text-sm w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-800 border border-zinc-700">✕</button>
         </div>
-        <div class="flex-1 overflow-y-auto px-4 py-3 space-y-2 no-scrollbar" id="extrato-anual-lista"></div>
+        <div class="flex-1 overflow-y-auto px-4 py-3 space-y-1 no-scrollbar max-w-lg mx-auto w-full" id="extrato-anual-lista"></div>
     </div>
 
-    <!-- TELA PIX: abre quando o link ?pix é acessado pelo cliente -->
-    <div id="pix-page" class="hidden fixed inset-0 z-[9999] flex flex-col items-center justify-center p-6" style="background:#0a0a0a;">
-        <div class="text-amber-500 font-black italic uppercase text-2xl mb-1 text-center">🥟 Priscila Esfihas</div>
-        <div class="text-zinc-500 text-[10px] uppercase font-bold mb-8 tracking-widest">Pagamento via Pix</div>
+    <!-- TELA PIX EXTERNA (ABRE QUANDO O CLIENTE CLICA NO LINK ?pix) -->
+    <div id="pix-page" class="hidden fixed inset-0 z-[9999] flex flex-col items-center justify-center p-6 bg-zinc-950">
+        <div class="w-16 h-16 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-3xl mb-4">🥟</div>
+        <div class="text-amber-400 font-black uppercase text-xl mb-1 text-center tracking-tight">Priscila Esfihas</div>
+        <div class="text-zinc-400 text-xs uppercase font-bold mb-8 tracking-widest">Pagamento Rápido via Pix</div>
 
-        <div class="w-full max-w-sm bg-zinc-900 border border-zinc-700 rounded-2xl p-6 text-center mb-4 shadow-2xl">
-            <div class="text-[9px] text-zinc-500 uppercase font-black tracking-widest mb-1">Tipo da Chave</div>
-            <div class="text-amber-500 font-bold text-xs mb-5">E-mail</div>
-            <div class="text-[9px] text-zinc-500 uppercase font-black tracking-widest mb-2">Chave Pix</div>
-            <div id="pix-key-display" class="text-xl font-black text-white break-all leading-tight">alanpocos@gmail.com</div>
+        <div class="w-full max-w-sm bg-zinc-900 border border-zinc-800 rounded-3xl p-6 text-center mb-5 shadow-2xl">
+            <div class="text-[10px] text-zinc-500 uppercase font-extrabold tracking-widest mb-1">Tipo da Chave</div>
+            <div class="inline-block bg-amber-500/10 text-amber-400 border border-amber-500/20 px-3 py-1 rounded-full font-bold text-xs mb-5">E-mail</div>
+            <div class="text-[10px] text-zinc-500 uppercase font-extrabold tracking-widest mb-2">Chave Pix</div>
+            <div id="pix-key-display" class="text-lg font-black text-white break-all leading-tight bg-zinc-950 p-3.5 rounded-xl border border-zinc-800">alanpocos@gmail.com</div>
         </div>
 
         <button onclick="copiarChavePix()" id="btn-copiar-pix"
-            class="w-full max-w-sm bg-amber-500 text-black font-black text-sm py-4 rounded-2xl uppercase tracking-wide transition-all active:scale-95">
+            class="w-full max-w-sm bg-amber-500 text-zinc-950 font-black text-sm py-4 rounded-2xl uppercase tracking-wide transition-all active:scale-95 shadow-lg shadow-amber-500/20">
             📋 Copiar Chave Pix
         </button>
-        <div id="pix-copiado" class="hidden text-emerald-400 font-black text-xs mt-4 uppercase tracking-widest">✅ Chave copiada com sucesso!</div>
+        <div id="pix-copiado" class="hidden text-emerald-400 font-extrabold text-xs mt-4 uppercase tracking-wider">✅ Chave copiada para a área de transferência!</div>
 
-        <div class="mt-10 text-[8px] text-zinc-700 uppercase text-center font-bold">Após copiar, abra seu banco e<br>cole na área de Pix › Pagar › Chave</div>
+        <div class="mt-10 text-[11px] text-zinc-500 text-center leading-relaxed max-w-xs">
+            Após copiar, abra o aplicativo do seu banco, acesse <strong class="text-zinc-300">Pix › Pagar › Chave</strong> e cole o e-mail acima.
+        </div>
     </div>
 
-    <div id="modal-detalhes" class="hidden">
-        <div class="flex justify-between items-center mb-4 pb-2 border-b border-zinc-900">
-            <h3 class="text-amber-500 font-black italic uppercase text-lg">Ficha do Cliente</h3>
-            <button onclick="closeModal()" class="text-zinc-500 font-black text-sm px-2">X VOLTAR</button>
-        </div>
-
-        <div class="card">
-            <div class="flex justify-between items-center mb-2">
-                <span class="label-gold mt-0">Nome do Cliente</span>
-                <button type="button" onclick="puxarContatoAgenda('edit')" class="text-[9px] bg-zinc-900 border border-amber-600/40 text-amber-500 px-2 py-1 rounded font-black uppercase">👤 Atualizar via Agenda</button>
-            </div>
-            <input type="text" id="edit-nome" class="uppercase">
-            <span class="label-gold">WhatsApp</span>
-            <input type="tel" id="edit-tel" placeholder="35999999999">
-            
-            <div class="grid grid-cols-2 gap-2 mt-3">
-                <div class="bg-zinc-900 p-2 rounded-xl text-center">
-                    <span class="text-[8px] text-zinc-500 font-black uppercase block">Saldo Devedor</span>
-                    <span id="modal-saldo" class="text-base font-black text-red-500 italic">R$ 0,00</span>
+    <!-- MODAL FICHA COMPLETA DO CLIENTE -->
+    <div id="modal-detalhes" class="hidden fixed inset-0 z-[2000] bg-zinc-950 overflow-y-auto">
+        <div class="max-w-lg mx-auto p-4 pb-16">
+            <div class="flex justify-between items-center mb-4 pb-3 border-b border-zinc-800 sticky top-0 bg-zinc-950/95 backdrop-blur-md z-10 pt-1">
+                <div>
+                    <h3 class="text-amber-400 font-black uppercase text-base tracking-tight">Ficha do Cliente</h3>
+                    <span class="text-[10px] text-zinc-500 font-semibold">Gerenciamento de conta e histórico</span>
                 </div>
-                <div class="bg-zinc-900 p-2 rounded-xl text-center">
-                    <span class="text-[8px] text-zinc-500 font-black uppercase block">Total Histórico</span>
-                    <span id="modal-historico-total" class="text-base font-black text-zinc-400 italic">R$ 0,00</span>
+                <button onclick="closeModal()" class="bg-zinc-900 border border-zinc-800 text-zinc-300 font-bold text-xs px-3.5 py-2 rounded-xl active:scale-95">✕ Fechar</button>
+            </div>
+
+            <!-- Resumo Financeiro da Ficha -->
+            <div class="grid grid-cols-2 gap-2.5 mb-3">
+                <div class="card-pro p-3.5 mb-0 bg-zinc-900/90">
+                    <span class="text-[10px] text-zinc-400 font-bold uppercase block">Saldo Devedor</span>
+                    <span id="modal-saldo" class="text-xl font-black text-rose-400 mt-1 block">R$ 0,00</span>
+                </div>
+                <div class="card-pro p-3.5 mb-0 bg-zinc-900/90">
+                    <span class="text-[10px] text-zinc-400 font-bold uppercase block">Total Já Comprado</span>
+                    <span id="modal-historico-total" class="text-xl font-black text-zinc-200 mt-1 block">R$ 0,00</span>
                 </div>
             </div>
 
-            <button class="btn-gold bg-zinc-800 text-amber-500 text-xs py-2 mt-4" onclick="salvarEdicao()">Salvar Alterações de Cadastro</button>
-        </div>
-
-        <div class="card border-emerald-900/40 bg-emerald-950/10">
-            <span class="label-gold text-emerald-500">Registrar Pagamento / Abatimento</span>
-            <div class="flex gap-2">
-                <input type="number" id="pagamento-valor" placeholder="R$ 0,00" step="0.01" class="mb-0">
-                <button class="btn-gold mt-0 w-1/3 bg-emerald-500 text-black text-xs" onclick="confirmarPagamento()">Baixar</button>
+            <!-- Abatimento / Pagamento -->
+            <div class="card-pro border-emerald-500/30 bg-emerald-950/10">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="label-gold text-emerald-400 mb-0">💸 Registrar Pagamento</span>
+                    <button type="button" onclick="preencherValorTotalPagamento()" class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2.5 py-1 rounded-lg font-extrabold uppercase active:scale-95">
+                        Quitar Tudo
+                    </button>
+                </div>
+                <div class="flex gap-2">
+                    <input type="number" id="pagamento-valor" placeholder="R$ 0,00" step="0.01" class="mb-0">
+                    <button class="btn-primary mt-0 w-2/5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-zinc-950 shadow-emerald-500/20" onclick="confirmarPagamento()">Baixar</button>
+                </div>
             </div>
-        </div>
 
-        <div class="grid grid-cols-2 gap-2 mb-4">
-            <button class="btn-gold bg-zinc-900 border border-zinc-800 text-white text-[10px] mt-0 py-3 flex flex-col items-center justify-center gap-1" onclick="enviarExtratoZap()">
-                <span>📋 Enviar Extrato</span>
-                <span class="text-[7px] text-zinc-500">Resumo 30 dias + Pix</span>
-            </button>
-            <button id="btn-cobranca-45" class="btn-gold bg-red-950/40 border border-red-900 text-red-400 text-[10px] mt-0 py-3 flex flex-col items-center justify-center gap-1" onclick="enviarCobranca45()">
-                <span>⚠️ Cobrança 45+ Dias</span>
-                <span class="text-[7px] text-red-600 font-black uppercase">Notificar Débito</span>
-            </button>
-        </div>
+            <!-- Ações de Cobrança via WhatsApp -->
+            <div class="grid grid-cols-2 gap-2.5 mb-3">
+                <button class="btn-secondary bg-zinc-900 border-zinc-800 py-3 flex-col gap-0.5" onclick="enviarExtratoZap()">
+                    <span class="text-white font-extrabold text-xs">📋 Enviar Extrato</span>
+                    <span class="text-[9px] text-zinc-400 font-medium">Resumo + Link Pix</span>
+                </button>
+                <button id="btn-cobranca-45" class="btn-secondary bg-rose-950/30 border-rose-800/50 py-3 flex-col gap-0.5" onclick="enviarCobranca45()">
+                    <span class="text-rose-400 font-extrabold text-xs">⚠️ Cobrança 45+ Dias</span>
+                    <span class="text-[9px] text-rose-500/80 font-medium">Lembrete de Acerto</span>
+                </button>
+            </div>
 
-        <div class="card flex-1 flex flex-col min-h-[200px]">
-            <span class="label-gold mt-0 mb-2">📅 Linha do Tempo Geral (Histórico Completo)</span>
-            <div id="extrato-linha-tempo" class="space-y-1 overflow-y-auto flex-1 no-scrollbar text-zinc-300"></div>
+            <!-- Dados Cadastrais -->
+            <div class="card-pro">
+                <div class="flex justify-between items-center mb-2.5">
+                    <span class="label-pro mb-0">Dados Cadastrais</span>
+                    <button type="button" onclick="puxarContatoAgenda('edit')" class="text-[10px] bg-zinc-800 border border-zinc-700 text-amber-400 px-2.5 py-1 rounded-lg font-bold uppercase">👤 Agenda</button>
+                </div>
+                <input type="text" id="edit-nome" class="uppercase mb-2.5" placeholder="Nome">
+                <input type="tel" id="edit-tel" placeholder="WhatsApp (35999999999)" class="mb-3">
+                <button class="btn-secondary text-amber-400 border-zinc-700 py-2.5" onclick="salvarEdicao()">Salvar Alterações</button>
+            </div>
+
+            <!-- Linha do Tempo com Estorno Seguro -->
+            <div class="card-pro">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="label-gold mb-0">📅 Histórico de Movimentações</span>
+                    <span class="text-[9px] text-zinc-500 font-medium">Toque na lixeira p/ estornar</span>
+                </div>
+                <div id="extrato-linha-tempo" class="space-y-2 max-h-[340px] overflow-y-auto no-scrollbar"></div>
+            </div>
         </div>
     </div>
 
@@ -300,7 +630,7 @@
             acucar: 30,     // g
             sal: 3,         // g
             fermento: 10,   // g
-            carne: 500        // g
+            carne: 500      // g
         };
 
         const nomesInsumos = {
@@ -322,6 +652,53 @@
         let historicoCompleto = [];
         let estoqueInsumos = {};
         let selecionadoId = null;
+        let filtroClienteAtual = 'todos';
+        let modoVendaAtual = 'pendura';
+        let metaMensal = parseFloat(localStorage.getItem('priscila_meta_mensal')) || 2000;
+
+        // Sistema de Toast Profissional (Substitui alert())
+        function showToast(msg, tipo = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const icones = { success: '✅', error: '⚠️', info: '🥟', warning: '🔔' };
+            const bordas = {
+                success: 'border-emerald-500/50 text-emerald-100',
+                error: 'border-rose-500/50 text-rose-100',
+                info: 'border-amber-500/50 text-zinc-100',
+                warning: 'border-amber-500/60 text-amber-100'
+            };
+            toast.className = `toast-msg ${bordas[tipo] || bordas.info}`;
+            toast.innerHTML = `<span class="text-base">${icones[tipo] || '🥟'}</span><span class="flex-1 leading-snug">${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-10px)';
+                toast.style.transition = 'all 0.25s ease';
+                setTimeout(() => toast.remove(), 260);
+            }, 3400);
+        }
+
+        // Modal de Confirmação Customizado (Substitui confirm())
+        function pedirConfirmacao(titulo, descricao) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('modal-confirm');
+                document.getElementById('confirm-title').innerText = titulo;
+                document.getElementById('confirm-desc').innerText = descricao;
+                modal.classList.remove('hidden');
+
+                const btnOk = document.getElementById('confirm-ok');
+                const btnCancel = document.getElementById('confirm-cancel');
+
+                const limpar = () => {
+                    modal.classList.add('hidden');
+                    btnOk.onclick = null;
+                    btnCancel.onclick = null;
+                };
+
+                btnOk.onclick = () => { limpar(); resolve(true); };
+                btnCancel.onclick = () => { limpar(); resolve(false); };
+            });
+        }
 
         // Controle Local de Massa Inteligente
         let controleProducaoDia = {
@@ -329,15 +706,22 @@
             saldoBandejas: 0
         };
 
-        // Carrega o estado de produção guardado
         if(localStorage.getItem('controleProducaoDia')) {
-            const salvo = JSON.parse(localStorage.getItem('controleProducaoDia'));
-            if(salvo.data === new Date().toLocaleDateString('pt-BR')) {
-                controleProducaoDia = salvo;
-            } else {
-                // Virou o dia: o que sobrou virou consumo/desperdício automático
-                localStorage.setItem('controleProducaoDia', JSON.stringify(controleProducaoDia));
-            }
+            try {
+                const salvo = JSON.parse(localStorage.getItem('controleProducaoDia'));
+                if(salvo.data === new Date().toLocaleDateString('pt-BR')) {
+                    controleProducaoDia = salvo;
+                } else {
+                    localStorage.setItem('controleProducaoDia', JSON.stringify(controleProducaoDia));
+                }
+            } catch(e) {}
+        }
+
+        function ajustarSaldoBancada(delta) {
+            controleProducaoDia.data = new Date().toLocaleDateString('pt-BR');
+            controleProducaoDia.saldoBandejas = Math.max(0, (controleProducaoDia.saldoBandejas || 0) + delta);
+            localStorage.setItem('controleProducaoDia', JSON.stringify(controleProducaoDia));
+            document.getElementById('saldo-bandejas-display').innerText = controleProducaoDia.saldoBandejas;
         }
 
         async function init() {
@@ -369,14 +753,11 @@
 
         async function puxarContatoAgenda(target) {
             if (!('contacts' in navigator && 'ContactsManager' in window)) {
-                alert("Seu navegador ou dispositivo não suporta puxar contatos da agenda diretamente.");
+                showToast("Seu navegador não suporta importação direta da agenda.", "warning");
                 return;
             }
             try {
-                const props = ['name', 'tel'];
-                const opts = { multiple: false };
-                const contacts = await navigator.contacts.select(props, opts);
-                
+                const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: false });
                 if (contacts && contacts.length > 0) {
                     const contact = contacts[0];
                     const nomeOriginal = (contact.name && contact.name[0]) ? contact.name[0] : "";
@@ -392,6 +773,7 @@
                         document.getElementById('edit-nome').value = nomeFormatado;
                         document.getElementById('edit-tel').value = telFormatado;
                     }
+                    showToast("Contato importado da agenda!", "success");
                 }
             } catch (err) {
                 console.error("Erro ao selecionar contato:", err);
@@ -403,10 +785,9 @@
                 const el = document.getElementById('tab-'+id);
                 const btn = document.getElementById('btn-'+id);
                 if(el) el.classList.toggle('hidden', id !== t);
-                if(btn) btn.classList.toggle('active-tab', id === t);
+                if(btn) btn.classList.toggle('active', id === t);
             });
             if(t === 'vendas') {
-                document.getElementById('venda-cliente-select').value = "";
                 document.getElementById('venda-qtd').value = 1;
                 updateVendaTotal();
             }
@@ -414,62 +795,151 @@
 
         function calcTotalGeral() {
             const total = clientes.reduce((acc, c) => acc + (c.saldo || 0), 0);
-            document.getElementById('resumo-total').innerText = `DÉBITO TOTAL: R$ ${total.toFixed(2)}`;
+            document.getElementById('resumo-total').innerText = `R$ ${total.toFixed(2)}`;
         }
 
         async function addCliente() {
             const nome = document.getElementById('novo-cliente-nome').value.toUpperCase().trim();
             const tel = document.getElementById('novo-cliente-tel').value.replace(/\D/g, '');
-            if(!nome) return alert("O nome do cliente é obrigatório!");
+            if(!nome) return showToast("Digite o nome do cliente para cadastrar.", "error");
             
-            await db.collection('clientes').add({
+            const jaExiste = clientes.some(c => c.nome === nome);
+            if(jaExiste) {
+                const ok = await pedirConfirmacao("Cliente já cadastrado", `Já existe um cliente chamado "${nome}". Deseja cadastrar mesmo assim?`);
+                if(!ok) return;
+            }
+
+            const docRef = await db.collection('clientes').add({
                 nome, tel, saldo: 0, ultimaCompra: null, totalComprado: 0
             });
             
             document.getElementById('novo-cliente-nome').value = "";
             document.getElementById('novo-cliente-tel').value = "";
-            showTab('clientes');
+            showToast(`Cliente ${nome} cadastrado com sucesso!`, "success");
+            
+            setTimeout(() => {
+                const sel = document.getElementById('venda-cliente-select');
+                if(sel) sel.value = docRef.id;
+            }, 300);
+        }
+
+        function setFiltroCliente(filtro) {
+            filtroClienteAtual = filtro;
+            ['todos', 'devedores', 'atrasados', 'quitados'].forEach(f => {
+                const btn = document.getElementById('filtro-' + f);
+                if(btn) btn.classList.toggle('active', f === filtro);
+            });
+            renderClientes();
         }
 
         function renderClientes() {
-            const busca = document.getElementById('search-g').value.toUpperCase();
+            const busca = document.getElementById('search-g').value.toUpperCase().trim();
             const lista = document.getElementById('list-clientes');
-            let h = '';
-            const filtrados = clientes.filter(c => c.nome.includes(busca));
             
+            let countTodos = clientes.length;
+            let countDevedores = 0;
+            let countAtrasados = 0;
+
+            clientes.forEach(c => {
+                if((c.saldo || 0) > 0) countDevedores++;
+                if(c.ultimaCompra && (c.saldo || 0) > 0) {
+                    const dias = Math.floor((new Date() - new Date(c.ultimaCompra.seconds * 1000)) / (1000 * 60 * 60 * 24));
+                    if(dias >= 45) countAtrasados++;
+                }
+            });
+
+            document.getElementById('count-todos').innerText = countTodos;
+            document.getElementById('count-devedores').innerText = countDevedores;
+            document.getElementById('count-atrasados').innerText = countAtrasados;
+
+            const filtrados = clientes.filter(c => {
+                const matchBusca = c.nome.includes(busca) || (c.tel && c.tel.includes(busca));
+                if(!matchBusca) return false;
+
+                if(filtroClienteAtual === 'devedores') return (c.saldo || 0) > 0;
+                if(filtroClienteAtual === 'quitados') return (c.saldo || 0) <= 0;
+                if(filtroClienteAtual === 'atrasados') {
+                    if(!c.ultimaCompra || (c.saldo || 0) <= 0) return false;
+                    const dias = Math.floor((new Date() - new Date(c.ultimaCompra.seconds * 1000)) / (1000 * 60 * 60 * 24));
+                    return dias >= 45;
+                }
+                return true;
+            });
+            
+            let h = '';
             filtrados.forEach(c => {
-                let statusTempo = 'Nunca pediu';
+                let statusTempo = 'Sem pedidos ainda';
                 let alertar45 = false;
                 
                 if(c.ultimaCompra) {
                     const dias = Math.floor((new Date() - new Date(c.ultimaCompra.seconds * 1000)) / (1000 * 60 * 60 * 24));
-                    statusTempo = dias === 0 ? 'Pediu hoje' : `Inativo há ${dias} dias`;
+                    statusTempo = dias === 0 ? 'Pediu hoje' : `Último pedido há ${dias}d`;
                     if(dias >= 45 && c.saldo > 0) alertar45 = true;
                 }
+
+                const iniciais = c.nome.split(' ').slice(0,2).map(n => n[0]).join('');
                 
                 h += `
-                <div class="card flex justify-between items-center cursor-pointer active:bg-zinc-900 border-l-4 ${alertar45 ? 'border-l-red-600' : 'border-l-zinc-700'}" onclick="openModal('${c.id}')">
-                    <div class="min-w-0 flex-1 pr-2">
-                        <div class="text-base font-black italic uppercase text-white truncate leading-tight">${c.nome}</div>
-                        <div class="text-[8px] font-bold text-zinc-500 uppercase mt-1 flex items-center gap-1">
-                            ${alertar45 ? '<span class="text-red-500 font-black">⚠️ DÉBITO VELHO 45+ DIAS</span> • ' : ''}
-                            ${statusTempo}
+                <div class="card-pro p-3.5 mb-0 flex justify-between items-center cursor-pointer active:scale-[0.99] transition-transform ${alertar45 ? 'border-rose-500/40 bg-rose-950/10' : ''}" onclick="openModal('${c.id}')">
+                    <div class="flex items-center gap-3 min-w-0 flex-1 pr-2">
+                        <div class="w-10 h-10 rounded-full ${alertar45 ? 'bg-rose-500/20 text-rose-400 border-rose-500/30' : 'bg-zinc-800 text-zinc-300 border-zinc-700'} border flex items-center justify-center font-black text-xs flex-shrink-0">
+                            ${iniciais}
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="text-sm font-extrabold uppercase text-white truncate">${c.nome}</div>
+                            <div class="text-[10px] font-medium text-zinc-400 mt-0.5 flex items-center gap-1.5 flex-wrap">
+                                ${alertar45 ? '<span class="text-rose-400 font-extrabold bg-rose-500/10 px-1.5 py-0.2 rounded">⚠️ 45+ DIAS</span>' : ''}
+                                <span>${statusTempo}</span>
+                            </div>
                         </div>
                     </div>
                     <div class="text-right flex-shrink-0">
-                        <div class="text-lg font-black italic ${c.saldo > 0 ? 'text-red-500' : 'text-emerald-500'}">R$ ${c.saldo.toFixed(2)}</div>
+                        <span class="text-[9px] font-bold uppercase block ${c.saldo > 0 ? 'text-rose-400/80' : 'text-emerald-400/80'}">${c.saldo > 0 ? 'Em aberto' : 'Em dia'}</span>
+                        <div class="text-base font-black ${c.saldo > 0 ? 'text-rose-400' : 'text-emerald-400'}">R$ ${(c.saldo || 0).toFixed(2)}</div>
                     </div>
                 </div>`;
             });
-            lista.innerHTML = h || '<div class="text-center p-10 text-zinc-600 font-black uppercase italic text-xs">Nenhum cliente cadastrado</div>';
+            lista.innerHTML = h || '<div class="text-center py-12 text-zinc-500 font-semibold text-xs">Nenhum cliente encontrado neste filtro.</div>';
         }
 
         function updateSelects() {
             const sel = document.getElementById('venda-cliente-select');
             if(!sel) return;
-            let h = '<option value="">SELECIONE O CLIENTE...</option>';
-            clientes.forEach(c => h += `<option value="${c.id}">${c.nome} (Devendo: R$ ${c.saldo.toFixed(2)})</option>`);
+            const valAtual = sel.value;
+            let h = '<option value="">Selecione o cliente...</option>';
+            clientes.forEach(c => h += `<option value="${c.id}">${c.nome} — Saldo: R$ ${(c.saldo || 0).toFixed(2)}</option>`);
             sel.innerHTML = h;
+            if(valAtual) sel.value = valAtual;
+        }
+
+        function setModoVenda(modo) {
+            modoVendaAtual = modo;
+            const btnPendura = document.getElementById('modo-pendura');
+            const btnAvista = document.getElementById('modo-avista');
+            const btnSubmit = document.getElementById('btn-registrar-venda');
+
+            if(modo === 'pendura') {
+                btnPendura.className = "py-2.5 px-3 rounded-xl border border-amber-500 bg-amber-500/15 text-amber-400 font-extrabold text-xs uppercase transition-all";
+                btnAvista.className = "py-2.5 px-3 rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-400 font-extrabold text-xs uppercase transition-all";
+                btnSubmit.innerHTML = "<span>📝 Lançar na Pendura</span>";
+            } else {
+                btnAvista.className = "py-2.5 px-3 rounded-xl border border-emerald-500 bg-emerald-500/15 text-emerald-400 font-extrabold text-xs uppercase transition-all";
+                btnPendura.className = "py-2.5 px-3 rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-400 font-extrabold text-xs uppercase transition-all";
+                btnSubmit.innerHTML = "<span>💸 Registrar Venda Paga</span>";
+            }
+            updateVendaTotal();
+        }
+
+        function ajustarQtdVenda(delta) {
+            const input = document.getElementById('venda-qtd');
+            const novo = Math.max(1, (parseInt(input.value) || 1) + delta);
+            input.value = novo;
+            updateVendaTotal();
+        }
+
+        function setQtdVenda(qtd) {
+            document.getElementById('venda-qtd').value = qtd;
+            updateVendaTotal();
         }
 
         function updateVendaTotal() {
@@ -477,20 +947,22 @@
             const qtd = parseInt(document.getElementById('venda-qtd').value) || 0;
             const total = qtd * PRECO_BANDEJA;
             document.getElementById('venda-total-display').innerText = `R$ ${total.toFixed(2)}`;
+            document.getElementById('venda-esfihas-count').innerText = `${qtd * 5} esfihas fechadas (${qtd} band.)`;
             
             const c = clientes.find(x => x.id === cid);
             const elAlerta = document.getElementById('alerta-limite');
-            if(c && (c.saldo + total) >= 100) elAlerta.classList.remove('hidden');
-            else elAlerta.classList.add('hidden');
+            if(modoVendaAtual === 'pendura' && c && ((c.saldo || 0) + total) >= 100) {
+                elAlerta.classList.remove('hidden');
+            } else {
+                elAlerta.classList.add('hidden');
+            }
         }
 
-        // LÓGICA REESTRUTURADA: GATILHO AUTOMÁTICO DE MASSA INTEIRA
         async function registrarVenda() {
             const cid = document.getElementById('venda-cliente-select').value;
             const qtd = parseInt(document.getElementById('venda-qtd').value);
-            if(!cid || !qtd || qtd <= 0) return alert("Selecione um cliente e quantidade válida!");
+            if(!cid || !qtd || qtd <= 0) return showToast("Selecione um cliente e uma quantidade válida.", "error");
             
-            // Verifica e resguarda mudança de dia antes de calcular o saldo
             const hojeStr = new Date().toLocaleDateString('pt-BR');
             if(controleProducaoDia.data !== hojeStr) {
                 controleProducaoDia.data = hojeStr;
@@ -500,15 +972,12 @@
             let bandejasNecessarias = qtd;
             let massasABater = 0;
 
-            // Se o saldo de bandejas prontas de hoje não for suficiente para cobrir a venda:
             if (controleProducaoDia.saldoBandejas < bandejasNecessarias) {
                 let falta = bandejasNecessarias - controleProducaoDia.saldoBandejas;
-                // Cada massa batida gera 4 bandejas
                 massasABater = Math.ceil(falta / 4);
                 controleProducaoDia.saldoBandejas += (massasABater * 4);
             }
 
-            // Consome do saldo do dia
             controleProducaoDia.saldoBandejas -= bandejasNecessarias;
             localStorage.setItem('controleProducaoDia', JSON.stringify(controleProducaoDia));
             document.getElementById('saldo-bandejas-display').innerText = controleProducaoDia.saldoBandejas;
@@ -517,21 +986,40 @@
             const c = clientes.find(x => x.id === cid);
             const batch = db.batch();
             
-            // 1. Atualizar ficha do cliente
             const cRef = db.collection('clientes').doc(cid);
+            const acrescimoSaldo = modoVendaAtual === 'pendura' ? total : 0;
+
             batch.update(cRef, {
-                saldo: (c.saldo || 0) + total,
+                saldo: (c.saldo || 0) + acrescimoSaldo,
                 totalComprado: (c.totalComprado || 0) + total,
                 ultimaCompra: firebase.firestore.FieldValue.serverTimestamp()
             });
             
-            // 2. Gravar histórico da venda
             const vRef = db.collection('vendas').doc();
             batch.set(vRef, {
-                clienteId: cid, clienteNome: c.nome, qtd, valor: total, data: firebase.firestore.FieldValue.serverTimestamp(), tipo: 'venda', massasProduzidas: massasABater
+                clienteId: cid,
+                clienteNome: c.nome,
+                qtd,
+                valor: total,
+                data: firebase.firestore.FieldValue.serverTimestamp(),
+                tipo: 'venda',
+                pagoNaHora: modoVendaAtual === 'avista',
+                massasProduzidas: massasABater
             });
+
+            // Se foi pago na hora, também registra o pagamento no histórico financeiro
+            if(modoVendaAtual === 'avista') {
+                const pRef = db.collection('vendas').doc();
+                batch.set(pRef, {
+                    clienteId: cid,
+                    clienteNome: c.nome,
+                    valor: total,
+                    data: firebase.firestore.FieldValue.serverTimestamp(),
+                    tipo: 'pagamento',
+                    origemAvista: true
+                });
+            }
             
-            // 3. DEDUÇÃO DO ESTOQUE (Se disparou novas massas inteiras)
             if(massasABater > 0) {
                 Object.keys(receitaProporcao).forEach(key => {
                     if(estoqueInsumos[key]) {
@@ -546,7 +1034,11 @@
             }
             
             await batch.commit();
-            alert(`Venda registrada! ` + (massasABater > 0 ? `Abatido ${massasABater} massa(s) inteira(s) do estoque.` : `Usou saldo de massa já pronta de hoje.`));
+            const msgMassa = massasABater > 0 ? ` (${massasABater} massa abatida)` : ` (usou saldo do dia)`;
+            showToast(`Pedido registrado com sucesso!${msgMassa}`, "success");
+            
+            document.getElementById('venda-qtd').value = 1;
+            setModoVenda('pendura');
             showTab('clientes');
         }
 
@@ -556,15 +1048,23 @@
             const unMedida = document.getElementById('insumo-unidade');
             const precoPacote = document.getElementById('insumo-preco-pacote');
             
-            if(tipo === 'farinha') { tamPacote.value = "1000"; unMedida.value = "g"; precoPacote.value = "5.50"; }
-            else if(tipo === 'ovos') { tamPacote.value = "30"; unMedida.value = "un"; precoPacote.value = "18.00"; }
-            else if(tipo === 'leite') { tamPacote.value = "1000"; unMedida.value = "ml"; precoPacote.value = "4.80"; }
-            else if(tipo === 'margarina') { tamPacote.value = "500"; unMedida.value = "g"; precoPacote.value = "6.50"; }
-            else if(tipo === 'oleo') { tamPacote.value = "900"; unMedida.value = "ml"; precoPacote.value = "7.00"; }
-            else if(tipo === 'acucar') { tamPacote.value = "1000"; unMedida.value = "g"; precoPacote.value = "4.20"; }
-            else if(tipo === 'sal') { tamPacote.value = "1000"; unMedida.value = "g"; precoPacote.value = "3.00"; }
-            else if(tipo === 'fermento') { tamPacote.value = "150"; unMedida.value = "g"; precoPacote.value = "14.00"; }
-            else if(tipo === 'carne') { tamPacote.value = "1000"; unMedida.value = "g"; precoPacote.value = "38.00"; }
+            const defaults = {
+                farinha: ["1000", "g", "5.50"],
+                ovos: ["30", "un", "18.00"],
+                leite: ["1000", "ml", "4.80"],
+                margarina: ["500", "g", "6.50"],
+                oleo: ["900", "ml", "7.00"],
+                acucar: ["1000", "g", "4.20"],
+                sal: ["1000", "g", "3.00"],
+                fermento: ["150", "g", "14.00"],
+                carne: ["1000", "g", "38.00"]
+            };
+
+            if(defaults[tipo]) {
+                tamPacote.value = defaults[tipo][0];
+                unMedida.value = defaults[tipo][1];
+                precoPacote.value = estoqueInsumos[tipo]?.precoPacote || defaults[tipo][2];
+            }
         }
 
         async function salvarInsumoEstoque() {
@@ -575,7 +1075,7 @@
             const qtdComprada = parseInt(document.getElementById('insumo-qtd-comprada').value) || 1;
 
             if(!tamanhoPacote || !precoPacote || tamanhoPacote <= 0 || precoPacote <= 0) {
-                return alert("Insira valores válidos!");
+                return showToast("Preencha tamanho e valor válidos!", "error");
             }
 
             const totalInjetadoEstoque = tamanhoPacote * qtdComprada;
@@ -594,7 +1094,7 @@
                 ultimaCompra: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            alert(`${nomesInsumos[tipo]} atualizado no estoque!`);
+            showToast(`${nomesInsumos[tipo]} atualizado no estoque!`, "success");
             document.getElementById('insumo-qtd-comprada').value = "1";
         }
 
@@ -602,41 +1102,62 @@
             let totalCustoMassa = 0;
             let container = document.getElementById('lista-estoque-status');
             let h = '';
+            let massasPossiveis = Infinity;
+            let temAlgumInsumo = false;
 
             Object.keys(receitaProporcao).forEach(key => {
                 const usaNaReceita = receitaProporcao[key];
                 const insumo = estoqueInsumos[key];
                 
                 let precoFracaoReceita = 0;
-                let estoqueTexto = 'Sem cadastro';
-                let unidade = key === 'ovos' ? 'un' : (key === 'leite' || key === 'oleo' ? 'ml' : (key === 'carne' ? 'kg' : 'g'));
+                let estoqueTexto = 'Não cadastrado';
+                let unidade = key === 'ovos' ? 'un' : (key === 'leite' || key === 'oleo' ? 'ml' : 'g');
                 let corAlertaEstoque = 'text-zinc-500';
+                let percBarra = 0;
+                let corBarra = 'bg-zinc-700';
 
                 if(insumo) {
+                    temAlgumInsumo = true;
                     precoFracaoReceita = insumo.custoPorUnidadeMedida * usaNaReceita;
                     totalCustoMassa += precoFracaoReceita;
                     unidade = insumo.unidade;
                     
                     const estAtual = insumo.estoqueAtual || 0;
-                    estoqueTexto = `${estAtual.toFixed(0)} ${unidade} em estoque`;
+                    const massasComEste = Math.floor(estAtual / usaNaReceita);
+                    if(massasComEste < massasPossiveis) massasPossiveis = massasComEste;
+
+                    estoqueTexto = `${estAtual.toFixed(0)} ${unidade} (${massasComEste} massas)`;
+                    percBarra = Math.min(100, (estAtual / (usaNaReceita * 5)) * 100);
                     
                     if(estAtual < usaNaReceita) {
-                        corAlertaEstoque = 'text-red-500 font-bold animate-pulse';
-                        estoqueTexto += ' ⚠️ BAIXO!';
+                        corAlertaEstoque = 'text-rose-400 font-bold';
+                        estoqueTexto += ' • REPOR!';
+                        corBarra = 'bg-rose-500';
+                    } else if(massasComEste <= 2) {
+                        corAlertaEstoque = 'text-amber-400 font-semibold';
+                        corBarra = 'bg-amber-500';
                     } else {
                         corAlertaEstoque = 'text-zinc-400';
+                        corBarra = 'bg-emerald-500';
                     }
+                } else {
+                    massasPossiveis = 0;
                 }
 
                 h += `
-                <div class="flex justify-between items-center bg-zinc-900/60 p-2.5 rounded-xl border border-zinc-900 text-xs">
-                    <div>
-                        <div class="font-black text-white uppercase">${nomesInsumos[key]}</div>
-                        <div class="text-[9px] ${corAlertaEstoque} mt-0.5">${estoqueTexto}</div>
+                <div class="bg-zinc-900/80 p-3 rounded-xl border border-zinc-800/80">
+                    <div class="flex justify-between items-center text-xs mb-1.5">
+                        <div>
+                            <div class="font-extrabold text-white uppercase">${nomesInsumos[key]}</div>
+                            <div class="text-[10px] ${corAlertaEstoque} mt-0.5">${estoqueTexto}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-black text-amber-400">R$ ${precoFracaoReceita.toFixed(2)}</div>
+                            <div class="text-[9px] text-zinc-500">Usa ${usaNaReceita}${unidade}/massa</div>
+                        </div>
                     </div>
-                    <div class="text-right">
-                        <div class="font-black text-amber-500">R$ ${precoFracaoReceita.toFixed(2)}</div>
-                        <div class="text-[7px] text-zinc-600 uppercase">Usa ${usaNaReceita}${unidade} na receita</div>
+                    <div class="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                        <div class="h-full ${corBarra} rounded-full transition-all" style="width: ${percBarra}%"></div>
                     </div>
                 </div>`;
             });
@@ -645,9 +1166,14 @@
 
             const custoPorBandeja = totalCustoMassa / 4;
             const lucroPorBandeja = PRECO_BANDEJA - custoPorBandeja;
+            const margem = PRECO_BANDEJA > 0 ? ((lucroPorBandeja / PRECO_BANDEJA) * 100) : 0;
+            const capFinal = (!temAlgumInsumo || massasPossiveis === Infinity) ? 0 : massasPossiveis;
 
             document.getElementById('custo-massa-total').innerText = `R$ ${totalCustoMassa.toFixed(2)}`;
             document.getElementById('lucro-bandeja-total').innerText = `R$ ${lucroPorBandeja.toFixed(2)}`;
+            document.getElementById('margem-lucro-badge').innerText = `Margem ${margem.toFixed(0)}%`;
+            document.getElementById('capacidade-massas-display').innerText = `${capFinal} massas`;
+            document.getElementById('capacidade-bandejas-sub').innerText = `${capFinal * 4} bandejas`;
         }
 
         function openModal(id) {
@@ -669,7 +1195,7 @@
             
             document.getElementById('edit-nome').value = c.nome;
             document.getElementById('edit-tel').value = c.tel || "";
-            document.getElementById('modal-saldo').innerText = `R$ ${c.saldo.toFixed(2)}`;
+            document.getElementById('modal-saldo').innerText = `R$ ${(c.saldo || 0).toFixed(2)}`;
             document.getElementById('modal-historico-total').innerText = `R$ ${(c.totalComprado || 0).toFixed(2)}`;
             
             let exibirAlerta45 = false;
@@ -679,38 +1205,82 @@
             }
             
             const btn45 = document.getElementById('btn-cobranca-45');
-            if(exibirAlerta45) { btn45.classList.remove('opacity-30'); btn45.style.pointerEvents = 'auto'; }
-            else { btn45.classList.add('opacity-30'); btn45.style.pointerEvents = 'none'; }
+            if(exibirAlerta45) { btn45.classList.remove('opacity-40'); btn45.style.pointerEvents = 'auto'; }
+            else { btn45.classList.add('opacity-40'); btn45.style.pointerEvents = 'none'; }
+        }
+
+        function preencherValorTotalPagamento() {
+            const c = clientes.find(x => x.id === selecionadoId);
+            if(!c || (c.saldo || 0) <= 0) return showToast("Cliente não possui saldo devedor.", "info");
+            document.getElementById('pagamento-valor').value = c.saldo.toFixed(2);
         }
 
         async function salvarEdicao() {
             if(!selecionadoId) return;
             const novoNome = document.getElementById('edit-nome').value.toUpperCase().trim();
             const novoTel = document.getElementById('edit-tel').value.replace(/\D/g, '');
-            if(!novoNome) return alert("Nome obrigatório!");
+            if(!novoNome) return showToast("O nome é obrigatório!", "error");
             
             await db.collection('clientes').doc(selecionadoId).update({ nome: novoNome, tel: novoTel });
-            alert("Cadastro atualizado!");
+            showToast("Dados do cliente atualizados!", "success");
         }
 
         async function confirmarPagamento() {
             const valor = parseFloat(document.getElementById('pagamento-valor').value);
-            if(!valor || valor <= 0 || !selecionadoId) return alert("Valor inválido!");
+            if(!valor || valor <= 0 || !selecionadoId) return showToast("Digite um valor válido para baixar.", "error");
             
             const c = clientes.find(x => x.id === selecionadoId);
             const batch = db.batch();
             const cRef = db.collection('clientes').doc(selecionadoId);
-            const novoSaldo = Math.max(0, c.saldo - valor);
+            const novoSaldo = Math.max(0, (c.saldo || 0) - valor);
             batch.update(cRef, { saldo: novoSaldo });
             
             const vRef = db.collection('vendas').doc();
             batch.set(vRef, {
-                clienteId: selecionadoId, clienteNome: c.nome, valor: valor, data: firebase.firestore.FieldValue.serverTimestamp(), tipo: 'pagamento'
+                clienteId: selecionadoId,
+                clienteNome: c.nome,
+                valor: valor,
+                data: firebase.firestore.FieldValue.serverTimestamp(),
+                tipo: 'pagamento'
             });
             
             await batch.commit();
             document.getElementById('pagamento-valor').value = "";
-            alert("Pagamento registrado!");
+            showToast(`Pagamento de R$ ${valor.toFixed(2)} registrado!`, "success");
+        }
+
+        // Estorno Inteligente de Lançamentos (Novidade Enterprise)
+        async function estornarMovimentacao(movId) {
+            const mov = historicoCompleto.find(h => h.id === movId);
+            if(!mov || !selecionadoId) return;
+            const c = clientes.find(x => x.id === selecionadoId);
+            if(!c) return;
+
+            const desc = mov.tipo === 'venda'
+                ? `Deseja estornar a venda de ${mov.qtd} bandeja(s) (R$ ${mov.valor.toFixed(2)})? O saldo do cliente será recalculado.`
+                : `Deseja cancelar o pagamento de R$ ${mov.valor.toFixed(2)}? O valor voltará ao saldo devedor.`;
+
+            const ok = await pedirConfirmacao("Estornar Lançamento", desc);
+            if(!ok) return;
+
+            const batch = db.batch();
+            const cRef = db.collection('clientes').doc(selecionadoId);
+
+            if(mov.tipo === 'venda') {
+                const abaterSaldo = mov.pagoNaHora ? 0 : mov.valor;
+                batch.update(cRef, {
+                    saldo: Math.max(0, (c.saldo || 0) - abaterSaldo),
+                    totalComprado: Math.max(0, (c.totalComprado || 0) - mov.valor)
+                });
+            } else {
+                batch.update(cRef, {
+                    saldo: (c.saldo || 0) + mov.valor
+                });
+            }
+
+            batch.delete(db.collection('vendas').doc(movId));
+            await batch.commit();
+            showToast("Lançamento estornado com sucesso!", "info");
         }
 
         function renderExtratoCliente(cid) {
@@ -719,14 +1289,29 @@
             let h = '';
             
             filtrados.forEach(i => {
-                const dataStr = i.data ? new Date(i.data.seconds * 1000).toLocaleDateString('pt-BR') : 'Processando...';
+                const dataStr = i.data ? new Date(i.data.seconds * 1000).toLocaleDateString('pt-BR') : 'Agora';
                 if(i.tipo === 'venda') {
-                    h += `<div class="hist-item border-l-4 border-l-red-500"><div class="flex justify-between font-bold"><span class="text-white">🥟 PEGOU ${i.qtd} BANDEJA(S)</span><span class="text-red-400">R$ ${i.valor.toFixed(2)}</span></div><div class="text-[8px] text-zinc-500 uppercase mt-0.5">${dataStr}</div></div>`;
+                    const badgeAvista = i.pagoNaHora ? '<span class="text-[8px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded ml-1">PAGO NA HORA</span>' : '';
+                    h += `
+                    <div class="bg-zinc-900 border border-zinc-800 border-l-4 border-l-rose-500 p-2.5 rounded-xl flex justify-between items-center">
+                        <div>
+                            <div class="text-xs font-extrabold text-white">🥟 ${i.qtd} BANDEJA(S) ${badgeAvista}</div>
+                            <div class="text-[10px] text-zinc-500 mt-0.5">${dataStr} • <span class="text-rose-400 font-bold">R$ ${i.valor.toFixed(2)}</span></div>
+                        </div>
+                        <button onclick="estornarMovimentacao('${i.id}')" class="text-zinc-600 hover:text-rose-400 p-1.5 text-xs" title="Estornar">🗑️</button>
+                    </div>`;
                 } else {
-                    h += `<div class="hist-item border-l-4 border-l-emerald-500"><div class="flex justify-between font-bold"><span class="text-emerald-400">💰 EFETUOU PAGAMENTO</span><span class="text-emerald-400">- R$ ${i.valor.toFixed(2)}</span></div><div class="text-[8px] text-zinc-500 uppercase mt-0.5">${dataStr}</div></div>`;
+                    h += `
+                    <div class="bg-zinc-900 border border-zinc-800 border-l-4 border-l-emerald-500 p-2.5 rounded-xl flex justify-between items-center">
+                        <div>
+                            <div class="text-xs font-extrabold text-emerald-400">💰 PAGAMENTO RECEBIDO</div>
+                            <div class="text-[10px] text-zinc-500 mt-0.5">${dataStr} • <span class="text-emerald-400 font-bold">- R$ ${i.valor.toFixed(2)}</span></div>
+                        </div>
+                        <button onclick="estornarMovimentacao('${i.id}')" class="text-zinc-600 hover:text-rose-400 p-1.5 text-xs" title="Estornar">🗑️</button>
+                    </div>`;
                 }
             });
-            container.innerHTML = h || '<div class="text-center py-6 text-zinc-700 italic text-xs font-bold">Nenhuma movimentação</div>';
+            container.innerHTML = h || '<div class="text-center py-8 text-zinc-600 text-xs font-semibold">Nenhuma movimentação registrada.</div>';
         }
 
         function abrirExtratoAnual() {
@@ -735,7 +1320,6 @@
             const fmt = d => d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
             const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 
-            // Gera todos os ciclos 7→6 do ano atual que já começaram
             const ciclos = [];
             for(let m = 0; m < 12; m++) {
                 const inicio = new Date(anoAtual, m, 7);
@@ -743,7 +1327,7 @@
                 if(inicio > hoje) break;
                 ciclos.push({ inicio, fim, label: `${meses[m]}/${anoAtual}` });
             }
-            ciclos.reverse(); // mais recente primeiro
+            ciclos.reverse();
 
             let totalAnual = 0;
             let html = '';
@@ -756,36 +1340,49 @@
                 totalAnual += valor;
                 const isCicloAtual = c.inicio <= hoje && hoje <= c.fim;
                 html += `
-                    <div class="flex items-center justify-between py-3 border-b border-zinc-800/60">
+                    <div class="flex items-center justify-between py-3.5 border-b border-zinc-800/80">
                         <div>
-                            <div class="text-white font-black text-xs uppercase">${c.label}${isCicloAtual ? ' <span class="text-amber-500 text-[8px]">● atual</span>' : ''}</div>
-                            <div class="text-zinc-600 text-[9px] font-bold mt-0.5">${fmt(c.inicio)} – ${fmt(c.fim)}</div>
+                            <div class="text-white font-extrabold text-xs uppercase flex items-center gap-2">
+                                <span>${c.label}</span>
+                                ${isCicloAtual ? '<span class="bg-amber-500/20 text-amber-400 text-[9px] px-2 py-0.5 rounded-full">Ciclo Atual</span>' : ''}
+                            </div>
+                            <div class="text-zinc-500 text-[10px] font-medium mt-0.5">${fmt(c.inicio)} até ${fmt(c.fim)}</div>
                         </div>
-                        <div class="text-emerald-400 font-black text-sm">${valor > 0 ? 'R$ ' + valor.toFixed(2) : '<span class="text-zinc-700">—</span>'}</div>
+                        <div class="text-emerald-400 font-black text-sm">${valor > 0 ? 'R$ ' + valor.toFixed(2) : '<span class="text-zinc-700">R$ 0,00</span>'}</div>
                     </div>`;
             });
 
-            // Rodapé com total
-            html += `<div class="flex items-center justify-between py-3 mt-1">
-                        <div class="text-amber-500 font-black text-xs uppercase">Total ${anoAtual}</div>
-                        <div class="text-amber-500 font-black text-sm">R$ ${totalAnual.toFixed(2)}</div>
+            html += `<div class="flex items-center justify-between py-4 mt-2 bg-zinc-900 px-3.5 rounded-2xl border border-zinc-800">
+                        <div class="text-amber-400 font-black text-xs uppercase">Total Acumulado ${anoAtual}</div>
+                        <div class="text-amber-400 font-black text-base">R$ ${totalAnual.toFixed(2)}</div>
                      </div>`;
 
-            document.getElementById('extrato-anual-titulo').innerText = `Ciclos de ${anoAtual}`;
+            document.getElementById('extrato-anual-titulo').innerText = `Ciclos de ${anoAtual} (Dia 07 a Dia 06)`;
             document.getElementById('extrato-anual-lista').innerHTML = html;
             document.getElementById('modal-extrato-anual').classList.remove('hidden');
         }
 
-        // CORREÇÃO DO ESCOPO DO BOTÃO CHAMAR (Injetando strings de forma limpa e segura)
+        function editarMetaMensal() {
+            const atual = metaMensal;
+            const novaStr = window.prompt("Defina sua meta de faturamento mensal (R$):", atual);
+            if(novaStr !== null) {
+                const val = parseFloat(novaStr.replace(',', '.'));
+                if(val && val > 0) {
+                    metaMensal = val;
+                    localStorage.setItem('priscila_meta_mensal', metaMensal);
+                    updateRelatorios();
+                    showToast("Meta mensal atualizada!", "success");
+                }
+            }
+        }
+
         function updateRelatorios() {
-            if(clientes.length === 0) return;
             const anoAtual = new Date().getFullYear();
             const fatAnual = historicoCompleto
                 .filter(h => h.tipo === 'venda' && h.data && new Date(h.data.seconds * 1000).getFullYear() === anoAtual)
                 .reduce((acc, v) => acc + (v.valor || 0), 0);
             document.getElementById('rep-faturamento-total').innerText = `R$ ${fatAnual.toFixed(2)}`;
 
-            // Faturamento mensal: ciclo do dia 7 ao dia 6 do mês seguinte
             const hoje = new Date();
             let inicioMensal, fimMensal;
             if(hoje.getDate() >= 7) {
@@ -801,112 +1398,117 @@
             const fmt = d => d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
             document.getElementById('rep-faturamento-mensal').innerText = `R$ ${fatMensal.toFixed(2)}`;
             document.getElementById('rep-faturamento-mensal-periodo').innerText = `${fmt(inicioMensal)} – ${fmt(fimMensal)}`;
+
+            // Atualiza Barra de Meta
+            const percMeta = Math.min(100, Math.round((fatMensal / metaMensal) * 100));
+            document.getElementById('meta-progresso-texto').innerText = `R$ ${fatMensal.toFixed(2)} / R$ ${metaMensal.toFixed(2)}`;
+            document.getElementById('meta-porcentagem-texto').innerText = `${percMeta}%`;
+            document.getElementById('meta-barra-progresso').style.width = `${percMeta}%`;
             
             const top = [...clientes].sort((a,b) => (b.totalComprado || 0) - (a.totalComprado || 0))[0];
             if(top && top.totalComprado > 0) {
                 document.getElementById('rep-top-cliente').innerText = `${top.nome}`;
-                document.getElementById('rep-top-valor').innerText = `Total comprado: R$ ${top.totalComprado.toFixed(2)}`;
+                document.getElementById('rep-top-valor').innerText = `R$ ${top.totalComprado.toFixed(2)} em compras`;
             } else {
                 document.getElementById('rep-top-cliente').innerText = '--';
                 document.getElementById('rep-top-valor').innerText = 'R$ 0,00';
             }
             
             const agora = new Date();
-            let hSumidos = '';
             const ordenadosPorInatividade = [...clientes].filter(c => c.ultimaCompra).sort((a,b) => a.ultimaCompra.seconds - b.ultimaCompra.seconds);
             
             const containerSumidos = document.getElementById('rep-sumidos');
-            if(!containerSumidos) return;
+            if(containerSumidos) {
+                containerSumidos.innerHTML = '';
+                ordenadosPorInatividade.forEach(c => {
+                    const dias = Math.floor((agora - new Date(c.ultimaCompra.seconds * 1000)) / (1000 * 60 * 60 * 24));
+                    if(dias >= 1) {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = "flex justify-between items-center bg-zinc-900 p-3 rounded-xl border border-zinc-800/80";
+                        itemDiv.innerHTML = `
+                            <div>
+                                <div class="font-extrabold text-xs text-white uppercase">${c.nome}</div>
+                                <div class="text-[10px] text-amber-400 font-semibold mt-0.5">Há ${dias} dia(s) sem pedir</div>
+                            </div>
+                        `;
 
-            containerSumidos.innerHTML = '';
+                        const btnChamar = document.createElement('button');
+                        btnChamar.className = "text-[10px] bg-amber-500 font-extrabold text-zinc-950 px-3 py-2 rounded-xl uppercase active:scale-95";
+                        btnChamar.innerText = "💬 Chamar";
+                        btnChamar.onclick = function() {
+                            enviarMensagemSaudadeDireto(c.nome, c.tel || '', dias);
+                        };
 
-            ordenadosPorInatividade.forEach(c => {
-                const dias = Math.floor((agora - new Date(c.ultimaCompra.seconds * 1000)) / (1000 * 60 * 60 * 24));
-                if(dias >= 1) {
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = "flex justify-between items-center bg-zinc-900/60 p-3 rounded-xl border border-zinc-900";
-                    
-                    itemDiv.innerHTML = `
-                        <div>
-                            <div class="font-black text-xs text-white uppercase">${c.nome}</div>
-                            <div class="text-[9px] text-amber-500 font-bold mt-0.5">Sem pedir há ${dias} dias</div>
-                        </div>
-                    `;
+                        itemDiv.appendChild(btnChamar);
+                        containerSumidos.appendChild(itemDiv);
+                    }
+                });
 
-                    const btnChamar = document.createElement('button');
-                    btnChamar.className = "text-[9px] bg-amber-500 font-black text-black px-3 py-2 rounded-lg uppercase italic";
-                    btnChamar.innerText = "💬 Chamar";
-                    btnChamar.onclick = function() {
-                        enviarMensagemSaudadeDireto(c.nome, c.tel || '', dias);
-                    };
-
-                    itemDiv.appendChild(btnChamar);
-                    containerSumidos.appendChild(itemDiv);
+                if(containerSumidos.innerHTML === '') {
+                    containerSumidos.innerHTML = '<div class="text-center py-6 text-zinc-600 text-xs font-semibold">Todos os clientes estão ativos!</div>';
                 }
-            });
-
+            }
 
             const pagamentos = historicoCompleto
                 .filter(h => h.tipo === 'pagamento')
-                .sort((a,b) => {
-                    const da = a.data ? a.data.seconds : 0;
-                    const db = b.data ? b.data.seconds : 0;
-                    return db - da;
-                })
+                .sort((a,b) => (b.data ? b.data.seconds : 0) - (a.data ? a.data.seconds : 0))
                 .slice(0, 15);
 
             const pagamentosContainer = document.getElementById('rep-pagamentos');
             if(pagamentosContainer) {
                 let pagamentosHtml = '';
-
                 pagamentos.forEach(p => {
-                    const dataPg = p.data ? new Date(p.data.seconds * 1000).toLocaleDateString('pt-BR') : 'Processando...';
-
+                    const dataPg = p.data ? new Date(p.data.seconds * 1000).toLocaleDateString('pt-BR') : 'Hoje';
                     pagamentosHtml += `
-                    <div class="flex justify-between items-center bg-zinc-900/60 p-3 rounded-xl border border-zinc-900">
+                    <div class="flex justify-between items-center bg-zinc-900 p-3 rounded-xl border border-zinc-800/80">
                         <div>
-                            <div class="font-black text-xs text-white uppercase">${p.clienteNome}</div>
-                            <div class="text-[9px] text-emerald-400 font-bold mt-0.5">Pagou R$ ${p.valor.toFixed(2)}</div>
+                            <div class="font-extrabold text-xs text-white uppercase">${p.clienteNome}</div>
+                            <div class="text-[10px] text-emerald-400 font-bold mt-0.5">+ R$ ${p.valor.toFixed(2)}</div>
                         </div>
-                        <div class="text-[9px] text-zinc-500 font-black uppercase">
-                            ${dataPg}
-                        </div>
+                        <div class="text-[10px] text-zinc-500 font-bold uppercase">${dataPg}</div>
                     </div>`;
                 });
-
-                pagamentosContainer.innerHTML = pagamentosHtml || '<div class="text-center py-6 text-zinc-700 italic text-xs font-bold">Nenhum pagamento registrado</div>';
-            }
-
-
-            if(containerSumidos.innerHTML === '') {
-                containerSumidos.innerHTML = '<div class="text-center py-6 text-zinc-700 italic text-xs font-bold">Todos ativos!</div>';
+                pagamentosContainer.innerHTML = pagamentosHtml || '<div class="text-center py-6 text-zinc-600 text-xs font-semibold">Nenhum pagamento registrado.</div>';
             }
         }
 
+        function exportarBackupCSV() {
+            if(clientes.length === 0) return showToast("Não há dados para exportar.", "warning");
+            let csv = "Nome;WhatsApp;Saldo Devedor;Total Comprado\n";
+            clientes.forEach(c => {
+                csv += `"${c.nome}";"${c.tel || ''}";"${(c.saldo || 0).toFixed(2).replace('.', ',')}";"${(c.totalComprado || 0).toFixed(2).replace('.', ',')}"\n`;
+            });
+            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_priscila_esfihas_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast("Planilha de backup baixada!", "success");
+        }
+
         function enviarMensagemSaudadeDireto(nome, tel, dias) {
-            if(!tel || tel.trim() === "") return alert("Este cliente não possui telefone cadastrado!");
-            
+            if(!tel || tel.trim() === "") return showToast("Este cliente não possui WhatsApp cadastrado.", "error");
             const texto = `Oi, ${nome}! Tudo bem? Bateu saudade daquela esfiha fechada quentinha! 🥟\n\nNotamos que já faz uns ${dias} dias desde o seu último pedido. A Priscila está preparando uma fornada fresca hoje. Gostaria de garantir uma bandeja com 5 unidades?\n\nSe quiser, só me avisar por aqui!`;
-            
             window.open(`https://api.whatsapp.com/send?phone=55${tel}&text=${encodeURIComponent(texto)}`, '_blank');
         }
 
         function enviarExtratoZap() {
             const c = clientes.find(x => x.id === selecionadoId);
             if(!c) return;
-            if(!c.tel) return alert("Cadastre o WhatsApp!");
+            if(!c.tel) return showToast("Cadastre o WhatsApp deste cliente primeiro.", "error");
             
             const filtrados = historicoCompleto.filter(h => h.clienteId === c.id);
             const ultimoPgto = filtrados
                 .filter(h => h.tipo === 'pagamento')
                 .sort((a, b) => (b.data ? b.data.seconds : 0) - (a.data ? a.data.seconds : 0))[0];
 
-            // Extrato desde o último pagamento (ou tudo, se nunca pagou)
             const segDe = h => h.data ? h.data.seconds : Date.now() / 1000;
             const recentes = ultimoPgto
                 ? filtrados.filter(h => segDe(h) >= segDe(ultimoPgto))
                 : filtrados;
-            const vendasDepois = recentes.filter(h => h.tipo === 'venda').reduce((acc, v) => acc + (v.valor || 0), 0);
+            const vendasDepois = recentes.filter(h => h.tipo === 'venda' && !h.pagoNaHora).reduce((acc, v) => acc + (v.valor || 0), 0);
             const saldoAnterior = ultimoPgto ? Math.round(((c.saldo || 0) - vendasDepois) * 100) / 100 : 0;
             
             let texto = `*Fala, ${c.nome}!* Segue o extrato das esfihas da Priscila:\n\n`;
@@ -916,13 +1518,12 @@
                 texto += `*Último pagamento:* ${dataPgtoStr} - R$ ${ultimoPgto.valor.toFixed(2)} ✅\n\n`;
             }
             
-            // Pendências em ordem cronológica (mais antiga primeiro)
-            const pendentes = recentes.filter(h => h.tipo === 'venda').reverse();
+            const pendentes = recentes.filter(h => h.tipo === 'venda' && !h.pagoNaHora).reverse();
             if(pendentes.length === 0 && saldoAnterior <= 0.009) {
-                if(!ultimoPgto) texto += `Sem movimentações.\n`;
+                if(!ultimoPgto) texto += `Sem movimentações em aberto.\n`;
             } else {
                 if(saldoAnterior > 0.009) {
-                    texto += `• Saldo pendente do último pagamento: R$ ${saldoAnterior.toFixed(2)}\n`;
+                    texto += `• Saldo anterior pendente: R$ ${saldoAnterior.toFixed(2)}\n`;
                 }
                 pendentes.forEach(i => {
                     const dataStr = i.data ? new Date(i.data.seconds * 1000).toLocaleDateString('pt-BR') : '';
@@ -930,8 +1531,8 @@
                 });
             }
             
-            texto += `\n*Total Pendente: R$ ${c.saldo.toFixed(2)}*\n\n`;
-            if(c.saldo > 0) {
+            texto += `\n*Total Pendente: R$ ${(c.saldo || 0).toFixed(2)}*\n\n`;
+            if((c.saldo || 0) > 0) {
                 const pixLink = window.location.origin + window.location.pathname + '?pix';
                 texto += `👆 Toque no link abaixo para copiar a chave Pix:\n${pixLink}`;
             }
@@ -942,41 +1543,35 @@
         function enviarCobranca45() {
             const c = clientes.find(x => x.id === selecionadoId);
             if(!c) return;
-            if(!c.tel) return alert("Cadastre o WhatsApp!");
+            if(!c.tel) return showToast("Cadastre o WhatsApp deste cliente primeiro.", "error");
             
             const pixLink = window.location.origin + window.location.pathname + '?pix';
-            const texto = `Olá, ${c.nome}! Tudo bem?\n\nPassando para lembrar do acerte das esfihas da Priscila. Temos em aberto o valor de *R$ ${c.saldo.toFixed(2)}*.\n\n👆 Toque no link abaixo para copiar a chave Pix:\n${pixLink}\n\nMuito obrigado! 🙏`;
+            const texto = `Olá, ${c.nome}! Tudo bem?\n\nPassando para lembrar do acerto das esfihas da Priscila. Temos em aberto o valor de *R$ ${(c.saldo || 0).toFixed(2)}*.\n\n👆 Toque no link abaixo para copiar a chave Pix:\n${pixLink}\n\nMuito obrigado! 🙏`;
             
             window.open(`https://api.whatsapp.com/send?phone=55${c.tel}&text=${encodeURIComponent(texto)}`, '_blank');
         }
 
         function copiarChavePix() {
             const chave = document.getElementById('pix-key-display').innerText;
-            navigator.clipboard.writeText(chave).then(() => {
-                const btn = document.getElementById('btn-copiar-pix');
-                const confirm = document.getElementById('pix-copiado');
-                btn.innerText = '✅ Copiado!';
-                btn.style.background = '#10b981';
-                confirm.classList.remove('hidden');
-                setTimeout(() => {
-                    btn.innerText = '📋 Copiar Chave Pix';
-                    btn.style.background = '';
-                    confirm.classList.add('hidden');
-                }, 3000);
-            }).catch(() => {
-                // Fallback para browsers mais antigos
-                const el = document.createElement('textarea');
-                el.value = chave;
-                document.body.appendChild(el);
-                el.select();
-                document.execCommand('copy');
-                document.body.removeChild(el);
-                document.getElementById('btn-copiar-pix').innerText = '✅ Copiado!';
-                document.getElementById('pix-copiado').classList.remove('hidden');
-            });
+            const el = document.createElement('textarea');
+            el.value = chave;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+
+            const btn = document.getElementById('btn-copiar-pix');
+            const confirm = document.getElementById('pix-copiado');
+            btn.innerText = '✅ Chave Copiada!';
+            btn.style.background = '#10b981';
+            confirm.classList.remove('hidden');
+            setTimeout(() => {
+                btn.innerText = '📋 Copiar Chave Pix';
+                btn.style.background = '';
+                confirm.classList.add('hidden');
+            }, 3000);
         }
 
-        // Detecta se o cliente acessou o link ?pix
         if(new URLSearchParams(window.location.search).has('pix')) {
             document.getElementById('pix-page').classList.remove('hidden');
             document.getElementById('main-app').classList.add('hidden');
