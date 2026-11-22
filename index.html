@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Priscila Esfihas v3.0</title>
+    <title>Priscila Esfihas v2.0</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#f59e0b">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,64 +13,51 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <style>
         body { background: #0a0a0a; color: #fff; font-family: sans-serif; padding-bottom: 120px; overflow-x: hidden; }
-        .card { background: #161616; border-radius: 22px; padding: 16px; margin-bottom: 14px; border: 1px solid #262626; box-shadow: 0 12px 45px rgba(0,0,0,0.7); }
-        .label-gold { color: #f59e0b; font-size: 10px; font-weight: 900; text-transform: uppercase; margin-top: 16px; margin-bottom: 5px; margin-left: 4px; letter-spacing: 1.2px; display: block; }
+        .card { background: #161616; border-radius: 18px; padding: 14px; margin-bottom: 12px; border: 1px solid #262626; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+        .label-gold { color: #f59e0b; font-size: 9px; font-weight: 900; text-transform: uppercase; margin-top: 14px; margin-bottom: 4px; margin-left: 4px; letter-spacing: 1px; display: block; }
         .label-gold:first-child { margin-top: 0; }
-        input, select, textarea { background: #222; border: 2px solid #333; color: #fff; padding: 13px; border-radius: 14px; width: 100%; margin-bottom: 5px; font-size: 16px; font-weight: 700; -webkit-appearance: none; }
+        input, select, textarea { background: #222; border: 2px solid #333; color: #fff; padding: 12px; border-radius: 12px; width: 100%; margin-bottom: 4px; font-size: 16px; font-weight: 900; -webkit-appearance: none; }
         input:focus, select:focus { border-color: #f59e0b; outline: none; }
-        .btn-gold { background: #f59e0b; color: #000; font-weight: 900; padding: 17px; border-radius: 20px; width: 100%; text-transform: uppercase; font-size: 14px; margin-top: 12px; cursor: pointer; transition: 0.25s ease; }
-        .btn-gold:active { transform: scale(0.97); background: #d97706; }
-        .tab-btn { background: #111; color: #444; flex: 1; padding: 15px 4px; border-radius: 16px; font-size: 10px; font-weight: 900; margin: 3px; border: 1px solid #222; text-transform: uppercase; text-align: center; transition: 0.2s; }
+        .btn-gold { background: #f59e0b; color: #000; font-weight: 900; padding: 16px; border-radius: 18px; width: 100%; text-transform: uppercase; font-size: 14px; margin-top: 10px; cursor: pointer; transition: 0.2s; }
+        .btn-gold:active { transform: scale(0.98); background: #d97706; }
+        .tab-btn { background: #111; color: #444; flex: 1; padding: 14px 2px; border-radius: 14px; font-size: 9px; font-weight: 900; margin: 2px; border: 1px solid #222; text-transform: uppercase; text-align: center; }
         .active-tab { background: #f59e0b; color: #000; border-color: #fbbf24; }
-        #modal-detalhes { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0a; z-index: 2000; padding: 18px; display: flex; flex-direction: column; overflow-y: auto; }
+        #modal-detalhes { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0a; z-index: 2000; padding: 16px; display: flex; flex-direction: column; overflow-y: auto; }
         .hidden { display: none !important; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .hist-item { background: #111; border: 1px solid #222; padding: 10px 14px; border-radius: 12px; margin-bottom: 8px; font-size: 13px; }
-        /* SPLASH SCREEN */
-        #splash-screen { position: fixed; width:100%; height:100%; background:#0a0a0a; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-        .splash-title { color:#f59e0b; font-size:28px; font-weight:900; text-transform:uppercase; font-style:italic; }
-        .splash-sub { color:#777; font-size:11px; text-transform:uppercase; margin-top:8px; }
-        /* TOAST MENSAGEM */
-        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); padding:14px 20px; border-radius:14px; z-index:9998; font-weight:900; text-transform:uppercase; font-size:12px; }
-        .toast-success { background:#10b981; color:white; }
-        .toast-error { background:#ef4444; color:white; }
+        .hist-item { background: #111; border: 1px solid #222; padding: 8px 12px; border-radius: 10px; margin-bottom: 6px; font-size: 12px; }
     </style>
 </head>
 <body class="p-3 max-w-lg mx-auto">
-    <!-- SPLASH SCREEN -->
-    <div id="splash-screen">
-        <div class="splash-title">PRISCILA ESFIHAS</div>
-        <div class="splash-sub">Gestão Completa & Inteligente</div>
-    </div>
 
-    <div id="main-app" class="hidden">
+    <div id="main-app">
         <div class="flex justify-between items-center mb-5 pt-2">
             <div>
                 <h1 class="text-2xl font-black text-amber-500 italic uppercase leading-none">PRISCILA ESFIHAS</h1>
-                <span class="text-[8px] font-black text-zinc-600 uppercase">Gestão Completa</span>
+                <span class="text-[8px] font-black text-zinc-600 uppercase">Gestão Completa & Estoque Inteligente</span>
             </div>
             <div class="text-right">
                 <div id="resumo-total" class="text-xs font-black text-red-500 italic">DÉBITO TOTAL: R$ 0,00</div>
             </div>
         </div>
+
         <div id="tabs-container" class="flex mb-6 bg-black p-1 rounded-2xl sticky top-2 z-50 border border-zinc-800 shadow-2xl">
-            <button id="btn-clientes" class="tab-btn active-tab" onclick="showTab('clientes')">👥 Clientes</button>
-            <button id="btn-vendas" class="tab-btn" onclick="showTab('vendas')">🛒 Nova Venda</button>
-            <button id="btn-relatorios" class="tab-btn" onclick="showTab('relatorios')">📊 Relatórios</button>
+            <button id="btn-clientes" class="tab-btn active-tab" onclick="showTab('clientes')">Clientes</button>
+            <button id="btn-vendas" class="tab-btn" onclick="showTab('vendas')">Nova Venda</button>
+            <button id="btn-custos" class="tab-btn" onclick="showTab('custos')">Custos & Estoque</button>
+            <button id="btn-relatorios" class="tab-btn" onclick="showTab('relatorios')">Relatórios</button>
         </div>
+
         <div id="tab-clientes">
-            <div class="flex gap-2 mb-4">
-                <button class="btn-gold py-2 text-[10px] w-1/3" onclick="filtrarClientes('todos')">Todos</button>
-                <button class="btn-gold bg-red-900 py-2 text-[10px] w-1/3" onclick="filtrarClientes('devendo')">Apenas Devendo</button>
-                <button class="btn-gold bg-emerald-800 py-2 text-[10px] w-1/3" onclick="filtrarClientes('semdebito')">Sem Débito</button>
-            </div>
-            <input type="text" id="search-g" oninput="renderClientes()" class="bg-black border border-zinc-800 p-3 rounded-xl w-full mb-4 text-xs uppercase" placeholder="Filtrar clientes por nome...">
+            <input type="text" id="search-g" oninput="renderClientes()" class="bg-black border border-zinc-800 p-3 rounded-xl w-full mb-4 text-xs uppercase" placeholder="Filtrar clientes...">
             <div id="list-clientes" class="space-y-3"></div>
         </div>
+
         <div id="tab-vendas" class="hidden">
             <div class="card">
                 <span class="label-gold">Selecione o Cliente</span>
                 <select id="venda-cliente-select"></select>
+
                 <div class="grid grid-cols-2 gap-3 mt-2">
                     <div>
                         <span class="label-gold">Bandejas (5 un)</span>
@@ -85,19 +72,91 @@
                 <div id="alerta-limite" class="hidden text-[10px] font-bold text-red-500 bg-red-950/40 border border-red-900 p-2 rounded-lg mt-3 text-center uppercase italic">
                     ⚠️ Atenção: Cliente já possui pendura alta!
                 </div>
+
                 <button class="btn-gold" onclick="registrarVenda()">Lançar Pendura</button>
             </div>
+
             <div class="card bg-zinc-950 border-dashed border-zinc-800">
                 <div class="flex justify-between items-center mb-2">
                     <span class="label-gold text-zinc-500 mt-0">Novo Cadastro Rápido</span>
                     <button type="button" onclick="puxarContatoAgenda('novo')" class="text-[9px] bg-zinc-900 border border-amber-600/40 text-amber-500 px-2 py-1 rounded font-black uppercase">👤 Puxar da Agenda</button>
                 </div>
                 <input type="text" id="novo-cliente-nome" placeholder="NOME DO CLIENTE (MAIÚSCULO)" class="mb-2 uppercase">
-                <input type="tel" id="novo-cliente-tel" placeholder="WHATSAPP (Ex: 35999999999)" class="mb-2">
-                <textarea id="novo-cliente-obs" placeholder="OBSERVAÇÕES (Preferências, endereço...)" rows="2" class="mb-3"></textarea>
+                <input type="tel" id="novo-cliente-tel" placeholder="WHATSAPP (Ex: 35999999999)" class="mb-3">
                 <button class="btn-gold bg-zinc-800 text-zinc-400 mt-0 py-3 text-xs" onclick="addCliente()">Cadastrar Novo Cliente</button>
             </div>
         </div>
+
+        <div id="tab-custos" class="hidden">
+            <div class="grid grid-cols-2 gap-2 mb-4">
+                <div class="card p-3 text-center bg-zinc-900/40">
+                    <span class="label-gold mt-0">Custo p/ Massa</span>
+                    <div id="custo-massa-total" class="text-lg font-black italic text-red-400">R$ 0,00</div>
+                    <span class="text-[7px] text-zinc-500 uppercase block mt-0.5">Rende 4 Bandejas (20 Esfihas)</span>
+                </div>
+                <div class="card p-3 text-center bg-zinc-900/40">
+                    <span class="label-gold mt-0">Lucro Real p/ Bandeja</span>
+                    <div id="lucro-bandeja-total" class="text-lg font-black italic text-emerald-400">R$ 0,00</div>
+                    <span class="text-[7px] text-zinc-500 uppercase block mt-0.5">Preço: R$ 25,00</span>
+                </div>
+            </div>
+
+            <div class="card bg-amber-950/20 border-amber-500/30 text-center py-3">
+                <span class="label-gold mt-0 text-amber-500">Saldo de Bandejas Prontas (Hoje)</span>
+                <div id="saldo-bandejas-display" class="text-3xl font-black text-white italic mt-1">0</div>
+                <span class="text-[8px] text-zinc-400 uppercase block mt-1">Gatilha novas massas inteiras automaticamente ao vender!</span>
+            </div>
+
+            <div class="card bg-zinc-950 border-zinc-800">
+                <span class="label-gold mt-0 mb-2 text-zinc-400">📝 Lançar/Atualizar Insumo de Estoque</span>
+                <select id="insumo-select" onchange="selecionarInsumoPreDefinido()">
+                    <option value="farinha">Farinha de Trigo (Usa 600g)</option>
+                    <option value="ovos">Ovos (Usa 2 unidades)</option>
+                    <option value="leite">Leite (Usa 250ml)</option>
+                    <option value="margarina">Margarina (Usa 45g)</option>
+                    <option value="oleo">Óleo (Usa 36ml)</option>
+                    <option value="acucar">Açúcar (Usa 30g)</option>
+                    <option value="sal">Sal (Usa 3g)</option>
+                    <option value="fermento">Fermento Seco (Usa 10g)</option>
+                    <option value="carne">Carne Moída (Usa 500g)</option>
+                </select>
+
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                    <div>
+                        <span class="label-gold">Qtd do Pacote Comprado</span>
+                        <input type="number" id="insumo-tamanho-pacote" placeholder="Ex: 1000 ou 150" step="any">
+                    </div>
+                    <div>
+                        <span class="label-gold">Unidade de Medida</span>
+                        <select id="insumo-unidade">
+                            <option value="g">Gramas (g)</option>
+                            <option value="ml">Mililitros (ml)</option>
+                            <option value="un">Unidades (un)</option>
+                            <option value="kg">Quilos (kg)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 mt-1">
+                    <div>
+                        <span class="label-gold">Valor Pago (R$)</span>
+                        <input type="number" id="insumo-preco-pacote" placeholder="Ex: 15.50" step="any">
+                    </div>
+                    <div>
+                        <span class="label-gold">Pacotes Comprados</span>
+                        <input type="number" id="insumo-qtd-comprada" value="1" min="1">
+                    </div>
+                </div>
+
+                <button class="btn-gold bg-amber-600 text-black py-3 mt-3 text-xs" onclick="salvarInsumoEstoque()">Salvar Compra e Atualizar Estoque</button>
+            </div>
+
+            <div class="card">
+                <span class="label-gold mt-0 mb-3">📦 Status Atual dos Ingredientes & Custos</span>
+                <div id="lista-estoque-status" class="space-y-2"></div>
+            </div>
+        </div>
+
         <div id="tab-relatorios" class="hidden">
             <div class="grid grid-cols-3 gap-2 mb-4">
                 <div class="card p-3 text-center flex flex-col justify-between">
@@ -116,16 +175,20 @@
                     <div id="rep-faturamento-mensal-periodo" class="text-[7px] text-zinc-600 font-bold uppercase mt-1 leading-tight">--</div>
                 </div>
             </div>
+
             <div class="card">
                 <span class="label-gold mt-0 mb-3">🕒 Clientes Sem Pedir (Reativação)</span>
                 <div id="rep-sumidos" class="space-y-2 max-h-[300px] overflow-y-auto no-scrollbar"></div>
             </div>
+
             <div class="card mt-4">
                 <span class="label-gold mt-0 mb-3">💰 Últimos Pagamentos Recebidos</span>
                 <div id="rep-pagamentos" class="space-y-2 max-h-[300px] overflow-y-auto no-scrollbar"></div>
             </div>
+
         </div>
     </div>
+
     <!-- MODAL EXTRATO ANUAL -->
     <div id="modal-extrato-anual" class="hidden fixed inset-0 z-[999] flex flex-col" style="background:rgba(0,0,0,0.92);">
         <div class="flex items-center justify-between px-4 pt-5 pb-3 border-b border-zinc-800">
@@ -138,24 +201,791 @@
         </div>
         <div class="flex-1 overflow-y-auto px-4 py-3 space-y-2 no-scrollbar" id="extrato-anual-lista"></div>
     </div>
+
     <!-- TELA PIX: abre quando o link ?pix é acessado pelo cliente -->
     <div id="pix-page" class="hidden fixed inset-0 z-[9999] flex flex-col items-center justify-center p-6" style="background:#0a0a0a;">
         <div class="text-amber-500 font-black italic uppercase text-2xl mb-1 text-center">🥟 Priscila Esfihas</div>
         <div class="text-zinc-500 text-[10px] uppercase font-bold mb-8 tracking-widest">Pagamento via Pix</div>
+
         <div class="w-full max-w-sm bg-zinc-900 border border-zinc-700 rounded-2xl p-6 text-center mb-4 shadow-2xl">
             <div class="text-[9px] text-zinc-500 uppercase font-black tracking-widest mb-1">Tipo da Chave</div>
             <div class="text-amber-500 font-bold text-xs mb-5">E-mail</div>
             <div class="text-[9px] text-zinc-500 uppercase font-black tracking-widest mb-2">Chave Pix</div>
             <div id="pix-key-display" class="text-xl font-black text-white break-all leading-tight">alanpocos@gmail.com</div>
         </div>
+
         <button onclick="copiarChavePix()" id="btn-copiar-pix"
             class="w-full max-w-sm bg-amber-500 text-black font-black text-sm py-4 rounded-2xl uppercase tracking-wide transition-all active:scale-95">
             📋 Copiar Chave Pix
         </button>
         <div id="pix-copiado" class="hidden text-emerald-400 font-black text-xs mt-4 uppercase tracking-widest">✅ Chave copiada com sucesso!</div>
-        <button onclick="window.location.href='./'" class="w-full max-w-sm bg-zinc-800 text-white font-black text-sm py-3 rounded-2xl uppercase tracking-wide mt-4">⬅️ Voltar para Início</button>
+
         <div class="mt-10 text-[8px] text-zinc-700 uppercase text-center font-bold">Após copiar, abra seu banco e<br>cole na área de Pix › Pagar › Chave</div>
     </div>
+
     <div id="modal-detalhes" class="hidden">
         <div class="flex justify-between items-center mb-4 pb-2 border-b border-zinc-900">
-           
+            <h3 class="text-amber-500 font-black italic uppercase text-lg">Ficha do Cliente</h3>
+            <button onclick="closeModal()" class="text-zinc-500 font-black text-sm px-2">X VOLTAR</button>
+        </div>
+
+        <div class="card">
+            <div class="flex justify-between items-center mb-2">
+                <span class="label-gold mt-0">Nome do Cliente</span>
+                <button type="button" onclick="puxarContatoAgenda('edit')" class="text-[9px] bg-zinc-900 border border-amber-600/40 text-amber-500 px-2 py-1 rounded font-black uppercase">👤 Atualizar via Agenda</button>
+            </div>
+            <input type="text" id="edit-nome" class="uppercase">
+            <span class="label-gold">WhatsApp</span>
+            <input type="tel" id="edit-tel" placeholder="35999999999">
+            
+            <div class="grid grid-cols-2 gap-2 mt-3">
+                <div class="bg-zinc-900 p-2 rounded-xl text-center">
+                    <span class="text-[8px] text-zinc-500 font-black uppercase block">Saldo Devedor</span>
+                    <span id="modal-saldo" class="text-base font-black text-red-500 italic">R$ 0,00</span>
+                </div>
+                <div class="bg-zinc-900 p-2 rounded-xl text-center">
+                    <span class="text-[8px] text-zinc-500 font-black uppercase block">Total Histórico</span>
+                    <span id="modal-historico-total" class="text-base font-black text-zinc-400 italic">R$ 0,00</span>
+                </div>
+            </div>
+
+            <button class="btn-gold bg-zinc-800 text-amber-500 text-xs py-2 mt-4" onclick="salvarEdicao()">Salvar Alterações de Cadastro</button>
+        </div>
+
+        <div class="card border-emerald-900/40 bg-emerald-950/10">
+            <span class="label-gold text-emerald-500">Registrar Pagamento / Abatimento</span>
+            <div class="flex gap-2">
+                <input type="number" id="pagamento-valor" placeholder="R$ 0,00" step="0.01" class="mb-0">
+                <button class="btn-gold mt-0 w-1/3 bg-emerald-500 text-black text-xs" onclick="confirmarPagamento()">Baixar</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 mb-4">
+            <button class="btn-gold bg-zinc-900 border border-zinc-800 text-white text-[10px] mt-0 py-3 flex flex-col items-center justify-center gap-1" onclick="enviarExtratoZap()">
+                <span>📋 Enviar Extrato</span>
+                <span class="text-[7px] text-zinc-500">Resumo 30 dias + Pix</span>
+            </button>
+            <button id="btn-cobranca-45" class="btn-gold bg-red-950/40 border border-red-900 text-red-400 text-[10px] mt-0 py-3 flex flex-col items-center justify-center gap-1" onclick="enviarCobranca45()">
+                <span>⚠️ Cobrança 45+ Dias</span>
+                <span class="text-[7px] text-red-600 font-black uppercase">Notificar Débito</span>
+            </button>
+        </div>
+
+        <div class="card flex-1 flex flex-col min-h-[200px]">
+            <span class="label-gold mt-0 mb-2">📅 Linha do Tempo Geral (Histórico Completo)</span>
+            <div id="extrato-linha-tempo" class="space-y-1 overflow-y-auto flex-1 no-scrollbar text-zinc-300"></div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBA4xSi8fgtNXJQxf7-AC8vQQvojxaMH48",
+            authDomain: "priscilas-esfihas.firebaseapp.com",
+            projectId: "priscilas-esfihas",
+            storageBucket: "priscilas-esfihas.firebasestorage.app",
+            messagingSenderId: "33498231694",
+            appId: "1:33498231694:web:5cd7fb0986ae6fa21b2adf",
+            measurementId: "G-E6N425TCGC"
+        };
+
+        const CHAVE_PIX_PADRAO = "alanpocos@gmail.com";
+        const PRECO_BANDEJA = 25.0;
+
+        const receitaProporcao = {
+            farinha: 600,   // g
+            ovos: 2,        // un
+            leite: 250,     // ml
+            margarina: 45,  // g
+            oleo: 36,       // ml
+            acucar: 30,     // g
+            sal: 3,         // g
+            fermento: 10,   // g
+            carne: 500        // g
+        };
+
+        const nomesInsumos = {
+            farinha: "Farinha de Trigo",
+            ovos: "Ovos",
+            leite: "Leite",
+            margarina: "Margarina",
+            oleo: "Óleo",
+            acucar: "Açúcar",
+            sal: "Sal",
+            fermento: "Fermento Seco",
+            carne: "Carne Moída"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        
+        let clientes = [];
+        let historicoCompleto = [];
+        let estoqueInsumos = {};
+        let selecionadoId = null;
+
+        // Controle Local de Massa Inteligente
+        let controleProducaoDia = {
+            data: new Date().toLocaleDateString('pt-BR'),
+            saldoBandejas: 0
+        };
+
+        // Carrega o estado de produção guardado
+        if(localStorage.getItem('controleProducaoDia')) {
+            const salvo = JSON.parse(localStorage.getItem('controleProducaoDia'));
+            if(salvo.data === new Date().toLocaleDateString('pt-BR')) {
+                controleProducaoDia = salvo;
+            } else {
+                // Virou o dia: o que sobrou virou consumo/desperdício automático
+                localStorage.setItem('controleProducaoDia', JSON.stringify(controleProducaoDia));
+            }
+        }
+
+        async function init() {
+            document.getElementById('saldo-bandejas-display').innerText = controleProducaoDia.saldoBandejas;
+
+            db.collection('clientes').orderBy('nome').onSnapshot(snap => {
+                clientes = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
+                renderClientes();
+                updateSelects();
+                updateRelatorios();
+                calcTotalGeral();
+                if(selecionadoId) atualizarTelaModal();
+            });
+
+            db.collection('vendas').orderBy('data', 'desc').onSnapshot(snap => {
+                historicoCompleto = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
+                updateRelatorios();
+                if(selecionadoId) renderExtratoCliente(selecionadoId);
+            });
+
+            db.collection('estoque').onSnapshot(snap => {
+                estoqueInsumos = {};
+                snap.docs.forEach(doc => { estoqueInsumos[doc.id] = doc.data(); });
+                renderEstoqueECustos();
+            });
+
+            selecionarInsumoPreDefinido();
+        }
+
+        async function puxarContatoAgenda(target) {
+            if (!('contacts' in navigator && 'ContactsManager' in window)) {
+                alert("Seu navegador ou dispositivo não suporta puxar contatos da agenda diretamente.");
+                return;
+            }
+            try {
+                const props = ['name', 'tel'];
+                const opts = { multiple: false };
+                const contacts = await navigator.contacts.select(props, opts);
+                
+                if (contacts && contacts.length > 0) {
+                    const contact = contacts[0];
+                    const nomeOriginal = (contact.name && contact.name[0]) ? contact.name[0] : "";
+                    const telOriginal = (contact.tel && contact.tel[0]) ? contact.tel[0] : "";
+                    
+                    const nomeFormatado = nomeOriginal.toUpperCase().trim();
+                    const telFormatado = telOriginal.replace(/\D/g, '');
+                    
+                    if (target === 'novo') {
+                        document.getElementById('novo-cliente-nome').value = nomeFormatado;
+                        document.getElementById('novo-cliente-tel').value = telFormatado;
+                    } else if (target === 'edit') {
+                        document.getElementById('edit-nome').value = nomeFormatado;
+                        document.getElementById('edit-tel').value = telFormatado;
+                    }
+                }
+            } catch (err) {
+                console.error("Erro ao selecionar contato:", err);
+            }
+        }
+
+        function showTab(t) {
+            ['clientes', 'vendas', 'custos', 'relatorios'].forEach(id => {
+                const el = document.getElementById('tab-'+id);
+                const btn = document.getElementById('btn-'+id);
+                if(el) el.classList.toggle('hidden', id !== t);
+                if(btn) btn.classList.toggle('active-tab', id === t);
+            });
+            if(t === 'vendas') {
+                document.getElementById('venda-cliente-select').value = "";
+                document.getElementById('venda-qtd').value = 1;
+                updateVendaTotal();
+            }
+        }
+
+        function calcTotalGeral() {
+            const total = clientes.reduce((acc, c) => acc + (c.saldo || 0), 0);
+            document.getElementById('resumo-total').innerText = `DÉBITO TOTAL: R$ ${total.toFixed(2)}`;
+        }
+
+        async function addCliente() {
+            const nome = document.getElementById('novo-cliente-nome').value.toUpperCase().trim();
+            const tel = document.getElementById('novo-cliente-tel').value.replace(/\D/g, '');
+            if(!nome) return alert("O nome do cliente é obrigatório!");
+            
+            await db.collection('clientes').add({
+                nome, tel, saldo: 0, ultimaCompra: null, totalComprado: 0
+            });
+            
+            document.getElementById('novo-cliente-nome').value = "";
+            document.getElementById('novo-cliente-tel').value = "";
+            showTab('clientes');
+        }
+
+        function renderClientes() {
+            const busca = document.getElementById('search-g').value.toUpperCase();
+            const lista = document.getElementById('list-clientes');
+            let h = '';
+            const filtrados = clientes.filter(c => c.nome.includes(busca));
+            
+            filtrados.forEach(c => {
+                let statusTempo = 'Nunca pediu';
+                let alertar45 = false;
+                
+                if(c.ultimaCompra) {
+                    const dias = Math.floor((new Date() - new Date(c.ultimaCompra.seconds * 1000)) / (1000 * 60 * 60 * 24));
+                    statusTempo = dias === 0 ? 'Pediu hoje' : `Inativo há ${dias} dias`;
+                    if(dias >= 45 && c.saldo > 0) alertar45 = true;
+                }
+                
+                h += `
+                <div class="card flex justify-between items-center cursor-pointer active:bg-zinc-900 border-l-4 ${alertar45 ? 'border-l-red-600' : 'border-l-zinc-700'}" onclick="openModal('${c.id}')">
+                    <div class="min-w-0 flex-1 pr-2">
+                        <div class="text-base font-black italic uppercase text-white truncate leading-tight">${c.nome}</div>
+                        <div class="text-[8px] font-bold text-zinc-500 uppercase mt-1 flex items-center gap-1">
+                            ${alertar45 ? '<span class="text-red-500 font-black">⚠️ DÉBITO VELHO 45+ DIAS</span> • ' : ''}
+                            ${statusTempo}
+                        </div>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        <div class="text-lg font-black italic ${c.saldo > 0 ? 'text-red-500' : 'text-emerald-500'}">R$ ${c.saldo.toFixed(2)}</div>
+                    </div>
+                </div>`;
+            });
+            lista.innerHTML = h || '<div class="text-center p-10 text-zinc-600 font-black uppercase italic text-xs">Nenhum cliente cadastrado</div>';
+        }
+
+        function updateSelects() {
+            const sel = document.getElementById('venda-cliente-select');
+            if(!sel) return;
+            let h = '<option value="">SELECIONE O CLIENTE...</option>';
+            clientes.forEach(c => h += `<option value="${c.id}">${c.nome} (Devendo: R$ ${c.saldo.toFixed(2)})</option>`);
+            sel.innerHTML = h;
+        }
+
+        function updateVendaTotal() {
+            const cid = document.getElementById('venda-cliente-select').value;
+            const qtd = parseInt(document.getElementById('venda-qtd').value) || 0;
+            const total = qtd * PRECO_BANDEJA;
+            document.getElementById('venda-total-display').innerText = `R$ ${total.toFixed(2)}`;
+            
+            const c = clientes.find(x => x.id === cid);
+            const elAlerta = document.getElementById('alerta-limite');
+            if(c && (c.saldo + total) >= 100) elAlerta.classList.remove('hidden');
+            else elAlerta.classList.add('hidden');
+        }
+
+        // LÓGICA REESTRUTURADA: GATILHO AUTOMÁTICO DE MASSA INTEIRA
+        async function registrarVenda() {
+            const cid = document.getElementById('venda-cliente-select').value;
+            const qtd = parseInt(document.getElementById('venda-qtd').value);
+            if(!cid || !qtd || qtd <= 0) return alert("Selecione um cliente e quantidade válida!");
+            
+            // Verifica e resguarda mudança de dia antes de calcular o saldo
+            const hojeStr = new Date().toLocaleDateString('pt-BR');
+            if(controleProducaoDia.data !== hojeStr) {
+                controleProducaoDia.data = hojeStr;
+                controleProducaoDia.saldoBandejas = 0;
+            }
+
+            let bandejasNecessarias = qtd;
+            let massasABater = 0;
+
+            // Se o saldo de bandejas prontas de hoje não for suficiente para cobrir a venda:
+            if (controleProducaoDia.saldoBandejas < bandejasNecessarias) {
+                let falta = bandejasNecessarias - controleProducaoDia.saldoBandejas;
+                // Cada massa batida gera 4 bandejas
+                massasABater = Math.ceil(falta / 4);
+                controleProducaoDia.saldoBandejas += (massasABater * 4);
+            }
+
+            // Consome do saldo do dia
+            controleProducaoDia.saldoBandejas -= bandejasNecessarias;
+            localStorage.setItem('controleProducaoDia', JSON.stringify(controleProducaoDia));
+            document.getElementById('saldo-bandejas-display').innerText = controleProducaoDia.saldoBandejas;
+
+            const total = qtd * PRECO_BANDEJA;
+            const c = clientes.find(x => x.id === cid);
+            const batch = db.batch();
+            
+            // 1. Atualizar ficha do cliente
+            const cRef = db.collection('clientes').doc(cid);
+            batch.update(cRef, {
+                saldo: (c.saldo || 0) + total,
+                totalComprado: (c.totalComprado || 0) + total,
+                ultimaCompra: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            // 2. Gravar histórico da venda
+            const vRef = db.collection('vendas').doc();
+            batch.set(vRef, {
+                clienteId: cid, clienteNome: c.nome, qtd, valor: total, data: firebase.firestore.FieldValue.serverTimestamp(), tipo: 'venda', massasProduzidas: massasABater
+            });
+            
+            // 3. DEDUÇÃO DO ESTOQUE (Se disparou novas massas inteiras)
+            if(massasABater > 0) {
+                Object.keys(receitaProporcao).forEach(key => {
+                    if(estoqueInsumos[key]) {
+                        const gastoTotalIngrediente = receitaProporcao[key] * massasABater;
+                        const estoqueAtual = estoqueInsumos[key].estoqueAtual || 0;
+                        const novoEstoque = Math.max(0, estoqueAtual - gastoTotalIngrediente);
+                        
+                        const estRef = db.collection('estoque').doc(key);
+                        batch.update(estRef, { estoqueAtual: novoEstoque });
+                    }
+                });
+            }
+            
+            await batch.commit();
+            alert(`Venda registrada! ` + (massasABater > 0 ? `Abatido ${massasABater} massa(s) inteira(s) do estoque.` : `Usou saldo de massa já pronta de hoje.`));
+            showTab('clientes');
+        }
+
+        function selecionarInsumoPreDefinido() {
+            const tipo = document.getElementById('insumo-select').value;
+            const tamPacote = document.getElementById('insumo-tamanho-pacote');
+            const unMedida = document.getElementById('insumo-unidade');
+            const precoPacote = document.getElementById('insumo-preco-pacote');
+            
+            if(tipo === 'farinha') { tamPacote.value = "1000"; unMedida.value = "g"; precoPacote.value = "5.50"; }
+            else if(tipo === 'ovos') { tamPacote.value = "30"; unMedida.value = "un"; precoPacote.value = "18.00"; }
+            else if(tipo === 'leite') { tamPacote.value = "1000"; unMedida.value = "ml"; precoPacote.value = "4.80"; }
+            else if(tipo === 'margarina') { tamPacote.value = "500"; unMedida.value = "g"; precoPacote.value = "6.50"; }
+            else if(tipo === 'oleo') { tamPacote.value = "900"; unMedida.value = "ml"; precoPacote.value = "7.00"; }
+            else if(tipo === 'acucar') { tamPacote.value = "1000"; unMedida.value = "g"; precoPacote.value = "4.20"; }
+            else if(tipo === 'sal') { tamPacote.value = "1000"; unMedida.value = "g"; precoPacote.value = "3.00"; }
+            else if(tipo === 'fermento') { tamPacote.value = "150"; unMedida.value = "g"; precoPacote.value = "14.00"; }
+            else if(tipo === 'carne') { tamPacote.value = "1000"; unMedida.value = "g"; precoPacote.value = "38.00"; }
+        }
+
+        async function salvarInsumoEstoque() {
+            const tipo = document.getElementById('insumo-select').value;
+            const tamanhoPacote = parseFloat(document.getElementById('insumo-tamanho-pacote').value);
+            const unidade = document.getElementById('insumo-unidade').value;
+            const precoPacote = parseFloat(document.getElementById('insumo-preco-pacote').value);
+            const qtdComprada = parseInt(document.getElementById('insumo-qtd-comprada').value) || 1;
+
+            if(!tamanhoPacote || !precoPacote || tamanhoPacote <= 0 || precoPacote <= 0) {
+                return alert("Insira valores válidos!");
+            }
+
+            const totalInjetadoEstoque = tamanhoPacote * qtdComprada;
+            const custoPorUnidadeMedida = precoPacote / tamanhoPacote;
+
+            const dadosExistentes = estoqueInsumos[tipo] || { estoqueAtual: 0 };
+            const novoEstoqueAtual = (dadosExistentes.estoqueAtual || 0) + totalInjetadoEstoque;
+
+            await db.collection('estoque').doc(tipo).set({
+                nome: nomesInsumos[tipo],
+                tamanhoPacote,
+                unidade,
+                precoPacote,
+                custoPorUnidadeMedida,
+                estoqueAtual: novoEstoqueAtual,
+                ultimaCompra: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            alert(`${nomesInsumos[tipo]} atualizado no estoque!`);
+            document.getElementById('insumo-qtd-comprada').value = "1";
+        }
+
+        function renderEstoqueECustos() {
+            let totalCustoMassa = 0;
+            let container = document.getElementById('lista-estoque-status');
+            let h = '';
+
+            Object.keys(receitaProporcao).forEach(key => {
+                const usaNaReceita = receitaProporcao[key];
+                const insumo = estoqueInsumos[key];
+                
+                let precoFracaoReceita = 0;
+                let estoqueTexto = 'Sem cadastro';
+                let unidade = key === 'ovos' ? 'un' : (key === 'leite' || key === 'oleo' ? 'ml' : (key === 'carne' ? 'kg' : 'g'));
+                let corAlertaEstoque = 'text-zinc-500';
+
+                if(insumo) {
+                    precoFracaoReceita = insumo.custoPorUnidadeMedida * usaNaReceita;
+                    totalCustoMassa += precoFracaoReceita;
+                    unidade = insumo.unidade;
+                    
+                    const estAtual = insumo.estoqueAtual || 0;
+                    estoqueTexto = `${estAtual.toFixed(0)} ${unidade} em estoque`;
+                    
+                    if(estAtual < usaNaReceita) {
+                        corAlertaEstoque = 'text-red-500 font-bold animate-pulse';
+                        estoqueTexto += ' ⚠️ BAIXO!';
+                    } else {
+                        corAlertaEstoque = 'text-zinc-400';
+                    }
+                }
+
+                h += `
+                <div class="flex justify-between items-center bg-zinc-900/60 p-2.5 rounded-xl border border-zinc-900 text-xs">
+                    <div>
+                        <div class="font-black text-white uppercase">${nomesInsumos[key]}</div>
+                        <div class="text-[9px] ${corAlertaEstoque} mt-0.5">${estoqueTexto}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-black text-amber-500">R$ ${precoFracaoReceita.toFixed(2)}</div>
+                        <div class="text-[7px] text-zinc-600 uppercase">Usa ${usaNaReceita}${unidade} na receita</div>
+                    </div>
+                </div>`;
+            });
+
+            container.innerHTML = h;
+
+            const custoPorBandeja = totalCustoMassa / 4;
+            const lucroPorBandeja = PRECO_BANDEJA - custoPorBandeja;
+
+            document.getElementById('custo-massa-total').innerText = `R$ ${totalCustoMassa.toFixed(2)}`;
+            document.getElementById('lucro-bandeja-total').innerText = `R$ ${lucroPorBandeja.toFixed(2)}`;
+        }
+
+        function openModal(id) {
+            selecionadoId = id;
+            atualizarTelaModal();
+            renderExtratoCliente(id);
+            document.getElementById('modal-detalhes').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-detalhes').classList.add('hidden');
+            selecionadoId = null;
+            document.getElementById('pagamento-valor').value = "";
+        }
+
+        function atualizarTelaModal() {
+            const c = clientes.find(x => x.id === selecionadoId);
+            if(!c) return closeModal();
+            
+            document.getElementById('edit-nome').value = c.nome;
+            document.getElementById('edit-tel').value = c.tel || "";
+            document.getElementById('modal-saldo').innerText = `R$ ${c.saldo.toFixed(2)}`;
+            document.getElementById('modal-historico-total').innerText = `R$ ${(c.totalComprado || 0).toFixed(2)}`;
+            
+            let exibirAlerta45 = false;
+            if(c.ultimaCompra) {
+                const dias = Math.floor((new Date() - new Date(c.ultimaCompra.seconds * 1000)) / (1000 * 60 * 60 * 24));
+                if(dias >= 45 && c.saldo > 0) exibirAlerta45 = true;
+            }
+            
+            const btn45 = document.getElementById('btn-cobranca-45');
+            if(exibirAlerta45) { btn45.classList.remove('opacity-30'); btn45.style.pointerEvents = 'auto'; }
+            else { btn45.classList.add('opacity-30'); btn45.style.pointerEvents = 'none'; }
+        }
+
+        async function salvarEdicao() {
+            if(!selecionadoId) return;
+            const novoNome = document.getElementById('edit-nome').value.toUpperCase().trim();
+            const novoTel = document.getElementById('edit-tel').value.replace(/\D/g, '');
+            if(!novoNome) return alert("Nome obrigatório!");
+            
+            await db.collection('clientes').doc(selecionadoId).update({ nome: novoNome, tel: novoTel });
+            alert("Cadastro atualizado!");
+        }
+
+        async function confirmarPagamento() {
+            const valor = parseFloat(document.getElementById('pagamento-valor').value);
+            if(!valor || valor <= 0 || !selecionadoId) return alert("Valor inválido!");
+            
+            const c = clientes.find(x => x.id === selecionadoId);
+            const batch = db.batch();
+            const cRef = db.collection('clientes').doc(selecionadoId);
+            const novoSaldo = Math.max(0, c.saldo - valor);
+            batch.update(cRef, { saldo: novoSaldo });
+            
+            const vRef = db.collection('vendas').doc();
+            batch.set(vRef, {
+                clienteId: selecionadoId, clienteNome: c.nome, valor: valor, data: firebase.firestore.FieldValue.serverTimestamp(), tipo: 'pagamento'
+            });
+            
+            await batch.commit();
+            document.getElementById('pagamento-valor').value = "";
+            alert("Pagamento registrado!");
+        }
+
+        function renderExtratoCliente(cid) {
+            const container = document.getElementById('extrato-linha-tempo');
+            const filtrados = historicoCompleto.filter(h => h.clienteId === cid);
+            let h = '';
+            
+            filtrados.forEach(i => {
+                const dataStr = i.data ? new Date(i.data.seconds * 1000).toLocaleDateString('pt-BR') : 'Processando...';
+                if(i.tipo === 'venda') {
+                    h += `<div class="hist-item border-l-4 border-l-red-500"><div class="flex justify-between font-bold"><span class="text-white">🥟 PEGOU ${i.qtd} BANDEJA(S)</span><span class="text-red-400">R$ ${i.valor.toFixed(2)}</span></div><div class="text-[8px] text-zinc-500 uppercase mt-0.5">${dataStr}</div></div>`;
+                } else {
+                    h += `<div class="hist-item border-l-4 border-l-emerald-500"><div class="flex justify-between font-bold"><span class="text-emerald-400">💰 EFETUOU PAGAMENTO</span><span class="text-emerald-400">- R$ ${i.valor.toFixed(2)}</span></div><div class="text-[8px] text-zinc-500 uppercase mt-0.5">${dataStr}</div></div>`;
+                }
+            });
+            container.innerHTML = h || '<div class="text-center py-6 text-zinc-700 italic text-xs font-bold">Nenhuma movimentação</div>';
+        }
+
+        function abrirExtratoAnual() {
+            const anoAtual = new Date().getFullYear();
+            const hoje = new Date();
+            const fmt = d => d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+            const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+            // Gera todos os ciclos 7→6 do ano atual que já começaram
+            const ciclos = [];
+            for(let m = 0; m < 12; m++) {
+                const inicio = new Date(anoAtual, m, 7);
+                const fim    = new Date(anoAtual, m + 1, 6, 23, 59, 59);
+                if(inicio > hoje) break;
+                ciclos.push({ inicio, fim, label: `${meses[m]}/${anoAtual}` });
+            }
+            ciclos.reverse(); // mais recente primeiro
+
+            let totalAnual = 0;
+            let html = '';
+            ciclos.forEach(c => {
+                const valor = historicoCompleto
+                    .filter(h => h.tipo === 'venda' && h.data &&
+                        new Date(h.data.seconds * 1000) >= c.inicio &&
+                        new Date(h.data.seconds * 1000) <= c.fim)
+                    .reduce((acc, v) => acc + (v.valor || 0), 0);
+                totalAnual += valor;
+                const isCicloAtual = c.inicio <= hoje && hoje <= c.fim;
+                html += `
+                    <div class="flex items-center justify-between py-3 border-b border-zinc-800/60">
+                        <div>
+                            <div class="text-white font-black text-xs uppercase">${c.label}${isCicloAtual ? ' <span class="text-amber-500 text-[8px]">● atual</span>' : ''}</div>
+                            <div class="text-zinc-600 text-[9px] font-bold mt-0.5">${fmt(c.inicio)} – ${fmt(c.fim)}</div>
+                        </div>
+                        <div class="text-emerald-400 font-black text-sm">${valor > 0 ? 'R$ ' + valor.toFixed(2) : '<span class="text-zinc-700">—</span>'}</div>
+                    </div>`;
+            });
+
+            // Rodapé com total
+            html += `<div class="flex items-center justify-between py-3 mt-1">
+                        <div class="text-amber-500 font-black text-xs uppercase">Total ${anoAtual}</div>
+                        <div class="text-amber-500 font-black text-sm">R$ ${totalAnual.toFixed(2)}</div>
+                     </div>`;
+
+            document.getElementById('extrato-anual-titulo').innerText = `Ciclos de ${anoAtual}`;
+            document.getElementById('extrato-anual-lista').innerHTML = html;
+            document.getElementById('modal-extrato-anual').classList.remove('hidden');
+        }
+
+        // CORREÇÃO DO ESCOPO DO BOTÃO CHAMAR (Injetando strings de forma limpa e segura)
+        function updateRelatorios() {
+            if(clientes.length === 0) return;
+            const anoAtual = new Date().getFullYear();
+            const fatAnual = historicoCompleto
+                .filter(h => h.tipo === 'venda' && h.data && new Date(h.data.seconds * 1000).getFullYear() === anoAtual)
+                .reduce((acc, v) => acc + (v.valor || 0), 0);
+            document.getElementById('rep-faturamento-total').innerText = `R$ ${fatAnual.toFixed(2)}`;
+
+            // Faturamento mensal: ciclo do dia 7 ao dia 6 do mês seguinte
+            const hoje = new Date();
+            let inicioMensal, fimMensal;
+            if(hoje.getDate() >= 7) {
+                inicioMensal = new Date(hoje.getFullYear(), hoje.getMonth(), 7);
+                fimMensal    = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 6, 23, 59, 59);
+            } else {
+                inicioMensal = new Date(hoje.getFullYear(), hoje.getMonth() - 1, 7);
+                fimMensal    = new Date(hoje.getFullYear(), hoje.getMonth(), 6, 23, 59, 59);
+            }
+            const fatMensal = historicoCompleto
+                .filter(h => h.tipo === 'venda' && h.data && new Date(h.data.seconds * 1000) >= inicioMensal && new Date(h.data.seconds * 1000) <= fimMensal)
+                .reduce((acc, v) => acc + (v.valor || 0), 0);
+            const fmt = d => d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+            document.getElementById('rep-faturamento-mensal').innerText = `R$ ${fatMensal.toFixed(2)}`;
+            document.getElementById('rep-faturamento-mensal-periodo').innerText = `${fmt(inicioMensal)} – ${fmt(fimMensal)}`;
+            
+            const top = [...clientes].sort((a,b) => (b.totalComprado || 0) - (a.totalComprado || 0))[0];
+            if(top && top.totalComprado > 0) {
+                document.getElementById('rep-top-cliente').innerText = `${top.nome}`;
+                document.getElementById('rep-top-valor').innerText = `Total comprado: R$ ${top.totalComprado.toFixed(2)}`;
+            } else {
+                document.getElementById('rep-top-cliente').innerText = '--';
+                document.getElementById('rep-top-valor').innerText = 'R$ 0,00';
+            }
+            
+            const agora = new Date();
+            let hSumidos = '';
+            const ordenadosPorInatividade = [...clientes].filter(c => c.ultimaCompra).sort((a,b) => a.ultimaCompra.seconds - b.ultimaCompra.seconds);
+            
+            const containerSumidos = document.getElementById('rep-sumidos');
+            if(!containerSumidos) return;
+
+            containerSumidos.innerHTML = '';
+
+            ordenadosPorInatividade.forEach(c => {
+                const dias = Math.floor((agora - new Date(c.ultimaCompra.seconds * 1000)) / (1000 * 60 * 60 * 24));
+                if(dias >= 1) {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = "flex justify-between items-center bg-zinc-900/60 p-3 rounded-xl border border-zinc-900";
+                    
+                    itemDiv.innerHTML = `
+                        <div>
+                            <div class="font-black text-xs text-white uppercase">${c.nome}</div>
+                            <div class="text-[9px] text-amber-500 font-bold mt-0.5">Sem pedir há ${dias} dias</div>
+                        </div>
+                    `;
+
+                    const btnChamar = document.createElement('button');
+                    btnChamar.className = "text-[9px] bg-amber-500 font-black text-black px-3 py-2 rounded-lg uppercase italic";
+                    btnChamar.innerText = "💬 Chamar";
+                    btnChamar.onclick = function() {
+                        enviarMensagemSaudadeDireto(c.nome, c.tel || '', dias);
+                    };
+
+                    itemDiv.appendChild(btnChamar);
+                    containerSumidos.appendChild(itemDiv);
+                }
+            });
+
+
+            const pagamentos = historicoCompleto
+                .filter(h => h.tipo === 'pagamento')
+                .sort((a,b) => {
+                    const da = a.data ? a.data.seconds : 0;
+                    const db = b.data ? b.data.seconds : 0;
+                    return db - da;
+                })
+                .slice(0, 15);
+
+            const pagamentosContainer = document.getElementById('rep-pagamentos');
+            if(pagamentosContainer) {
+                let pagamentosHtml = '';
+
+                pagamentos.forEach(p => {
+                    const dataPg = p.data ? new Date(p.data.seconds * 1000).toLocaleDateString('pt-BR') : 'Processando...';
+
+                    pagamentosHtml += `
+                    <div class="flex justify-between items-center bg-zinc-900/60 p-3 rounded-xl border border-zinc-900">
+                        <div>
+                            <div class="font-black text-xs text-white uppercase">${p.clienteNome}</div>
+                            <div class="text-[9px] text-emerald-400 font-bold mt-0.5">Pagou R$ ${p.valor.toFixed(2)}</div>
+                        </div>
+                        <div class="text-[9px] text-zinc-500 font-black uppercase">
+                            ${dataPg}
+                        </div>
+                    </div>`;
+                });
+
+                pagamentosContainer.innerHTML = pagamentosHtml || '<div class="text-center py-6 text-zinc-700 italic text-xs font-bold">Nenhum pagamento registrado</div>';
+            }
+
+
+            if(containerSumidos.innerHTML === '') {
+                containerSumidos.innerHTML = '<div class="text-center py-6 text-zinc-700 italic text-xs font-bold">Todos ativos!</div>';
+            }
+        }
+
+        function enviarMensagemSaudadeDireto(nome, tel, dias) {
+            if(!tel || tel.trim() === "") return alert("Este cliente não possui telefone cadastrado!");
+            
+            const texto = `Oi, ${nome}! Tudo bem? Bateu saudade daquela esfiha fechada quentinha! 🥟\n\nNotamos que já faz uns ${dias} dias desde o seu último pedido. A Priscila está preparando uma fornada fresca hoje. Gostaria de garantir uma bandeja com 5 unidades?\n\nSe quiser, só me avisar por aqui!`;
+            
+            window.open(`https://api.whatsapp.com/send?phone=55${tel}&text=${encodeURIComponent(texto)}`, '_blank');
+        }
+
+        function enviarExtratoZap() {
+            const c = clientes.find(x => x.id === selecionadoId);
+            if(!c) return;
+            if(!c.tel) return alert("Cadastre o WhatsApp!");
+            
+            const filtrados = historicoCompleto.filter(h => h.clienteId === c.id);
+            const ultimoPgto = filtrados
+                .filter(h => h.tipo === 'pagamento')
+                .sort((a, b) => (b.data ? b.data.seconds : 0) - (a.data ? a.data.seconds : 0))[0];
+
+            // Extrato desde o último pagamento (ou tudo, se nunca pagou)
+            const segDe = h => h.data ? h.data.seconds : Date.now() / 1000;
+            const recentes = ultimoPgto
+                ? filtrados.filter(h => segDe(h) >= segDe(ultimoPgto))
+                : filtrados;
+            const vendasDepois = recentes.filter(h => h.tipo === 'venda').reduce((acc, v) => acc + (v.valor || 0), 0);
+            const saldoAnterior = ultimoPgto ? Math.round(((c.saldo || 0) - vendasDepois) * 100) / 100 : 0;
+            
+            let texto = `*Fala, ${c.nome}!* Segue o extrato das esfihas da Priscila:\n\n`;
+            
+            if(ultimoPgto) {
+                const dataPgtoStr = ultimoPgto.data ? new Date(ultimoPgto.data.seconds * 1000).toLocaleDateString('pt-BR') : '';
+                texto += `*Último pagamento:* ${dataPgtoStr} - R$ ${ultimoPgto.valor.toFixed(2)} ✅\n\n`;
+            }
+            
+            // Pendências em ordem cronológica (mais antiga primeiro)
+            const pendentes = recentes.filter(h => h.tipo === 'venda').reverse();
+            if(pendentes.length === 0 && saldoAnterior <= 0.009) {
+                if(!ultimoPgto) texto += `Sem movimentações.\n`;
+            } else {
+                if(saldoAnterior > 0.009) {
+                    texto += `• Saldo pendente do último pagamento: R$ ${saldoAnterior.toFixed(2)}\n`;
+                }
+                pendentes.forEach(i => {
+                    const dataStr = i.data ? new Date(i.data.seconds * 1000).toLocaleDateString('pt-BR') : '';
+                    texto += `• ${dataStr}: Pegou ${i.qtd} band. (R$ ${i.valor.toFixed(2)})\n`;
+                });
+            }
+            
+            texto += `\n*Total Pendente: R$ ${c.saldo.toFixed(2)}*\n\n`;
+            if(c.saldo > 0) {
+                const pixLink = window.location.origin + window.location.pathname + '?pix';
+                texto += `👆 Toque no link abaixo para copiar a chave Pix:\n${pixLink}`;
+            }
+            
+            window.open(`https://api.whatsapp.com/send?phone=55${c.tel}&text=${encodeURIComponent(texto)}`, '_blank');
+        }
+
+        function enviarCobranca45() {
+            const c = clientes.find(x => x.id === selecionadoId);
+            if(!c) return;
+            if(!c.tel) return alert("Cadastre o WhatsApp!");
+            
+            const pixLink = window.location.origin + window.location.pathname + '?pix';
+            const texto = `Olá, ${c.nome}! Tudo bem?\n\nPassando para lembrar do acerte das esfihas da Priscila. Temos em aberto o valor de *R$ ${c.saldo.toFixed(2)}*.\n\n👆 Toque no link abaixo para copiar a chave Pix:\n${pixLink}\n\nMuito obrigado! 🙏`;
+            
+            window.open(`https://api.whatsapp.com/send?phone=55${c.tel}&text=${encodeURIComponent(texto)}`, '_blank');
+        }
+
+        function copiarChavePix() {
+            const chave = document.getElementById('pix-key-display').innerText;
+            navigator.clipboard.writeText(chave).then(() => {
+                const btn = document.getElementById('btn-copiar-pix');
+                const confirm = document.getElementById('pix-copiado');
+                btn.innerText = '✅ Copiado!';
+                btn.style.background = '#10b981';
+                confirm.classList.remove('hidden');
+                setTimeout(() => {
+                    btn.innerText = '📋 Copiar Chave Pix';
+                    btn.style.background = '';
+                    confirm.classList.add('hidden');
+                }, 3000);
+            }).catch(() => {
+                // Fallback para browsers mais antigos
+                const el = document.createElement('textarea');
+                el.value = chave;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+                document.getElementById('btn-copiar-pix').innerText = '✅ Copiado!';
+                document.getElementById('pix-copiado').classList.remove('hidden');
+            });
+        }
+
+        // Detecta se o cliente acessou o link ?pix
+        if(new URLSearchParams(window.location.search).has('pix')) {
+            document.getElementById('pix-page').classList.remove('hidden');
+            document.getElementById('main-app').classList.add('hidden');
+        } else {
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js'); });
+            }
+            init();
+        }
+    </script>
+</body>
+</html>
