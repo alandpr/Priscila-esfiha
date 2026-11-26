@@ -506,7 +506,7 @@
                 <div class="text-amber-400 font-black uppercase text-sm tracking-wide">📈 Faturamento Anual</div>
                 <div id="extrato-anual-titulo" class="text-zinc-400 text-[10px] uppercase font-bold tracking-wider mt-0.5"></div>
             </div>
-            <button onclick="document.getElementById('modal-extrato-anual').classList.add('hidden')"
+            <button onclick="fecharExtratoAnual()"
                 class="text-zinc-400 font-black text-sm w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-800 border border-zinc-700">✕</button>
         </div>
         <div class="flex-1 overflow-y-auto px-4 py-3 space-y-1 no-scrollbar max-w-lg mx-auto w-full" id="extrato-anual-lista"></div>
@@ -654,7 +654,47 @@
         let selecionadoId = null;
         let filtroClienteAtual = 'todos';
         let modoVendaAtual = 'pendura';
+        let abaAtual = 'clientes';
+        let ignorarPopstate = false;
         let metaMensal = parseFloat(localStorage.getItem('priscila_meta_mensal')) || 2000;
+
+        function inicializarProtecaoVoltar() {
+            try {
+                history.replaceState({ priscilaApp: true, view: 'clientes' }, '', window.location.href);
+                history.pushState({ priscilaApp: true, view: 'guard' }, '', window.location.href);
+            } catch (e) {}
+
+            window.addEventListener('popstate', function() {
+                if (ignorarPopstate) {
+                    ignorarPopstate = false;
+                    return;
+                }
+
+                const modalConfirm = document.getElementById('modal-confirm');
+                const modalDetalhes = document.getElementById('modal-detalhes');
+                const modalExtrato = document.getElementById('modal-extrato-anual');
+
+                if (modalConfirm && !modalConfirm.classList.contains('hidden')) {
+                    document.getElementById('confirm-cancel').click();
+                } else if (modalDetalhes && !modalDetalhes.classList.contains('hidden')) {
+                    closeModal(true);
+                } else if (modalExtrato && !modalExtrato.classList.contains('hidden')) {
+                    fecharExtratoAnual(true);
+                } else if (abaAtual !== 'clientes') {
+                    showTab('clientes', true);
+                }
+
+                try {
+                    history.pushState({ priscilaApp: true, view: 'guard' }, '', window.location.href);
+                } catch (e) {}
+            });
+        }
+
+        function empurrarEstadoNavegacao(viewName) {
+            try {
+                history.pushState({ priscilaApp: true, view: viewName }, '', window.location.href);
+            } catch (e) {}
+        }
 
         // Sistema de Toast Profissional (Substitui alert())
         function showToast(msg, tipo = 'info') {
@@ -780,7 +820,8 @@
             }
         }
 
-        function showTab(t) {
+        function showTab(t, fromPopstate = false) {
+            abaAtual = t;
             ['clientes', 'vendas', 'custos', 'relatorios'].forEach(id => {
                 const el = document.getElementById('tab-'+id);
                 const btn = document.getElementById('btn-'+id);
@@ -788,8 +829,13 @@
                 if(btn) btn.classList.toggle('active', id === t);
             });
             if(t === 'vendas') {
+                document.getElementById('venda-cliente-select').value = "";
                 document.getElementById('venda-qtd').value = 1;
+                setModoVenda('pendura');
                 updateVendaTotal();
+            }
+            if(!fromPopstate && t !== 'clientes') {
+                empurrarEstadoNavegacao('tab-' + t);
             }
         }
 
@@ -1037,8 +1083,10 @@
             const msgMassa = massasABater > 0 ? ` (${massasABater} massa abatida)` : ` (usou saldo do dia)`;
             showToast(`Pedido registrado com sucesso!${msgMassa}`, "success");
             
+            document.getElementById('venda-cliente-select').value = "";
             document.getElementById('venda-qtd').value = 1;
             setModoVenda('pendura');
+            updateVendaTotal();
             showTab('clientes');
         }
 
@@ -1181,12 +1229,17 @@
             atualizarTelaModal();
             renderExtratoCliente(id);
             document.getElementById('modal-detalhes').classList.remove('hidden');
+            empurrarEstadoNavegacao('modal-detalhes');
         }
 
-        function closeModal() {
+        function closeModal(fromPopstate = false) {
             document.getElementById('modal-detalhes').classList.add('hidden');
             selecionadoId = null;
             document.getElementById('pagamento-valor').value = "";
+            if(!fromPopstate && history.state && history.state.view === 'modal-detalhes') {
+                ignorarPopstate = true;
+                history.back();
+            }
         }
 
         function atualizarTelaModal() {
@@ -1314,6 +1367,14 @@
             container.innerHTML = h || '<div class="text-center py-8 text-zinc-600 text-xs font-semibold">Nenhuma movimentação registrada.</div>';
         }
 
+        function fecharExtratoAnual(fromPopstate = false) {
+            document.getElementById('modal-extrato-anual').classList.add('hidden');
+            if(!fromPopstate && history.state && history.state.view === 'modal-extrato-anual') {
+                ignorarPopstate = true;
+                history.back();
+            }
+        }
+
         function abrirExtratoAnual() {
             const anoAtual = new Date().getFullYear();
             const hoje = new Date();
@@ -1360,6 +1421,7 @@
             document.getElementById('extrato-anual-titulo').innerText = `Ciclos de ${anoAtual} (Dia 07 a Dia 06)`;
             document.getElementById('extrato-anual-lista').innerHTML = html;
             document.getElementById('modal-extrato-anual').classList.remove('hidden');
+            empurrarEstadoNavegacao('modal-extrato-anual');
         }
 
         function editarMetaMensal() {
@@ -1579,6 +1641,7 @@
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js'); });
             }
+            inicializarProtecaoVoltar();
             init();
         }
     </script>
