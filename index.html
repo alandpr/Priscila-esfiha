@@ -1,2204 +1,1649 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Priscila Esfihas • Gestão Enterprise</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#09090b">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-  <style>
-    :root {
-      --bg-main: #09090b;
-      --bg-card: #121215;
-      --border-subtle: #27272a;
-      --gold-primary: #f59e0b;
-    }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body {
-      background-color: var(--bg-main);
-      color: #fafafa;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      padding-bottom: 120px;
-      overflow-x: hidden;
-    }
-    .glass-header {
-      background: rgba(9, 9, 11, 0.85);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-    }
-    .card-pro {
-      background: linear-gradient(145deg, #16161a 0%, #101013 100%);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 20px;
-      padding: 16px;
-      margin-bottom: 14px;
-      box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.7);
-    }
-    .label-pro {
-      color: #a1a1aa;
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 6px;
-      display: block;
-    }
-    .label-gold {
-      color: #f59e0b;
-      font-size: 10px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 6px;
-      display: block;
-    }
-    input, select, textarea {
-      background: #18181b;
-      border: 1.5px solid #27272a;
-      color: #ffffff;
-      padding: 13px 14px;
-      border-radius: 14px;
-      width: 100%;
-      font-size: 15px;
-      font-weight: 600;
-      transition: all 0.2s ease;
-      -webkit-appearance: none;
-    }
-    input:focus, select:focus, textarea:focus {
-      border-color: #f59e0b;
-      background: #1f1f23;
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-      color: #09090b;
-      font-weight: 800;
-      padding: 15px 18px;
-      border-radius: 16px;
-      width: 100%;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      font-size: 13px;
-      cursor: pointer;
-      transition: all 0.18s ease;
-      box-shadow: 0 8px 20px -4px rgba(245, 158, 11, 0.35);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    .btn-primary:active { transform: scale(0.97); }
-    .btn-secondary {
-      background: #18181b;
-      border: 1px solid #27272a;
-      color: #e4e4e7;
-      font-weight: 700;
-      padding: 13px 16px;
-      border-radius: 14px;
-      width: 100%;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.18s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-    .btn-secondary:active { transform: scale(0.97); background: #27272a; }
-    .nav-item {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 10px 4px;
-      border-radius: 14px;
-      color: #71717a;
-      font-size: 10px;
-      font-weight: 700;
-      transition: all 0.2s ease;
-      gap: 3px;
-    }
-    .nav-item.active {
-      background: rgba(245, 158, 11, 0.14);
-      color: #f59e0b;
-    }
-    .filter-pill {
-      padding: 6px 12px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 700;
-      background: #18181b;
-      border: 1px solid #27272a;
-      color: #a1a1aa;
-      white-space: nowrap;
-      transition: all 0.15s ease;
-    }
-    .filter-pill.active {
-      background: #f59e0b;
-      color: #09090b;
-      border-color: #f59e0b;
-    }
-    .hidden { display: none !important; }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-    /* Botão Flutuante Assistente IA */
-    .fab-ai {
-      position: fixed;
-      bottom: 84px;
-      right: 16px;
-      z-index: 60;
-      width: 56px;
-      height: 56px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
-      color: #09090b;
-      box-shadow: 0 12px 28px rgba(245, 158, 11, 0.45);
-      border: 2px solid rgba(255, 255, 255, 0.22);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      cursor: pointer;
-      transition: transform 0.18s ease, box-shadow 0.18s ease;
-    }
-    .fab-ai:active { transform: scale(0.92); }
-    .fab-ai.listening {
-      animation: pulseMic 1.2s infinite;
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-      color: #ffffff;
-    }
-    @keyframes pulseMic {
-      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.65); }
-      70% { box-shadow: 0 0 0 16px rgba(239, 68, 68, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-    }
-
-    /* Toast Notification */
-    #toast-container {
-      position: fixed;
-      top: 16px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 9999;
-      width: 92%;
-      max-width: 420px;
-      pointer-events: none;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .toast-msg {
-      background: #18181b;
-      border: 1px solid #3f3f46;
-      color: #fff;
-      padding: 12px 16px;
-      border-radius: 14px;
-      font-size: 12px;
-      font-weight: 700;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.85);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-16px) scale(0.95); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Priscila Esfihas • Gestão Enterprise</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#09090b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <style>
+        :root {
+            --bg-main: #09090b;
+            --bg-card: #121215;
+            --border-subtle: #27272a;
+            --gold-primary: #f59e0b;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            background-color: var(--bg-main);
+            color: #fafafa;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            padding-bottom: 110px;
+            overflow-x: hidden;
+        }
+        .glass-header {
+            background: rgba(9, 9, 11, 0.85);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+        .card-pro {
+            background: linear-gradient(145deg, #16161a 0%, #101013 100%);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.7);
+        }
+        .label-pro {
+            color: #a1a1aa;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .label-gold {
+            color: #f59e0b;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 6px;
+            display: block;
+        }
+        input, select, textarea {
+            background: #18181b;
+            border: 1.5px solid #27272a;
+            color: #ffffff;
+            padding: 13px 14px;
+            border-radius: 14px;
+            width: 100%;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            -webkit-appearance: none;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #f59e0b;
+            background: #1f1f23;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #09090b;
+            font-weight: 800;
+            padding: 15px 18px;
+            border-radius: 16px;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            box-shadow: 0 8px 20px -4px rgba(245, 158, 11, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-primary:active { transform: scale(0.97); }
+        .btn-secondary {
+            background: #18181b;
+            border: 1px solid #27272a;
+            color: #e4e4e7;
+            font-weight: 700;
+            padding: 13px 16px;
+            border-radius: 14px;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .btn-secondary:active { transform: scale(0.97); background: #27272a; }
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 4px;
+            border-radius: 14px;
+            color: #71717a;
+            font-size: 10px;
+            font-weight: 700;
+            transition: all 0.2s ease;
+            gap: 3px;
+        }
+        .nav-item.active {
+            background: rgba(245, 158, 11, 0.14);
+            color: #f59e0b;
+        }
+        .filter-pill {
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            background: #18181b;
+            border: 1px solid #27272a;
+            color: #a1a1aa;
+            white-space: nowrap;
+            transition: all 0.15s ease;
+        }
+        .filter-pill.active {
+            background: #f59e0b;
+            color: #09090b;
+            border-color: #f59e0b;
+        }
+        .hidden { display: none !important; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Toast Notification */
+        #toast-container {
+            position: fixed;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            width: 92%;
+            max-width: 420px;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .toast-msg {
+            background: #18181b;
+            border: 1px solid #3f3f46;
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.85);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-16px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+    </style>
 </head>
 <body class="max-w-lg mx-auto px-3.5 pt-2">
 
-  <!-- SISTEMA DE NOTIFICAÇÕES PROFISSIONAIS (TOAST) -->
-  <div id="toast-container"></div>
+    <!-- SISTEMA DE NOTIFICAÇÕES PROFISSIONAIS (TOAST) -->
+    <div id="toast-container"></div>
 
-  <!-- MODAL DE CONFIRMAÇÃO CUSTOMIZADO -->
-  <div id="modal-confirm" class="hidden fixed inset-0 z-[9500] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 w-full max-w-sm shadow-2xl">
-      <h4 id="confirm-title" class="text-white font-extrabold text-base mb-1.5">Confirmar Ação</h4>
-      <p id="confirm-desc" class="text-zinc-400 text-xs leading-relaxed mb-5">Deseja continuar com esta operação?</p>
-      <div class="grid grid-cols-2 gap-2.5">
-        <button id="confirm-cancel" class="btn-secondary py-2.5">Cancelar</button>
-        <button id="confirm-ok" class="btn-primary py-2.5">Confirmar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- APP PRINCIPAL -->
-  <div id="main-app">
-    <!-- HEADER CORPORATIVO -->
-    <header class="glass-header sticky top-0 z-40 py-3 mb-3 border-b border-zinc-800/80 flex items-center justify-between">
-      <div class="flex items-center gap-2.5">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-zinc-950 font-black text-lg shadow-lg shadow-amber-500/20">
-          🥟
-        </div>
-        <div>
-          <div class="flex items-center gap-1.5">
-            <h1 class="text-base font-black tracking-tight text-white uppercase">Priscila Esfihas</h1>
-            <span class="text-[9px] font-extrabold bg-amber-500/15 text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded-md">PRO</span>
-          </div>
-          <div class="flex items-center gap-1.5 mt-0.5">
-            <span id="sync-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span class="text-[10px] font-medium text-zinc-400">Gestão & Estoque Inteligente</span>
-          </div>
-        </div>
-      </div>
-      <div class="text-right bg-zinc-900/90 border border-zinc-800 px-3 py-1.5 rounded-xl">
-        <span class="text-[9px] font-bold text-zinc-500 uppercase block leading-none mb-1">A Receber</span>
-        <div id="resumo-total" class="text-xs font-black text-rose-400 tracking-tight">R$ 0,00</div>
-      </div>
-    </header>
-
-    <!-- ABA 1: CARTEIRA DE CLIENTES -->
-    <section id="tab-clientes">
-      <div class="mb-3">
-        <div class="relative mb-2.5">
-          <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">🔍</span>
-          <input type="text" id="search-g" oninput="renderClientes()" class="pl-10 pr-4 py-3 text-xs uppercase tracking-wide bg-zinc-900/90 border-zinc-800" placeholder="Buscar cliente por nome ou telefone...">
-        </div>
-        <div class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
-          <button onclick="setFiltroCliente('todos')" id="filtro-todos" class="filter-pill active">Todos (<span id="count-todos">0</span>)</button>
-          <button onclick="setFiltroCliente('devedores')" id="filtro-devedores" class="filter-pill">Com Saldo (<span id="count-devedores">0</span>)</button>
-          <button onclick="setFiltroCliente('atrasados')" id="filtro-atrasados" class="filter-pill">⚠️ 45+ Dias (<span id="count-atrasados">0</span>)</button>
-          <button onclick="setFiltroCliente('quitados')" id="filtro-quitados" class="filter-pill">Em Dia</button>
-        </div>
-      </div>
-
-      <div id="list-clientes" class="space-y-2.5"></div>
-    </section>
-
-    <!-- ABA 2: PDV / NOVA VENDA -->
-    <section id="tab-vendas" class="hidden">
-      <div class="card-pro">
-        <div class="flex justify-between items-center mb-3">
-          <span class="label-gold mb-0">🛒 Lançamento de Pedido</span>
-          <span class="text-[10px] font-bold text-zinc-400 bg-zinc-900 px-2 py-1 rounded-lg border border-zinc-800">R$ 25,00 / band.</span>
-        </div>
-
-        <label class="label-pro">Cliente</label>
-        <select id="venda-cliente-select" onchange="updateVendaTotal()" class="mb-3"></select>
-
-        <label class="label-pro">Modalidade da Venda</label>
-        <div class="grid grid-cols-2 gap-2 mb-3">
-          <button type="button" id="modo-pendura" onclick="setModoVenda('pendura')" class="py-2.5 px-3 rounded-xl border border-amber-500 bg-amber-500/15 text-amber-400 font-extrabold text-xs uppercase transition-all">
-            📝 Pendura (Fiado)
-          </button>
-          <button type="button" id="modo-avista" onclick="setModoVenda('avista')" class="py-2.5 px-3 rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-400 font-extrabold text-xs uppercase transition-all">
-            💸 Pago na Hora
-          </button>
-        </div>
-
-        <label class="label-pro">Quantidade de Bandejas (5 esfihas/band.)</label>
-        <div class="flex items-center gap-2 mb-3">
-          <button type="button" onclick="ajustarQtdVenda(-1)" class="w-12 h-12 rounded-xl bg-zinc-800 border border-zinc-700 text-white font-black text-xl active:scale-95">-</button>
-          <input type="number" id="venda-qtd" value="1" min="1" oninput="updateVendaTotal()" class="text-center text-lg font-black mb-0">
-          <button type="button" onclick="ajustarQtdVenda(1)" class="w-12 h-12 rounded-xl bg-zinc-800 border border-zinc-700 text-white font-black text-xl active:scale-95">+</button>
-        </div>
-
-        <div class="grid grid-cols-4 gap-1.5 mb-4">
-          <button type="button" onclick="setQtdVenda(1)" class="py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-zinc-300 active:bg-zinc-800">1 band.</button>
-          <button type="button" onclick="setQtdVenda(2)" class="py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-zinc-300 active:bg-zinc-800">2 band.</button>
-          <button type="button" onclick="setQtdVenda(4)" class="py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-amber-400/90 active:bg-zinc-800">4 (1 Massa)</button>
-          <button type="button" onclick="setQtdVenda(8)" class="py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-zinc-300 active:bg-zinc-800">8 band.</button>
-        </div>
-
-        <div class="bg-zinc-950/90 border border-zinc-800/90 rounded-2xl p-3.5 flex justify-between items-center mb-3">
-          <div>
-            <span class="text-[10px] font-bold text-zinc-500 uppercase block">Total do Pedido</span>
-            <span id="venda-esfihas-count" class="text-[11px] font-semibold text-zinc-400">5 esfihas fechadas</span>
-          </div>
-          <div id="venda-total-display" class="text-2xl font-black text-amber-400 tracking-tight">R$ 25,00</div>
-        </div>
-
-        <div id="alerta-limite" class="hidden text-[11px] font-bold text-rose-400 bg-rose-950/40 border border-rose-800/60 p-2.5 rounded-xl mb-3 text-center">
-          ⚠️ Atenção: O saldo devedor deste cliente ultrapassará R$ 100,00!
-        </div>
-
-        <button class="btn-primary" id="btn-registrar-venda" onclick="registrarVenda()">
-          <span>Confirmar Lançamento</span>
-        </button>
-      </div>
-
-      <div class="card-pro border-dashed border-zinc-800 bg-zinc-950/50">
-        <div class="flex justify-between items-center mb-3">
-          <span class="label-pro mb-0 text-zinc-300">➕ Novo Cliente Rápido</span>
-          <button type="button" onclick="puxarContatoAgenda('novo')" class="text-[10px] bg-amber-500/10 border border-amber-500/30 text-amber-400 px-2.5 py-1.5 rounded-lg font-extrabold uppercase flex items-center gap-1 active:scale-95">
-            <span>👤 Agenda</span>
-          </button>
-        </div>
-        <input type="text" id="novo-cliente-nome" placeholder="NOME COMPLETO DO CLIENTE" class="mb-2.5 uppercase">
-        <input type="tel" id="novo-cliente-tel" placeholder="WHATSAPP (Ex: 35999999999)" class="mb-3">
-        <button class="btn-secondary text-amber-400 border-zinc-700" onclick="addCliente()">Salvar Novo Cliente</button>
-      </div>
-    </section>
-
-    <!-- ABA 3: ENGENHARIA DE CUSTOS & ESTOQUE -->
-    <section id="tab-custos" class="hidden">
-      <div class="grid grid-cols-3 gap-2 mb-3">
-        <div class="card-pro p-3 mb-0 text-center">
-          <span class="text-[9px] font-bold text-zinc-400 uppercase block">Custo Massa</span>
-          <div id="custo-massa-total" class="text-sm font-black text-rose-400 mt-1">R$ 0,00</div>
-          <span class="text-[8px] text-zinc-500 block mt-0.5">4 bandejas</span>
-        </div>
-        <div class="card-pro p-3 mb-0 text-center">
-          <span class="text-[9px] font-bold text-zinc-400 uppercase block">Lucro / Band.</span>
-          <div id="lucro-bandeja-total" class="text-sm font-black text-emerald-400 mt-1">R$ 0,00</div>
-          <span id="margem-lucro-badge" class="text-[8px] text-emerald-500/80 font-bold block mt-0.5">Margem 0%</span>
-        </div>
-        <div class="card-pro p-3 mb-0 text-center border-amber-500/30 bg-amber-500/5">
-          <span class="text-[9px] font-bold text-amber-400 uppercase block">Capacidade</span>
-          <div id="capacidade-massas-display" class="text-sm font-black text-white mt-1">0 massas</div>
-          <span id="capacidade-bandejas-sub" class="text-[8px] text-zinc-400 block mt-0.5">0 bandejas</span>
-        </div>
-      </div>
-
-      <div class="card-pro bg-gradient-to-r from-amber-950/30 via-zinc-900 to-zinc-900 border-amber-500/30 flex items-center justify-between">
-        <div>
-          <span class="label-gold mb-0.5">🔥 Saldo Prontas (Hoje)</span>
-          <p class="text-[10px] text-zinc-400 leading-tight max-w-[200px]">
-            Ao zerar, a venda abate automaticamente 1 massa inteira do estoque.
-          </p>
-        </div>
-        <div class="flex items-center gap-2">
-          <button onclick="ajustarSaldoBancada(-1)" class="w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-300 font-black text-sm active:scale-95">-</button>
-          <div id="saldo-bandejas-display" class="text-2xl font-black text-white w-8 text-center">0</div>
-          <button onclick="ajustarSaldoBancada(1)" class="w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700 text-amber-400 font-black text-sm active:scale-95">+</button>
-        </div>
-      </div>
-
-      <div class="card-pro">
-        <span class="label-gold mb-3">📦 Entrada de Mercadoria / Insumos</span>
-        <select id="insumo-select" onchange="selecionarInsumoPreDefinido()" class="mb-3">
-          <option value="farinha">Farinha de Trigo (Receita: 600g)</option>
-          <option value="ovos">Ovos (Receita: 2 un)</option>
-          <option value="leite">Leite (Receita: 250ml)</option>
-          <option value="margarina">Margarina (Receita: 45g)</option>
-          <option value="oleo">Óleo (Receita: 36ml)</option>
-          <option value="acucar">Açúcar (Receita: 30g)</option>
-          <option value="sal">Sal (Receita: 3g)</option>
-          <option value="fermento">Fermento Seco (Receita: 10g)</option>
-          <option value="carne">Carne Moída (Receita: 500g)</option>
-        </select>
-
-        <div class="grid grid-cols-2 gap-2.5 mb-2.5">
-          <div>
-            <label class="label-pro">Tamanho Embalagem</label>
-            <input type="number" id="insumo-tamanho-pacote" placeholder="Ex: 1000" step="any">
-          </div>
-          <div>
-            <label class="label-pro">Unidade</label>
-            <select id="insumo-unidade">
-              <option value="g">Gramas (g)</option>
-              <option value="ml">Mililitros (ml)</option>
-              <option value="un">Unidades (un)</option>
-              <option value="kg">Quilos (kg)</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2.5 mb-3">
-          <div>
-            <label class="label-pro">Valor Pago (Pacote)</label>
-            <input type="number" id="insumo-preco-pacote" placeholder="R$ 0,00" step="any">
-          </div>
-          <div>
-            <label class="label-pro">Qtd. Pacotes</label>
-            <input type="number" id="insumo-qtd-comprada" value="1" min="1">
-          </div>
-        </div>
-
-        <button class="btn-primary py-3 text-xs" onclick="salvarInsumoEstoque()">Atualizar Estoque & Custo</button>
-      </div>
-
-      <div class="card-pro">
-        <div class="flex justify-between items-center mb-3">
-          <span class="label-gold mb-0">📊 Inventário & Custo por Receita</span>
-          <span class="text-[9px] text-zinc-500 font-bold uppercase">1 Massa = 20 Esfihas</span>
-        </div>
-        <div id="lista-estoque-status" class="space-y-2.5"></div>
-      </div>
-    </section>
-
-    <!-- ABA 4: BUSINESS INTELLIGENCE & RELATÓRIOS -->
-    <section id="tab-relatorios" class="hidden">
-      <div class="grid grid-cols-2 gap-2.5 mb-3">
-        <div class="card-pro p-3.5 mb-0 cursor-pointer active:scale-98 transition-transform" onclick="abrirExtratoAnual()">
-          <div class="flex justify-between items-start">
-            <span class="label-pro mb-0">📈 Fat. Anual</span>
-            <span class="text-[9px] text-amber-400 font-bold">Ver ciclos ›</span>
-          </div>
-          <div id="rep-faturamento-total" class="text-lg font-black text-emerald-400 mt-1.5">R$ 0,00</div>
-          <div class="text-[9px] text-zinc-500 font-medium mt-0.5">Toque para detalhar</div>
-        </div>
-
-        <div class="card-pro p-3.5 mb-0">
-          <span class="label-pro mb-0">📅 Ciclo Mensal</span>
-          <div id="rep-faturamento-mensal" class="text-lg font-black text-sky-400 mt-1.5">R$ 0,00</div>
-          <div id="rep-faturamento-mensal-periodo" class="text-[9px] text-zinc-500 font-medium mt-0.5">--</div>
-        </div>
-      </div>
-
-      <div class="card-pro">
-        <div class="flex justify-between items-center mb-2">
-          <span class="label-gold mb-0">🎯 Meta do Ciclo Mensal</span>
-          <button onclick="editarMetaMensal()" class="text-[10px] text-zinc-400 underline font-bold">Editar Meta</button>
-        </div>
-        <div class="flex justify-between items-end mb-1.5">
-          <span id="meta-progresso-texto" class="text-xs font-extrabold text-white">R$ 0,00 / R$ 2.000,00</span>
-          <span id="meta-porcentagem-texto" class="text-xs font-black text-amber-400">0%</span>
-        </div>
-        <div class="w-full h-2.5 bg-zinc-800 rounded-full overflow-hidden">
-          <div id="meta-barra-progresso" class="h-full bg-gradient-to-r from-amber-500 to-emerald-400 rounded-full transition-all duration-500" style="width: 0%"></div>
-        </div>
-      </div>
-
-      <div class="card-pro flex items-center justify-between bg-gradient-to-r from-zinc-900 to-amber-950/20 border-amber-500/20">
-        <div class="flex items-center gap-3 min-w-0">
-          <div class="w-10 h-10 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-lg flex-shrink-0">🏆</div>
-          <div class="min-w-0">
-            <span class="text-[9px] font-bold text-amber-400 uppercase block">Cliente VIP #1</span>
-            <div id="rep-top-cliente" class="text-sm font-black text-white uppercase truncate">--</div>
-            <div id="rep-top-valor" class="text-[10px] text-zinc-400 font-semibold">R$ 0,00 em compras</div>
-          </div>
-        </div>
-        <button onclick="exportarBackupCSV()" class="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-200 text-[10px] font-bold px-3 py-2 rounded-xl uppercase flex-shrink-0 active:scale-95">
-          📥 Backup CSV
-        </button>
-      </div>
-
-      <div class="card-pro">
-        <div class="flex justify-between items-center mb-3">
-          <span class="label-gold mb-0">🕒 Reativação (Clientes Inativos)</span>
-          <span class="text-[9px] text-zinc-500 font-bold">Toque p/ WhatsApp</span>
-        </div>
-        <div id="rep-sumidos" class="space-y-2 max-h-[280px] overflow-y-auto no-scrollbar"></div>
-      </div>
-
-      <div class="card-pro">
-        <span class="label-gold mb-3">💰 Últimos Recebimentos</span>
-        <div id="rep-pagamentos" class="space-y-2 max-h-[280px] overflow-y-auto no-scrollbar"></div>
-      </div>
-    </section>
-
-    <!-- BOTÃO FLUTUANTE DO ASSISTENTE GEMINI POR VOZ -->
-    <button id="fab-assistente" onclick="abrirAssistenteIA()" class="fab-ai" title="Assistente Gemini por Voz">
-      🎙️
-    </button>
-
-    <!-- BARRA DE NAVEGAÇÃO INFERIOR FIXA -->
-    <nav class="fixed bottom-0 left-0 right-0 z-50 glass-header border-t border-zinc-800/90 px-3 py-2">
-      <div class="max-w-lg mx-auto flex items-center justify-between gap-1">
-        <button id="btn-clientes" class="nav-item active" onclick="showTab('clientes')">
-          <span class="text-base">👥</span>
-          <span>Clientes</span>
-        </button>
-        <button id="btn-vendas" class="nav-item" onclick="showTab('vendas')">
-          <span class="text-base">🥟</span>
-          <span>Vender</span>
-        </button>
-        <button id="btn-custos" class="nav-item" onclick="showTab('custos')">
-          <span class="text-base">📦</span>
-          <span>Estoque</span>
-        </button>
-        <button id="btn-relatorios" class="nav-item" onclick="showTab('relatorios')">
-          <span class="text-base">📊</span>
-          <span>Gestão</span>
-        </button>
-      </div>
-    </nav>
-  </div>
-
-  <!-- MODAL ASSISTENTE GEMINI (MODO CONVERSA & CONFIRMAÇÃO POR VOZ) -->
-  <div id="modal-assistente" class="hidden fixed inset-0 z-[4000] bg-zinc-950/95 backdrop-blur-md flex flex-col">
-    <div class="max-w-lg mx-auto w-full flex-1 flex flex-col p-4 overflow-hidden">
-      <!-- Topo do Assistente -->
-      <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
-        <div class="flex items-center gap-2.5">
-          <div class="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-xl">✨</div>
-          <div>
-            <div class="flex items-center gap-1.5">
-              <h3 class="text-white font-black text-sm uppercase tracking-tight">Gemini Ao Vivo</h3>
-              <span id="ai-status-badge" class="text-[9px] font-extrabold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full">PRONTO</span>
+    <!-- MODAL DE CONFIRMAÇÃO CUSTOMIZADO -->
+    <div id="modal-confirm" class="hidden fixed inset-0 z-[9500] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 w-full max-w-sm shadow-2xl">
+            <h4 id="confirm-title" class="text-white font-extrabold text-base mb-1.5">Confirmar Ação</h4>
+            <p id="confirm-desc" class="text-zinc-400 text-xs leading-relaxed mb-5">Deseja continuar com esta operação?</p>
+            <div class="grid grid-cols-2 gap-2.5">
+                <button id="confirm-cancel" class="btn-secondary py-2.5">Cancelar</button>
+                <button id="confirm-ok" class="btn-primary py-2.5">Confirmar</button>
             </div>
-            <p class="text-[10px] text-zinc-400">Fale comandos ou pergunte sobre clientes e vendas</p>
-          </div>
         </div>
-        <div class="flex items-center gap-1.5">
-          <button onclick="toggleVozResposta()" id="btn-toggle-tts" class="bg-zinc-900 border border-zinc-800 text-amber-400 text-[10px] font-bold px-2.5 py-2 rounded-xl" title="Ativar/Desativar leitura em voz alta">🔊 Voz ON</button>
-          <button onclick="abrirConfigApiKey()" class="bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs px-2.5 py-2 rounded-xl" title="Configurar Chave API">🔑</button>
-          <button onclick="fecharAssistenteIA()" class="bg-zinc-900 border border-zinc-800 text-zinc-300 font-bold text-xs px-3 py-2 rounded-xl">✕</button>
-        </div>
-      </div>
-
-      <!-- Painel Config API Key (expansível) -->
-      <div id="ai-config-panel" class="hidden mt-3 bg-zinc-900 border border-amber-500/30 rounded-2xl p-3.5">
-        <label class="label-gold mb-1">🔑 Chave API do Google Gemini</label>
-        <p class="text-[10px] text-zinc-400 mb-2 leading-relaxed">
-          Cole sua chave do Google AI Studio. Ela fica salva apenas neste aparelho. Se quiser testar a sua antiga, basta colar aqui!
-        </p>
-        <input type="password" id="input-gemini-api-key" placeholder="AIzaSy..." class="mb-2.5 text-xs py-2.5">
-        <div class="flex gap-2">
-          <button onclick="salvarApiKeyGemini()" class="btn-primary py-2.5 text-xs">Salvar e Testar Chave</button>
-          <button onclick="fecharConfigApiKey()" class="btn-secondary py-2.5 text-xs w-24">Fechar</button>
-        </div>
-      </div>
-
-      <!-- Histórico de Conversa -->
-      <div id="ai-chat-history" class="flex-1 overflow-y-auto py-3 space-y-2.5 no-scrollbar"></div>
-
-      <!-- Cartão de Confirmação por Voz / Toque -->
-      <div id="ai-confirm-card" class="hidden mb-2.5 bg-gradient-to-br from-amber-950/60 via-zinc-900 to-zinc-900 border-2 border-amber-500/60 rounded-2xl p-4 shadow-2xl">
-        <div class="flex items-center justify-between mb-1.5">
-          <span class="text-[10px] font-black uppercase tracking-wider text-amber-400">🛡️ Confirmação Necessária</span>
-          <span id="ai-confirm-listen-badge" class="text-[10px] font-extrabold text-rose-400 animate-pulse">🎤 Ouvindo "Sim" ou "Não"...</span>
-        </div>
-        <p id="ai-confirm-texto" class="text-sm font-extrabold text-white mb-3 leading-snug"></p>
-        <div class="grid grid-cols-2 gap-2">
-          <button onclick="cancelarAcaoPendenteIA()" class="btn-secondary py-2.5 text-xs border-rose-500/40 text-rose-300">✕ Não / Cancelar</button>
-          <button onclick="executarAcaoPendenteIA()" class="btn-primary py-2.5 text-xs">✓ Sim, Confirmar</button>
-        </div>
-      </div>
-
-      <!-- Área Inferior: Microfone Grande + Texto -->
-      <div class="pt-2 border-t border-zinc-800/90">
-        <div id="ai-live-transcript" class="hidden text-xs text-amber-300 font-semibold bg-zinc-900/90 border border-amber-500/20 px-3 py-2 rounded-xl mb-2 italic"></div>
-        <div class="flex items-center gap-2">
-          <button id="btn-ai-mic" onclick="iniciarEscutaVoz()" class="w-14 h-12 rounded-2xl bg-amber-500 text-zinc-950 font-black text-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-amber-500/25 active:scale-95">
-            🎤
-          </button>
-          <input type="text" id="ai-text-input" onkeydown="if(event.key==='Enter') enviarComandoTextoIA()" placeholder="Ex: quanto o João deve? ou dá baixa de 25 pro João" class="py-3 text-xs mb-0">
-          <button onclick="enviarComandoTextoIA()" class="px-4 h-12 rounded-2xl bg-zinc-800 border border-zinc-700 text-amber-400 font-extrabold text-xs uppercase flex-shrink-0 active:scale-95">
-            Enviar
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL EXTRATO ANUAL -->
-  <div id="modal-extrato-anual" class="hidden fixed inset-0 z-[999] flex flex-col bg-zinc-950">
-    <div class="flex items-center justify-between px-4 pt-5 pb-3 border-b border-zinc-800 bg-zinc-900/50">
-      <div>
-        <div class="text-amber-400 font-black uppercase text-sm tracking-wide">📈 Faturamento Anual</div>
-        <div id="extrato-anual-titulo" class="text-zinc-400 text-[10px] uppercase font-bold tracking-wider mt-0.5"></div>
-      </div>
-      <button onclick="fecharExtratoAnual()"
-        class="text-zinc-400 font-black text-sm w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-800 border border-zinc-700">✕</button>
-    </div>
-    <div class="flex-1 overflow-y-auto px-4 py-3 space-y-1 no-scrollbar max-w-lg mx-auto w-full" id="extrato-anual-lista"></div>
-  </div>
-
-  <!-- TELA PIX EXTERNA -->
-  <div id="pix-page" class="hidden fixed inset-0 z-[9999] flex flex-col items-center justify-center p-6 bg-zinc-950">
-    <div class="w-16 h-16 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-3xl mb-4">🥟</div>
-    <div class="text-amber-400 font-black uppercase text-xl mb-1 text-center tracking-tight">Priscila Esfihas</div>
-    <div class="text-zinc-400 text-xs uppercase font-bold mb-8 tracking-widest">Pagamento Rápido via Pix</div>
-
-    <div class="w-full max-w-sm bg-zinc-900 border border-zinc-800 rounded-3xl p-6 text-center mb-5 shadow-2xl">
-      <div class="text-[10px] text-zinc-500 uppercase font-extrabold tracking-widest mb-1">Tipo da Chave</div>
-      <div class="inline-block bg-amber-500/10 text-amber-400 border border-amber-500/20 px-3 py-1 rounded-full font-bold text-xs mb-5">E-mail</div>
-      <div class="text-[10px] text-zinc-500 uppercase font-extrabold tracking-widest mb-2">Chave Pix</div>
-      <div id="pix-key-display" class="text-lg font-black text-white break-all leading-tight bg-zinc-950 p-3.5 rounded-xl border border-zinc-800">alanpocos@gmail.com</div>
     </div>
 
-    <button onclick="copiarChavePix()" id="btn-copiar-pix"
-      class="w-full max-w-sm bg-amber-500 text-zinc-950 font-black text-sm py-4 rounded-2xl uppercase tracking-wide transition-all active:scale-95 shadow-lg shadow-amber-500/20">
-      📋 Copiar Chave Pix
-    </button>
-    <div id="pix-copiado" class="hidden text-emerald-400 font-extrabold text-xs mt-4 uppercase tracking-wider">✅ Chave copiada para a área de transferência!</div>
+    <!-- APP PRINCIPAL -->
+    <div id="main-app">
+        <!-- HEADER CORPORATIVO -->
+        <header class="glass-header sticky top-0 z-40 py-3 mb-3 border-b border-zinc-800/80 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-zinc-950 font-black text-lg shadow-lg shadow-amber-500/20">
+                    🥟
+                </div>
+                <div>
+                    <div class="flex items-center gap-1.5">
+                        <h1 class="text-base font-black tracking-tight text-white uppercase">Priscila Esfihas</h1>
+                        <span class="text-[9px] font-extrabold bg-amber-500/15 text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded-md">PRO</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span id="sync-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="text-[10px] font-medium text-zinc-400">Gestão & Estoque Inteligente</span>
+                    </div>
+                </div>
+            </div>
+            <div class="text-right bg-zinc-900/90 border border-zinc-800 px-3 py-1.5 rounded-xl">
+                <span class="text-[9px] font-bold text-zinc-500 uppercase block leading-none mb-1">A Receber</span>
+                <div id="resumo-total" class="text-xs font-black text-rose-400 tracking-tight">R$ 0,00</div>
+            </div>
+        </header>
 
-    <div class="mt-10 text-[11px] text-zinc-500 text-center leading-relaxed max-w-xs">
-      Após copiar, abra o aplicativo do seu banco, acesse <strong class="text-zinc-300">Pix › Pagar › Chave</strong> e cole o e-mail acima.
+        <!-- ABA 1: CARTEIRA DE CLIENTES -->
+        <section id="tab-clientes">
+            <!-- Barra de Busca e Filtros Rápidos -->
+            <div class="mb-3">
+                <div class="relative mb-2.5">
+                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">🔍</span>
+                    <input type="text" id="search-g" oninput="renderClientes()" class="pl-10 pr-4 py-3 text-xs uppercase tracking-wide bg-zinc-900/90 border-zinc-800" placeholder="Buscar cliente por nome ou telefone...">
+                </div>
+                <div class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
+                    <button onclick="setFiltroCliente('todos')" id="filtro-todos" class="filter-pill active">Todos (<span id="count-todos">0</span>)</button>
+                    <button onclick="setFiltroCliente('devedores')" id="filtro-devedores" class="filter-pill">Com Saldo (<span id="count-devedores">0</span>)</button>
+                    <button onclick="setFiltroCliente('atrasados')" id="filtro-atrasados" class="filter-pill">⚠️ 45+ Dias (<span id="count-atrasados">0</span>)</button>
+                    <button onclick="setFiltroCliente('quitados')" id="filtro-quitados" class="filter-pill">Em Dia</button>
+                </div>
+            </div>
+
+            <div id="list-clientes" class="space-y-2.5"></div>
+        </section>
+
+        <!-- ABA 2: PDV / NOVA VENDA -->
+        <section id="tab-vendas" class="hidden">
+            <div class="card-pro">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="label-gold mb-0">🛒 Lançamento de Pedido</span>
+                    <span class="text-[10px] font-bold text-zinc-400 bg-zinc-900 px-2 py-1 rounded-lg border border-zinc-800">R$ 25,00 / band.</span>
+                </div>
+
+                <label class="label-pro">Cliente</label>
+                <select id="venda-cliente-select" onchange="updateVendaTotal()" class="mb-3"></select>
+
+                <!-- Tipo de Pagamento (Novidade Enterprise) -->
+                <label class="label-pro">Modalidade da Venda</label>
+                <div class="grid grid-cols-2 gap-2 mb-3">
+                    <button type="button" id="modo-pendura" onclick="setModoVenda('pendura')" class="py-2.5 px-3 rounded-xl border border-amber-500 bg-amber-500/15 text-amber-400 font-extrabold text-xs uppercase transition-all">
+                        📝 Pendura (Fiado)
+                    </button>
+                    <button type="button" id="modo-avista" onclick="setModoVenda('avista')" class="py-2.5 px-3 rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-400 font-extrabold text-xs uppercase transition-all">
+                        💸 Pago na Hora
+                    </button>
+                </div>
+
+                <!-- Seletor Rápido de Quantidade -->
+                <label class="label-pro">Quantidade de Bandejas (5 esfihas/band.)</label>
+                <div class="flex items-center gap-2 mb-3">
+                    <button type="button" onclick="ajustarQtdVenda(-1)" class="w-12 h-12 rounded-xl bg-zinc-800 border border-zinc-700 text-white font-black text-xl active:scale-95">-</button>
+                    <input type="number" id="venda-qtd" value="1" min="1" oninput="updateVendaTotal()" class="text-center text-lg font-black mb-0">
+                    <button type="button" onclick="ajustarQtdVenda(1)" class="w-12 h-12 rounded-xl bg-zinc-800 border border-zinc-700 text-white font-black text-xl active:scale-95">+</button>
+                </div>
+
+                <!-- Atalhos de Quantidade -->
+                <div class="grid grid-cols-4 gap-1.5 mb-4">
+                    <button type="button" onclick="setQtdVenda(1)" class="py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-zinc-300 active:bg-zinc-800">1 band.</button>
+                    <button type="button" onclick="setQtdVenda(2)" class="py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-zinc-300 active:bg-zinc-800">2 band.</button>
+                    <button type="button" onclick="setQtdVenda(4)" class="py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-amber-400/90 active:bg-zinc-800">4 (1 Massa)</button>
+                    <button type="button" onclick="setQtdVenda(8)" class="py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-zinc-300 active:bg-zinc-800">8 band.</button>
+                </div>
+
+                <!-- Resumo Financeiro da Venda -->
+                <div class="bg-zinc-950/90 border border-zinc-800/90 rounded-2xl p-3.5 flex justify-between items-center mb-3">
+                    <div>
+                        <span class="text-[10px] font-bold text-zinc-500 uppercase block">Total do Pedido</span>
+                        <span id="venda-esfihas-count" class="text-[11px] font-semibold text-zinc-400">5 esfihas fechadas</span>
+                    </div>
+                    <div id="venda-total-display" class="text-2xl font-black text-amber-400 tracking-tight">R$ 25,00</div>
+                </div>
+                
+                <div id="alerta-limite" class="hidden text-[11px] font-bold text-rose-400 bg-rose-950/40 border border-rose-800/60 p-2.5 rounded-xl mb-3 text-center">
+                    ⚠️ Atenção: O saldo devedor deste cliente ultrapassará R$ 100,00!
+                </div>
+
+                <button class="btn-primary" id="btn-registrar-venda" onclick="registrarVenda()">
+                    <span>Confirmar Lançamento</span>
+                </button>
+            </div>
+
+            <!-- Cadastro Rápido -->
+            <div class="card-pro border-dashed border-zinc-800 bg-zinc-950/50">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="label-pro mb-0 text-zinc-300">➕ Novo Cliente Rápido</span>
+                    <button type="button" onclick="puxarContatoAgenda('novo')" class="text-[10px] bg-amber-500/10 border border-amber-500/30 text-amber-400 px-2.5 py-1.5 rounded-lg font-extrabold uppercase flex items-center gap-1 active:scale-95">
+                        <span>👤 Agenda</span>
+                    </button>
+                </div>
+                <input type="text" id="novo-cliente-nome" placeholder="NOME COMPLETO DO CLIENTE" class="mb-2.5 uppercase">
+                <input type="tel" id="novo-cliente-tel" placeholder="WHATSAPP (Ex: 35999999999)" class="mb-3">
+                <button class="btn-secondary text-amber-400 border-zinc-700" onclick="addCliente()">Salvar Novo Cliente</button>
+            </div>
+        </section>
+
+        <!-- ABA 3: ENGENHARIA DE CUSTOS & ESTOQUE -->
+        <section id="tab-custos" class="hidden">
+            <!-- KPIs de Produção e Lucratividade -->
+            <div class="grid grid-cols-3 gap-2 mb-3">
+                <div class="card-pro p-3 mb-0 text-center">
+                    <span class="text-[9px] font-bold text-zinc-400 uppercase block">Custo Massa</span>
+                    <div id="custo-massa-total" class="text-sm font-black text-rose-400 mt-1">R$ 0,00</div>
+                    <span class="text-[8px] text-zinc-500 block mt-0.5">4 bandejas</span>
+                </div>
+                <div class="card-pro p-3 mb-0 text-center">
+                    <span class="text-[9px] font-bold text-zinc-400 uppercase block">Lucro / Band.</span>
+                    <div id="lucro-bandeja-total" class="text-sm font-black text-emerald-400 mt-1">R$ 0,00</div>
+                    <span id="margem-lucro-badge" class="text-[8px] text-emerald-500/80 font-bold block mt-0.5">Margem 0%</span>
+                </div>
+                <div class="card-pro p-3 mb-0 text-center border-amber-500/30 bg-amber-500/5">
+                    <span class="text-[9px] font-bold text-amber-400 uppercase block">Capacidade</span>
+                    <div id="capacidade-massas-display" class="text-sm font-black text-white mt-1">0 massas</div>
+                    <span id="capacidade-bandejas-sub" class="text-[8px] text-zinc-400 block mt-0.5">0 bandejas</span>
+                </div>
+            </div>
+
+            <!-- Controle de Bancada / Saldo do Dia -->
+            <div class="card-pro bg-gradient-to-r from-amber-950/30 via-zinc-900 to-zinc-900 border-amber-500/30 flex items-center justify-between">
+                <div>
+                    <span class="label-gold mb-0.5">🔥 Saldo Prontas (Hoje)</span>
+                    <p class="text-[10px] text-zinc-400 leading-tight max-w-[200px]">
+                        Ao zerar, a venda abate automaticamente 1 massa inteira do estoque.
+                    </p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="ajustarSaldoBancada(-1)" class="w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-300 font-black text-sm active:scale-95">-</button>
+                    <div id="saldo-bandejas-display" class="text-2xl font-black text-white w-8 text-center">0</div>
+                    <button onclick="ajustarSaldoBancada(1)" class="w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700 text-amber-400 font-black text-sm active:scale-95">+</button>
+                </div>
+            </div>
+
+            <!-- Lançamento de Compra de Insumos -->
+            <div class="card-pro">
+                <span class="label-gold mb-3">📦 Entrada de Mercadoria / Insumos</span>
+                <select id="insumo-select" onchange="selecionarInsumoPreDefinido()" class="mb-3">
+                    <option value="farinha">Farinha de Trigo (Receita: 600g)</option>
+                    <option value="ovos">Ovos (Receita: 2 un)</option>
+                    <option value="leite">Leite (Receita: 250ml)</option>
+                    <option value="margarina">Margarina (Receita: 45g)</option>
+                    <option value="oleo">Óleo (Receita: 36ml)</option>
+                    <option value="acucar">Açúcar (Receita: 30g)</option>
+                    <option value="sal">Sal (Receita: 3g)</option>
+                    <option value="fermento">Fermento Seco (Receita: 10g)</option>
+                    <option value="carne">Carne Moída (Receita: 500g)</option>
+                </select>
+
+                <div class="grid grid-cols-2 gap-2.5 mb-2.5">
+                    <div>
+                        <label class="label-pro">Tamanho Embalagem</label>
+                        <input type="number" id="insumo-tamanho-pacote" placeholder="Ex: 1000" step="any">
+                    </div>
+                    <div>
+                        <label class="label-pro">Unidade</label>
+                        <select id="insumo-unidade">
+                            <option value="g">Gramas (g)</option>
+                            <option value="ml">Mililitros (ml)</option>
+                            <option value="un">Unidades (un)</option>
+                            <option value="kg">Quilos (kg)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2.5 mb-3">
+                    <div>
+                        <label class="label-pro">Valor Pago (Pacote)</label>
+                        <input type="number" id="insumo-preco-pacote" placeholder="R$ 0,00" step="any">
+                    </div>
+                    <div>
+                        <label class="label-pro">Qtd. Pacotes</label>
+                        <input type="number" id="insumo-qtd-comprada" value="1" min="1">
+                    </div>
+                </div>
+
+                <button class="btn-primary py-3 text-xs" onclick="salvarInsumoEstoque()">Atualizar Estoque & Custo</button>
+            </div>
+
+            <!-- Lista de Insumos e Níveis -->
+            <div class="card-pro">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="label-gold mb-0">📊 Inventário & Custo por Receita</span>
+                    <span class="text-[9px] text-zinc-500 font-bold uppercase">1 Massa = 20 Esfihas</span>
+                </div>
+                <div id="lista-estoque-status" class="space-y-2.5"></div>
+            </div>
+        </section>
+
+        <!-- ABA 4: BUSINESS INTELLIGENCE & RELATÓRIOS -->
+        <section id="tab-relatorios" class="hidden">
+            <!-- KPIs Principais -->
+            <div class="grid grid-cols-2 gap-2.5 mb-3">
+                <div class="card-pro p-3.5 mb-0 cursor-pointer active:scale-98 transition-transform" onclick="abrirExtratoAnual()">
+                    <div class="flex justify-between items-start">
+                        <span class="label-pro mb-0">📈 Fat. Anual</span>
+                        <span class="text-[9px] text-amber-400 font-bold">Ver ciclos ›</span>
+                    </div>
+                    <div id="rep-faturamento-total" class="text-lg font-black text-emerald-400 mt-1.5">R$ 0,00</div>
+                    <div class="text-[9px] text-zinc-500 font-medium mt-0.5">Toque para detalhar</div>
+                </div>
+
+                <div class="card-pro p-3.5 mb-0">
+                    <span class="label-pro mb-0">📅 Ciclo Mensal</span>
+                    <div id="rep-faturamento-mensal" class="text-lg font-black text-sky-400 mt-1.5">R$ 0,00</div>
+                    <div id="rep-faturamento-mensal-periodo" class="text-[9px] text-zinc-500 font-medium mt-0.5">--</div>
+                </div>
+            </div>
+
+            <!-- Meta Mensal de Faturamento (Novidade Enterprise) -->
+            <div class="card-pro">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="label-gold mb-0">🎯 Meta do Ciclo Mensal</span>
+                    <button onclick="editarMetaMensal()" class="text-[10px] text-zinc-400 underline font-bold">Editar Meta</button>
+                </div>
+                <div class="flex justify-between items-end mb-1.5">
+                    <span id="meta-progresso-texto" class="text-xs font-extrabold text-white">R$ 0,00 / R$ 2.000,00</span>
+                    <span id="meta-porcentagem-texto" class="text-xs font-black text-amber-400">0%</span>
+                </div>
+                <div class="w-full h-2.5 bg-zinc-800 rounded-full overflow-hidden">
+                    <div id="meta-barra-progresso" class="h-full bg-gradient-to-r from-amber-500 to-emerald-400 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Destaque VIP -->
+            <div class="card-pro flex items-center justify-between bg-gradient-to-r from-zinc-900 to-amber-950/20 border-amber-500/20">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-lg flex-shrink-0">🏆</div>
+                    <div class="min-w-0">
+                        <span class="text-[9px] font-bold text-amber-400 uppercase block">Cliente VIP #1</span>
+                        <div id="rep-top-cliente" class="text-sm font-black text-white uppercase truncate">--</div>
+                        <div id="rep-top-valor" class="text-[10px] text-zinc-400 font-semibold">R$ 0,00 em compras</div>
+                    </div>
+                </div>
+                <button onclick="exportarBackupCSV()" class="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-200 text-[10px] font-bold px-3 py-2 rounded-xl uppercase flex-shrink-0 active:scale-95">
+                    📥 Backup CSV
+                </button>
+            </div>
+
+            <!-- Reativação de Clientes -->
+            <div class="card-pro">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="label-gold mb-0">🕒 Reativação (Clientes Inativos)</span>
+                    <span class="text-[9px] text-zinc-500 font-bold">Toque p/ WhatsApp</span>
+                </div>
+                <div id="rep-sumidos" class="space-y-2 max-h-[280px] overflow-y-auto no-scrollbar"></div>
+            </div>
+
+            <!-- Últimos Recebimentos -->
+            <div class="card-pro">
+                <span class="label-gold mb-3">💰 Últimos Recebimentos</span>
+                <div id="rep-pagamentos" class="space-y-2 max-h-[280px] overflow-y-auto no-scrollbar"></div>
+            </div>
+        </section>
+
+        <!-- BARRA DE NAVEGAÇÃO INFERIOR FIXA (ESTILO APP NATIVO) -->
+        <nav class="fixed bottom-0 left-0 right-0 z-50 glass-header border-t border-zinc-800/90 px-3 py-2">
+            <div class="max-w-lg mx-auto flex items-center justify-between gap-1">
+                <button id="btn-clientes" class="nav-item active" onclick="showTab('clientes')">
+                    <span class="text-base">👥</span>
+                    <span>Clientes</span>
+                </button>
+                <button id="btn-vendas" class="nav-item" onclick="showTab('vendas')">
+                    <span class="text-base">🥟</span>
+                    <span>Vender</span>
+                </button>
+                <button id="btn-custos" class="nav-item" onclick="showTab('custos')">
+                    <span class="text-base">📦</span>
+                    <span>Estoque</span>
+                </button>
+                <button id="btn-relatorios" class="nav-item" onclick="showTab('relatorios')">
+                    <span class="text-base">📊</span>
+                    <span>Gestão</span>
+                </button>
+            </div>
+        </nav>
     </div>
-  </div>
 
-  <!-- MODAL FICHA COMPLETA DO CLIENTE -->
-  <div id="modal-detalhes" class="hidden fixed inset-0 z-[2000] bg-zinc-950 overflow-y-auto">
-    <div class="max-w-lg mx-auto p-4 pb-16">
-      <div class="flex justify-between items-center mb-4 pb-3 border-b border-zinc-800 sticky top-0 bg-zinc-950/95 backdrop-blur-md z-10 pt-1">
-        <div>
-          <h3 class="text-amber-400 font-black uppercase text-base tracking-tight">Ficha do Cliente</h3>
-          <span class="text-[10px] text-zinc-500 font-semibold">Gerenciamento de conta e histórico</span>
+    <!-- MODAL EXTRATO ANUAL -->
+    <div id="modal-extrato-anual" class="hidden fixed inset-0 z-[999] flex flex-col bg-zinc-950">
+        <div class="flex items-center justify-between px-4 pt-5 pb-3 border-b border-zinc-800 bg-zinc-900/50">
+            <div>
+                <div class="text-amber-400 font-black uppercase text-sm tracking-wide">📈 Faturamento Anual</div>
+                <div id="extrato-anual-titulo" class="text-zinc-400 text-[10px] uppercase font-bold tracking-wider mt-0.5"></div>
+            </div>
+            <button onclick="fecharExtratoAnual()"
+                class="text-zinc-400 font-black text-sm w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-800 border border-zinc-700">✕</button>
         </div>
-        <button onclick="closeModal()" class="bg-zinc-900 border border-zinc-800 text-zinc-300 font-bold text-xs px-3.5 py-2 rounded-xl active:scale-95">✕ Fechar</button>
-      </div>
+        <div class="flex-1 overflow-y-auto px-4 py-3 space-y-1 no-scrollbar max-w-lg mx-auto w-full" id="extrato-anual-lista"></div>
+    </div>
 
-      <div class="grid grid-cols-2 gap-2.5 mb-3">
-        <div class="card-pro p-3.5 mb-0 bg-zinc-900/90">
-          <span class="text-[10px] text-zinc-400 font-bold uppercase block">Saldo Devedor</span>
-          <span id="modal-saldo" class="text-xl font-black text-rose-400 mt-1 block">R$ 0,00</span>
-        </div>
-        <div class="card-pro p-3.5 mb-0 bg-zinc-900/90">
-          <span class="text-[10px] text-zinc-400 font-bold uppercase block">Total Já Comprado</span>
-          <span id="modal-historico-total" class="text-xl font-black text-zinc-200 mt-1 block">R$ 0,00</span>
-        </div>
-      </div>
+    <!-- TELA PIX EXTERNA (ABRE QUANDO O CLIENTE CLICA NO LINK ?pix) -->
+    <div id="pix-page" class="hidden fixed inset-0 z-[9999] flex flex-col items-center justify-center p-6 bg-zinc-950">
+        <div class="w-16 h-16 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-3xl mb-4">🥟</div>
+        <div class="text-amber-400 font-black uppercase text-xl mb-1 text-center tracking-tight">Priscila Esfihas</div>
+        <div class="text-zinc-400 text-xs uppercase font-bold mb-8 tracking-widest">Pagamento Rápido via Pix</div>
 
-      <div class="card-pro border-emerald-500/30 bg-emerald-950/10">
-        <div class="flex justify-between items-center mb-2">
-          <span class="label-gold text-emerald-400 mb-0">💸 Registrar Pagamento</span>
-          <button type="button" onclick="preencherValorTotalPagamento()" class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2.5 py-1 rounded-lg font-extrabold uppercase active:scale-95">
-            Quitar Tudo
-          </button>
+        <div class="w-full max-w-sm bg-zinc-900 border border-zinc-800 rounded-3xl p-6 text-center mb-5 shadow-2xl">
+            <div class="text-[10px] text-zinc-500 uppercase font-extrabold tracking-widest mb-1">Tipo da Chave</div>
+            <div class="inline-block bg-amber-500/10 text-amber-400 border border-amber-500/20 px-3 py-1 rounded-full font-bold text-xs mb-5">E-mail</div>
+            <div class="text-[10px] text-zinc-500 uppercase font-extrabold tracking-widest mb-2">Chave Pix</div>
+            <div id="pix-key-display" class="text-lg font-black text-white break-all leading-tight bg-zinc-950 p-3.5 rounded-xl border border-zinc-800">alanpocos@gmail.com</div>
         </div>
-        <div class="flex gap-2">
-          <input type="number" id="pagamento-valor" placeholder="R$ 0,00" step="0.01" class="mb-0">
-          <button class="btn-primary mt-0 w-2/5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-zinc-950 shadow-emerald-500/20" onclick="confirmarPagamento()">Baixar</button>
-        </div>
-      </div>
 
-      <div class="grid grid-cols-2 gap-2.5 mb-3">
-        <button class="btn-secondary bg-zinc-900 border-zinc-800 py-3 flex-col gap-0.5" onclick="enviarExtratoZap()">
-          <span class="text-white font-extrabold text-xs">📋 Enviar Extrato</span>
-          <span class="text-[9px] text-zinc-400 font-medium">Resumo + Link Pix</span>
+        <button onclick="copiarChavePix()" id="btn-copiar-pix"
+            class="w-full max-w-sm bg-amber-500 text-zinc-950 font-black text-sm py-4 rounded-2xl uppercase tracking-wide transition-all active:scale-95 shadow-lg shadow-amber-500/20">
+            📋 Copiar Chave Pix
         </button>
-        <button id="btn-cobranca-45" class="btn-secondary bg-rose-950/30 border-rose-800/50 py-3 flex-col gap-0.5" onclick="enviarCobranca45()">
-          <span class="text-rose-400 font-extrabold text-xs">⚠️ Cobrança 45+ Dias</span>
-          <span class="text-[9px] text-rose-500/80 font-medium">Lembrete de Acerto</span>
-        </button>
-      </div>
+        <div id="pix-copiado" class="hidden text-emerald-400 font-extrabold text-xs mt-4 uppercase tracking-wider">✅ Chave copiada para a área de transferência!</div>
 
-      <div class="card-pro">
-        <div class="flex justify-between items-center mb-2.5">
-          <span class="label-pro mb-0">Dados Cadastrais</span>
-          <button type="button" onclick="puxarContatoAgenda('edit')" class="text-[10px] bg-zinc-800 border border-zinc-700 text-amber-400 px-2.5 py-1 rounded-lg font-bold uppercase">👤 Agenda</button>
+        <div class="mt-10 text-[11px] text-zinc-500 text-center leading-relaxed max-w-xs">
+            Após copiar, abra o aplicativo do seu banco, acesse <strong class="text-zinc-300">Pix › Pagar › Chave</strong> e cole o e-mail acima.
         </div>
-        <input type="text" id="edit-nome" class="uppercase mb-2.5" placeholder="Nome">
-        <input type="tel" id="edit-tel" placeholder="WhatsApp (35999999999)" class="mb-3">
-        <button class="btn-secondary text-amber-400 border-zinc-700 py-2.5" onclick="salvarEdicao()">Salvar Alterações</button>
-      </div>
-
-      <div class="card-pro">
-        <div class="flex justify-between items-center mb-3">
-          <span class="label-gold mb-0">📅 Histórico de Movimentações</span>
-          <span class="text-[9px] text-zinc-500 font-medium">Toque na lixeira p/ estornar</span>
-        </div>
-        <div id="extrato-linha-tempo" class="space-y-2 max-h-[340px] overflow-y-auto no-scrollbar"></div>
-      </div>
     </div>
-  </div>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBA4xSi8fgtNXJQxf7-AC8vQQvojxaMH48",
-      authDomain: "priscilas-esfihas.firebaseapp.com",
-      projectId: "priscilas-esfihas",
-      storageBucket: "priscilas-esfihas.firebasestorage.app",
-      messagingSenderId: "33498231694",
-      appId: "1:33498231694:web:5cd7fb0986ae6fa21b2adf",
-      measurementId: "G-E6N425TCGC"
-    };
+    <!-- MODAL FICHA COMPLETA DO CLIENTE -->
+    <div id="modal-detalhes" class="hidden fixed inset-0 z-[2000] bg-zinc-950 overflow-y-auto">
+        <div class="max-w-lg mx-auto p-4 pb-16">
+            <div class="flex justify-between items-center mb-4 pb-3 border-b border-zinc-800 sticky top-0 bg-zinc-950/95 backdrop-blur-md z-10 pt-1">
+                <div>
+                    <h3 class="text-amber-400 font-black uppercase text-base tracking-tight">Ficha do Cliente</h3>
+                    <span class="text-[10px] text-zinc-500 font-semibold">Gerenciamento de conta e histórico</span>
+                </div>
+                <button onclick="closeModal()" class="bg-zinc-900 border border-zinc-800 text-zinc-300 font-bold text-xs px-3.5 py-2 rounded-xl active:scale-95">✕ Fechar</button>
+            </div>
 
-    const CHAVE_PIX_PADRAO = "alanpocos@gmail.com";
-    const PRECO_BANDEJA = 25.0;
+            <!-- Resumo Financeiro da Ficha -->
+            <div class="grid grid-cols-2 gap-2.5 mb-3">
+                <div class="card-pro p-3.5 mb-0 bg-zinc-900/90">
+                    <span class="text-[10px] text-zinc-400 font-bold uppercase block">Saldo Devedor</span>
+                    <span id="modal-saldo" class="text-xl font-black text-rose-400 mt-1 block">R$ 0,00</span>
+                </div>
+                <div class="card-pro p-3.5 mb-0 bg-zinc-900/90">
+                    <span class="text-[10px] text-zinc-400 font-bold uppercase block">Total Já Comprado</span>
+                    <span id="modal-historico-total" class="text-xl font-black text-zinc-200 mt-1 block">R$ 0,00</span>
+                </div>
+            </div>
 
-    const receitaProporcao = {
-      farinha: 600,
-      ovos: 2,
-      leite: 250,
-      margarina: 45,
-      oleo: 36,
-      acucar: 30,
-      sal: 3,
-      fermento: 10,
-      carne: 500
-    };
+            <!-- Abatimento / Pagamento -->
+            <div class="card-pro border-emerald-500/30 bg-emerald-950/10">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="label-gold text-emerald-400 mb-0">💸 Registrar Pagamento</span>
+                    <button type="button" onclick="preencherValorTotalPagamento()" class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2.5 py-1 rounded-lg font-extrabold uppercase active:scale-95">
+                        Quitar Tudo
+                    </button>
+                </div>
+                <div class="flex gap-2">
+                    <input type="number" id="pagamento-valor" placeholder="R$ 0,00" step="0.01" class="mb-0">
+                    <button class="btn-primary mt-0 w-2/5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-zinc-950 shadow-emerald-500/20" onclick="confirmarPagamento()">Baixar</button>
+                </div>
+            </div>
 
-    const nomesInsumos = {
-      farinha: "Farinha de Trigo",
-      ovos: "Ovos",
-      leite: "Leite",
-      margarina: "Margarina",
-      oleo: "Óleo",
-      acucar: "Açúcar",
-      sal: "Sal",
-      fermento: "Fermento Seco",
-      carne: "Carne Moída"
-    };
+            <!-- Ações de Cobrança via WhatsApp -->
+            <div class="grid grid-cols-2 gap-2.5 mb-3">
+                <button class="btn-secondary bg-zinc-900 border-zinc-800 py-3 flex-col gap-0.5" onclick="enviarExtratoZap()">
+                    <span class="text-white font-extrabold text-xs">📋 Enviar Extrato</span>
+                    <span class="text-[9px] text-zinc-400 font-medium">Resumo + Link Pix</span>
+                </button>
+                <button id="btn-cobranca-45" class="btn-secondary bg-rose-950/30 border-rose-800/50 py-3 flex-col gap-0.5" onclick="enviarCobranca45()">
+                    <span class="text-rose-400 font-extrabold text-xs">⚠️ Cobrança 45+ Dias</span>
+                    <span class="text-[9px] text-rose-500/80 font-medium">Lembrete de Acerto</span>
+                </button>
+            </div>
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+            <!-- Dados Cadastrais -->
+            <div class="card-pro">
+                <div class="flex justify-between items-center mb-2.5">
+                    <span class="label-pro mb-0">Dados Cadastrais</span>
+                    <button type="button" onclick="puxarContatoAgenda('edit')" class="text-[10px] bg-zinc-800 border border-zinc-700 text-amber-400 px-2.5 py-1 rounded-lg font-bold uppercase">👤 Agenda</button>
+                </div>
+                <input type="text" id="edit-nome" class="uppercase mb-2.5" placeholder="Nome">
+                <input type="tel" id="edit-tel" placeholder="WhatsApp (35999999999)" class="mb-3">
+                <button class="btn-secondary text-amber-400 border-zinc-700 py-2.5" onclick="salvarEdicao()">Salvar Alterações</button>
+            </div>
 
-    let clientes = [];
-    let historicoCompleto = [];
-    let estoqueInsumos = {};
-    let selecionadoId = null;
-    let filtroClienteAtual = 'todos';
-    let modoVendaAtual = 'pendura';
-    let abaAtual = 'clientes';
-    let ignorarPopstate = false;
-    let metaMensal = parseFloat(localStorage.getItem('priscila_meta_mensal')) || 2000;
+            <!-- Linha do Tempo com Estorno Seguro -->
+            <div class="card-pro">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="label-gold mb-0">📅 Histórico de Movimentações</span>
+                    <span class="text-[9px] text-zinc-500 font-medium">Toque na lixeira p/ estornar</span>
+                </div>
+                <div id="extrato-linha-tempo" class="space-y-2 max-h-[340px] overflow-y-auto no-scrollbar"></div>
+            </div>
+        </div>
+    </div>
 
-    // Estado do Assistente Gemini
-    let geminiApiKey = localStorage.getItem('priscila_gemini_api_key') || '';
-    let vozAtiva = localStorage.getItem('priscila_ai_voz_ativa') !== 'false';
-    let acaoPendenteIA = null;
-    let modoEscutaConfirmacao = false;
-    let recognition = null;
-    let estaOuvindo = false;
-
-    function inicializarProtecaoVoltar() {
-      try {
-        history.replaceState({ priscilaApp: true, view: 'clientes' }, '', window.location.href);
-        history.pushState({ priscilaApp: true, view: 'guard' }, '', window.location.href);
-      } catch (e) {}
-
-      window.addEventListener('popstate', function() {
-        if (ignorarPopstate) {
-          ignorarPopstate = false;
-          return;
-        }
-
-        const modalConfirm = document.getElementById('modal-confirm');
-        const modalAssistente = document.getElementById('modal-assistente');
-        const modalDetalhes = document.getElementById('modal-detalhes');
-        const modalExtrato = document.getElementById('modal-extrato-anual');
-
-        if (modalConfirm && !modalConfirm.classList.contains('hidden')) {
-          document.getElementById('confirm-cancel').click();
-        } else if (modalAssistente && !modalAssistente.classList.contains('hidden')) {
-          fecharAssistenteIA(true);
-        } else if (modalDetalhes && !modalDetalhes.classList.contains('hidden')) {
-          closeModal(true);
-        } else if (modalExtrato && !modalExtrato.classList.contains('hidden')) {
-          fecharExtratoAnual(true);
-        } else if (abaAtual !== 'clientes') {
-          showTab('clientes', true);
-        }
-
-        try {
-          history.pushState({ priscilaApp: true, view: 'guard' }, '', window.location.href);
-        } catch (e) {}
-      });
-    }
-
-    function empurrarEstadoNavegacao(viewName) {
-      try {
-        history.pushState({ priscilaApp: true, view: viewName }, '', window.location.href);
-      } catch (e) {}
-    }
-
-    function showToast(msg, tipo = 'info') {
-      const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      const icones = { success: '✅', error: '⚠️', info: '🥟', warning: '🔔' };
-      const bordas = {
-        success: 'border-emerald-500/50 text-emerald-100',
-        error: 'border-rose-500/50 text-rose-100',
-        info: 'border-amber-500/50 text-zinc-100',
-        warning: 'border-amber-500/60 text-amber-100'
-      };
-      toast.className = `toast-msg ${bordas[tipo] || bordas.info}`;
-      toast.innerHTML = `<span class="text-base">${icones[tipo] || '🥟'}</span><span class="flex-1 leading-snug">${msg}</span>`;
-      container.appendChild(toast);
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(-10px)';
-        toast.style.transition = 'all 0.25s ease';
-        setTimeout(() => toast.remove(), 260);
-      }, 3400);
-    }
-
-    function pedirConfirmacao(titulo, descricao) {
-      return new Promise((resolve) => {
-        const modal = document.getElementById('modal-confirm');
-        document.getElementById('confirm-title').innerText = titulo;
-        document.getElementById('confirm-desc').innerText = descricao;
-        modal.classList.remove('hidden');
-
-        const btnOk = document.getElementById('confirm-ok');
-        const btnCancel = document.getElementById('confirm-cancel');
-
-        const limpar = () => {
-          modal.classList.add('hidden');
-          btnOk.onclick = null;
-          btnCancel.onclick = null;
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBA4xSi8fgtNXJQxf7-AC8vQQvojxaMH48",
+            authDomain: "priscilas-esfihas.firebaseapp.com",
+            projectId: "priscilas-esfihas",
+            storageBucket: "priscilas-esfihas.firebasestorage.app",
+            messagingSenderId: "33498231694",
+            appId: "1:33498231694:web:5cd7fb0986ae6fa21b2adf",
+            measurementId: "G-E6N425TCGC"
         };
 
-        btnOk.onclick = () => { limpar(); resolve(true); };
-        btnCancel.onclick = () => { limpar(); resolve(false); };
-      });
-    }
+        const CHAVE_PIX_PADRAO = "alanpocos@gmail.com";
+        const PRECO_BANDEJA = 25.0;
 
-    let controleProducaoDia = {
-      data: new Date().toLocaleDateString('pt-BR'),
-      saldoBandejas: 0
-    };
+        const receitaProporcao = {
+            farinha: 600,   // g
+            ovos: 2,        // un
+            leite: 250,     // ml
+            margarina: 45,  // g
+            oleo: 36,       // ml
+            acucar: 30,     // g
+            sal: 3,         // g
+            fermento: 10,   // g
+            carne: 500      // g
+        };
 
-    if(localStorage.getItem('controleProducaoDia')) {
-      try {
-        const salvo = JSON.parse(localStorage.getItem('controleProducaoDia'));
-        if(salvo.data === new Date().toLocaleDateString('pt-BR')) {
-          controleProducaoDia = salvo;
-        } else {
-          localStorage.setItem('controleProducaoDia', JSON.stringify(controleProducaoDia));
-        }
-      } catch(e) {}
-    }
+        const nomesInsumos = {
+            farinha: "Farinha de Trigo",
+            ovos: "Ovos",
+            leite: "Leite",
+            margarina: "Margarina",
+            oleo: "Óleo",
+            acucar: "Açúcar",
+            sal: "Sal",
+            fermento: "Fermento Seco",
+            carne: "Carne Moída"
+        };
 
-    function ajustarSaldoBancada(delta) {
-      controleProducaoDia.data = new Date().toLocaleDateString('pt-BR');
-      controleProducaoDia.saldoBandejas = Math.max(0, (controleProducaoDia.saldoBandejas || 0) + delta);
-      localStorage.setItem('controleProducaoDia', JSON.stringify(controleProducaoDia));
-      document.getElementById('saldo-bandejas-display').innerText = controleProducaoDia.saldoBandejas;
-    }
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        
+        let clientes = [];
+        let historicoCompleto = [];
+        let estoqueInsumos = {};
+        let selecionadoId = null;
+        let filtroClienteAtual = 'todos';
+        let modoVendaAtual = 'pendura';
+        let abaAtual = 'clientes';
+        let ignorarPopstate = false;
+        let metaMensal = parseFloat(localStorage.getItem('priscila_meta_mensal')) || 2000;
 
-    async function init() {
-      document.getElementById('saldo-bandejas-display').innerText = controleProducaoDia.saldoBandejas;
+        function inicializarProtecaoVoltar() {
+            try {
+                history.replaceState({ priscilaApp: true, view: 'clientes' }, '', window.location.href);
+                history.pushState({ priscilaApp: true, view: 'guard' }, '', window.location.href);
+            } catch (e) {}
 
-      db.collection('clientes').orderBy('nome').onSnapshot(snap => {
-        clientes = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
-        renderClientes();
-        updateSelects();
-        updateRelatorios();
-        calcTotalGeral();
-        if(selecionadoId) atualizarTelaModal();
-      });
+            window.addEventListener('popstate', function() {
+                if (ignorarPopstate) {
+                    ignorarPopstate = false;
+                    return;
+                }
 
-      db.collection('vendas').orderBy('data', 'desc').onSnapshot(snap => {
-        historicoCompleto = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
-        updateRelatorios();
-        if(selecionadoId) renderExtratoCliente(selecionadoId);
-      });
+                const modalConfirm = document.getElementById('modal-confirm');
+                const modalDetalhes = document.getElementById('modal-detalhes');
+                const modalExtrato = document.getElementById('modal-extrato-anual');
 
-      db.collection('estoque').onSnapshot(snap => {
-        estoqueInsumos = {};
-        snap.docs.forEach(doc => { estoqueInsumos[doc.id] = doc.data(); });
-        renderEstoqueECustos();
-      });
+                if (modalConfirm && !modalConfirm.classList.contains('hidden')) {
+                    document.getElementById('confirm-cancel').click();
+                } else if (modalDetalhes && !modalDetalhes.classList.contains('hidden')) {
+                    closeModal(true);
+                } else if (modalExtrato && !modalExtrato.classList.contains('hidden')) {
+                    fecharExtratoAnual(true);
+                } else if (abaAtual !== 'clientes') {
+                    showTab('clientes', true);
+                }
 
-      selecionarInsumoPreDefinido();
-      atualizarBotaoTTS();
-    }
-
-    async function puxarContatoAgenda(target) {
-      if (!('contacts' in navigator && 'ContactsManager' in window)) {
-        showToast("Seu navegador não suporta importação direta da agenda.", "warning");
-        return;
-      }
-      try {
-        const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: false });
-        if (contacts && contacts.length > 0) {
-          const contact = contacts[0];
-          const nomeOriginal = (contact.name && contact.name[0]) ? contact.name[0] : "";
-          const telOriginal = (contact.tel && contact.tel[0]) ? contact.tel[0] : "";
-
-          const nomeFormatado = nomeOriginal.toUpperCase().trim();
-          const telFormatado = telOriginal.replace(/\D/g, '');
-
-          if (target === 'novo') {
-            document.getElementById('novo-cliente-nome').value = nomeFormatado;
-            document.getElementById('novo-cliente-tel').value = telFormatado;
-          } else if (target === 'edit') {
-            document.getElementById('edit-nome').value = nomeFormatado;
-            document.getElementById('edit-tel').value = telFormatado;
-          }
-          showToast("Contato importado da agenda!", "success");
-        }
-      } catch (err) {
-        console.error("Erro ao selecionar contato:", err);
-      }
-    }
-
-    function showTab(t, fromPopstate = false) {
-      abaAtual = t;
-      ['clientes', 'vendas', 'custos', 'relatorios'].forEach(id => {
-        const el = document.getElementById('tab-'+id);
-        const btn = document.getElementById('btn-'+id);
-        if(el) el.classList.toggle('hidden', id !== t);
-        if(btn) btn.classList.toggle('active', id === t);
-      });
-      if(t === 'vendas') {
-        document.getElementById('venda-cliente-select').value = "";
-        document.getElementById('venda-qtd').value = 1;
-        setModoVenda('pendura');
-        updateVendaTotal();
-      }
-      if(!fromPopstate && t !== 'clientes') {
-        empurrarEstadoNavegacao('tab-' + t);
-      }
-    }
-
-    function calcTotalGeral() {
-      const total = clientes.reduce((acc, c) => acc + (c.saldo || 0), 0);
-      document.getElementById('resumo-total').innerText = `R$ ${total.toFixed(2)}`;
-    }
-
-    async function addCliente() {
-      const nome = document.getElementById('novo-cliente-nome').value.toUpperCase().trim();
-      const tel = document.getElementById('novo-cliente-tel').value.replace(/\D/g, '');
-      if(!nome) return showToast("Digite o nome do cliente para cadastrar.", "error");
-
-      const jaExiste = clientes.some(c => c.nome === nome);
-      if(jaExiste) {
-        const ok = await pedirConfirmacao("Cliente já cadastrado", `Já existe um cliente chamado "${nome}". Deseja cadastrar mesmo assim?`);
-        if(!ok) return;
-      }
-
-      const docRef = await db.collection('clientes').add({
-        nome, tel, saldo: 0, ultimaCompra: null, totalComprado: 0
-      });
-
-      document.getElementById('novo-cliente-nome').value = "";
-      document.getElementById('novo-cliente-tel').value = "";
-      showToast(`Cliente ${nome} cadastrado com sucesso!`, "success");
-
-      setTimeout(() => {
-        const sel = document.getElementById('venda-cliente-select');
-        if(sel) sel.value = docRef.id;
-      }, 300);
-    }
-
-    function setFiltroCliente(filtro) {
-      filtroClienteAtual = filtro;
-      ['todos', 'devedores', 'atrasados', 'quitados'].forEach(f => {
-        const btn = document.getElementById('filtro-' + f);
-        if(btn) btn.classList.toggle('active', f === filtro);
-      });
-      renderClientes();
-    }
-
-    function renderClientes() {
-      const busca = document.getElementById('search-g').value.toUpperCase().trim();
-      const lista = document.getElementById('list-clientes');
-
-      let countTodos = clientes.length;
-      let countDevedores = 0;
-      let countAtrasados = 0;
-
-      clientes.forEach(c => {
-        if((c.saldo || 0) > 0) countDevedores++;
-        if(c.ultimaCompra && (c.saldo || 0) > 0) {
-          const dias = Math.floor((new Date() - new Date(c.ultimaCompra.seconds * 1000)) / (1000 * 60 * 60 * 24));
-          if(dias >= 45) countAtrasados++;
-        }
-      });
-
-      document.getElementById('count-todos').innerText = countTodos;
-      document.getElementById('count-devedores').innerText = countDevedores;
-      document.getElementById('count-atrasados').innerText = countAtrasados;
-
-      const filtrados = clientes.filter(c => {
-        const matchBusca = c.nome.includes(busca) || (c.tel && c.tel.includes(busca));
-        if(!matchBusca) return false;
-
-        if(filtroClienteAtual === 'devedores') return (c.saldo || 0) > 0;
-        if(filtroClienteAtual === 'quitados') return (c.saldo || 0) <= 0;
-        if(filtroClienteAtual === 'atrasados') {
-          if(!c.ultimaCompra || (c.saldo || 0) <= 0) return false;
-          const dias = Math.floor((new Date() - new Date(c.ultimaCompra.seconds * 1000)) / (1000 * 60 * 60 * 24));
-          return dias >= 45;
-        }
-        return true;
-      });
-
-      let h = '';
-      filtrados.forEach(c => {
-        let statusTempo = 'Sem pedidos ainda';
-        let alertar45 = false;
-
-        if(c.ultimaCompra) {
-          const dias = Math.floor((new Date() - new Date(c.ultimaCompra.seconds * 1000)) / (1000 * 60 * 60 * 24));
-          statusTempo = dias === 0 ? 'Pediu hoje' : `Último pedido há ${dias}d`;
-          if(dias >= 45 && c.saldo > 0) alertar45 = true;
+                try {
+                    history.pushState({ priscilaApp: true, view: 'guard' }, '', window.location.href);
+                } catch (e) {}
+            });
         }
 
-        const iniciais = c.nome.split(' ').slice(0,2).map(n => n[0]).join('');
-
-        h += `
-          <div class="card-pro p-3.5 mb-0 flex justify-between items-center cursor-pointer active:scale-[0.99] transition-transform ${alertar45 ? 'border-rose-500/40 bg-rose-950/10' : ''}" onclick="openModal('${c.id}')">
-            <div class="flex items-center gap-3 min-w-0 flex-1 pr-2">
-              <div class="w-10 h-10 rounded-full ${alertar45 ? 'bg-rose-500/20 text-rose-400 border-rose-500/30' : 'bg-zinc-800 text-zinc-300 border-zinc-700'} border flex items-center justify-center font-black text-xs flex-shrink-0">
-                ${iniciais}
-              </div>
-              <div class="min-w-0 flex-1">
-                <div class="text-sm font-extrabold uppercase text-white truncate">${c.nome}</div>
-                <div class="text-[10px] font-medium text-zinc-400 mt-0.5 flex items-center gap-1.5 flex-wrap">
-                  ${alertar45 ? '<span class="text-rose-400 font-extrabold bg-rose-500/10 px-1.5 py-0.2 rounded">⚠️ 45+ DIAS</span>' : ''}
-                  <span>${statusTempo}</span>
-                </div>
-              </div>
-            </div>
-            <div class="text-right flex-shrink-0">
-              <span class="text-[9px] font-bold uppercase block ${c.saldo > 0 ? 'text-rose-400/80' : 'text-emerald-400/80'}">${c.saldo > 0 ? 'Em aberto' : 'Em dia'}</span>
-              <div class="text-base font-black ${c.saldo > 0 ? 'text-rose-400' : 'text-emerald-400'}">R$ ${(c.saldo || 0).toFixed(2)}</div>
-            </div>
-          </div>`;
-      });
-      lista.innerHTML = h || '<div class="text-center py-12 text-zinc-500 font-semibold text-xs">Nenhum cliente encontrado neste filtro.</div>';
-    }
-
-    function updateSelects() {
-      const sel = document.getElementById('venda-cliente-select');
-      if(!sel) return;
-      const valAtual = sel.value;
-      let h = '<option value="">Selecione o cliente...</option>';
-      clientes.forEach(c => h += `<option value="${c.id}">${c.nome} — Saldo: R$ ${(c.saldo || 0).toFixed(2)}</option>`);
-      sel.innerHTML = h;
-      if(valAtual) sel.value = valAtual;
-    }
-
-    function setModoVenda(modo) {
-      modoVendaAtual = modo;
-      const btnPendura = document.getElementById('modo-pendura');
-      const btnAvista = document.getElementById('modo-avista');
-      const btnSubmit = document.getElementById('btn-registrar-venda');
-
-      if(modo === 'pendura') {
-        btnPendura.className = "py-2.5 px-3 rounded-xl border border-amber-500 bg-amber-500/15 text-amber-400 font-extrabold text-xs uppercase transition-all";
-        btnAvista.className = "py-2.5 px-3 rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-400 font-extrabold text-xs uppercase transition-all";
-        btnSubmit.innerHTML = "<span>📝 Lançar na Pendura</span>";
-      } else {
-        btnAvista.className = "py-2.5 px-3 rounded-xl border border-emerald-500 bg-emerald-500/15 text-emerald-400 font-extrabold text-xs uppercase transition-all";
-        btnPendura.className = "py-2.5 px-3 rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-400 font-extrabold text-xs uppercase transition-all";
-        btnSubmit.innerHTML = "<span>💸 Registrar Venda Paga</span>";
-      }
-      updateVendaTotal();
-    }
-
-    function ajustarQtdVenda(delta) {
-      const input = document.getElementById('venda-qtd');
-      const novo = Math.max(1, (parseInt(input.value) || 1) + delta);
-      input.value = novo;
-      updateVendaTotal();
-    }
-
-    function setQtdVenda(qtd) {
-      document.getElementById('venda-qtd').value = qtd;
-      updateVendaTotal();
-    }
-
-    function updateVendaTotal() {
-      const cid = document.getElementById('venda-cliente-select').value;
-      const qtd = parseInt(document.getElementById('venda-qtd').value) || 0;
-      const total = qtd * PRECO_BANDEJA;
-      document.getElementById('venda-total-display').innerText = `R$ ${total.toFixed(2)}`;
-      document.getElementById('venda-esfihas-count').innerText = `${qtd * 5} esfihas fechadas (${qtd} band.)`;
-
-      const c = clientes.find(x => x.id === cid);
-      const elAlerta = document.getElementById('alerta-limite');
-      if(modoVendaAtual === 'pendura' && c && ((c.saldo || 0) + total) >= 100) {
-        elAlerta.classList.remove('hidden');
-      } else {
-        elAlerta.classList.add('hidden');
-      }
-    }
-
-    // Função reutilizável para registrar venda (usada pelo PDV e pelo Assistente IA)
-    async function executarVendaNoBanco(cid, qtd, modo = 'pendura', voltarParaClientes = true) {
-      const c = clientes.find(x => x.id === cid);
-      if(!c || !qtd || qtd <= 0) throw new Error("Cliente ou quantidade inválidos.");
-
-      const hojeStr = new Date().toLocaleDateString('pt-BR');
-      if(controleProducaoDia.data !== hojeStr) {
-        controleProducaoDia.data = hojeStr;
-        controleProducaoDia.saldoBandejas = 0;
-      }
-
-      let bandejasNecessarias = qtd;
-      let massasABater = 0;
-
-      if (controleProducaoDia.saldoBandejas < bandejasNecessarias) {
-        let falta = bandejasNecessarias - controleProducaoDia.saldoBandejas;
-        massasABater = Math.ceil(falta / 4);
-        controleProducaoDia.saldoBandejas += (massasABater * 4);
-      }
-
-      controleProducaoDia.saldoBandejas -= bandejasNecessarias;
-      localStorage.setItem('controleProducaoDia', JSON.stringify(controleProducaoDia));
-      document.getElementById('saldo-bandejas-display').innerText = controleProducaoDia.saldoBandejas;
-
-      const total = qtd * PRECO_BANDEJA;
-      const batch = db.batch();
-
-      const cRef = db.collection('clientes').doc(cid);
-      const acrescimoSaldo = modo === 'pendura' ? total : 0;
-
-      batch.update(cRef, {
-        saldo: (c.saldo || 0) + acrescimoSaldo,
-        totalComprado: (c.totalComprado || 0) + total,
-        ultimaCompra: firebase.firestore.FieldValue.serverTimestamp()
-      });
-
-      const vRef = db.collection('vendas').doc();
-      batch.set(vRef, {
-        clienteId: cid,
-        clienteNome: c.nome,
-        qtd,
-        valor: total,
-        data: firebase.firestore.FieldValue.serverTimestamp(),
-        tipo: 'venda',
-        pagoNaHora: modo === 'avista',
-        massasProduzidas: massasABater
-      });
-
-      if(modo === 'avista') {
-        const pRef = db.collection('vendas').doc();
-        batch.set(pRef, {
-          clienteId: cid,
-          clienteNome: c.nome,
-          valor: total,
-          data: firebase.firestore.FieldValue.serverTimestamp(),
-          tipo: 'pagamento',
-          origemAvista: true
-        });
-      }
-
-      if(massasABater > 0) {
-        Object.keys(receitaProporcao).forEach(key => {
-          if(estoqueInsumos[key]) {
-            const gastoTotalIngrediente = receitaProporcao[key] * massasABater;
-            const estoqueAtual = estoqueInsumos[key].estoqueAtual || 0;
-            const novoEstoque = Math.max(0, estoqueAtual - gastoTotalIngrediente);
-
-            const estRef = db.collection('estoque').doc(key);
-            batch.update(estRef, { estoqueAtual: novoEstoque });
-          }
-        });
-      }
-
-      await batch.commit();
-      const msgMassa = massasABater > 0 ? ` (${massasABater} massa abatida)` : ` (usou saldo do dia)`;
-      showToast(`Pedido registrado com sucesso!${msgMassa}`, "success");
-
-      if(voltarParaClientes) {
-        document.getElementById('venda-cliente-select').value = "";
-        document.getElementById('venda-qtd').value = 1;
-        setModoVenda('pendura');
-        updateVendaTotal();
-        showTab('clientes');
-      }
-
-      return { cliente: c, qtd, total, modo, massasABater };
-    }
-
-    async function registrarVenda() {
-      const cid = document.getElementById('venda-cliente-select').value;
-      const qtd = parseInt(document.getElementById('venda-qtd').value);
-      if(!cid || !qtd || qtd <= 0) return showToast("Selecione um cliente e uma quantidade válida.", "error");
-      try {
-        await executarVendaNoBanco(cid, qtd, modoVendaAtual, true);
-      } catch (e) {
-        showToast(e.message || "Erro ao registrar venda.", "error");
-      }
-    }
-
-    function selecionarInsumoPreDefinido() {
-      const tipo = document.getElementById('insumo-select').value;
-      const tamPacote = document.getElementById('insumo-tamanho-pacote');
-      const unMedida = document.getElementById('insumo-unidade');
-      const precoPacote = document.getElementById('insumo-preco-pacote');
-
-      const defaults = {
-        farinha: ["1000", "g", "5.50"],
-        ovos: ["30", "un", "18.00"],
-        leite: ["1000", "ml", "4.80"],
-        margarina: ["500", "g", "6.50"],
-        oleo: ["900", "ml", "7.00"],
-        acucar: ["1000", "g", "4.20"],
-        sal: ["1000", "g", "3.00"],
-        fermento: ["150", "g", "14.00"],
-        carne: ["1000", "g", "38.00"]
-      };
-
-      if(defaults[tipo]) {
-        tamPacote.value = defaults[tipo][0];
-        unMedida.value = defaults[tipo][1];
-        precoPacote.value = estoqueInsumos[tipo]?.precoPacote || defaults[tipo][2];
-      }
-    }
-
-    async function salvarInsumoEstoque() {
-      const tipo = document.getElementById('insumo-select').value;
-      const tamanhoPacote = parseFloat(document.getElementById('insumo-tamanho-pacote').value);
-      const unidade = document.getElementById('insumo-unidade').value;
-      const precoPacote = parseFloat(document.getElementById('insumo-preco-pacote').value);
-      const qtdComprada = parseInt(document.getElementById('insumo-qtd-comprada').value) || 1;
-
-      if(!tamanhoPacote || !precoPacote || tamanhoPacote <= 0 || precoPacote <= 0) {
-        return showToast("Preencha tamanho e valor válidos!", "error");
-      }
-
-      const totalInjetadoEstoque = tamanhoPacote * qtdComprada;
-      const custoPorUnidadeMedida = precoPacote / tamanhoPacote;
-
-      const dadosExistentes = estoqueInsumos[tipo] || { estoqueAtual: 0 };
-      const novoEstoqueAtual = (dadosExistentes.estoqueAtual || 0) + totalInjetadoEstoque;
-
-      await db.collection('estoque').doc(tipo).set({
-        nome: nomesInsumos[tipo],
-        tamanhoPacote,
-        unidade,
-        precoPacote,
-        custoPorUnidadeMedida,
-        estoqueAtual: novoEstoqueAtual,
-        ultimaCompra: firebase.firestore.FieldValue.serverTimestamp()
-      });
-
-      showToast(`${nomesInsumos[tipo]} atualizado no estoque!`, "success");
-      document.getElementById('insumo-qtd-comprada').value = "1";
-    }
-
-    function renderEstoqueECustos() {
-      let totalCustoMassa = 0;
-      let container = document.getElementById('lista-estoque-status');
-      let h = '';
-      let massasPossiveis = Infinity;
-      let temAlgumInsumo = false;
-
-      Object.keys(receitaProporcao).forEach(key => {
-        const usaNaReceita = receitaProporcao[key];
-        const insumo = estoqueInsumos[key];
-
-        let precoFracaoReceita = 0;
-        let estoqueTexto = 'Não cadastrado';
-        let unidade = key === 'ovos' ? 'un' : (key === 'leite' || key === 'oleo' ? 'ml' : 'g');
-        let corAlertaEstoque = 'text-zinc-500';
-        let percBarra = 0;
-        let corBarra = 'bg-zinc-700';
-
-        if(insumo) {
-          temAlgumInsumo = true;
-          precoFracaoReceita = insumo.custoPorUnidadeMedida * usaNaReceita;
-          totalCustoMassa += precoFracaoReceita;
-          unidade = insumo.unidade;
-
-          const estAtual = insumo.estoqueAtual || 0;
-          const massasComEste = Math.floor(estAtual / usaNaReceita);
-          if(massasComEste < massasPossiveis) massasPossiveis = massasComEste;
-
-          estoqueTexto = `${estAtual.toFixed(0)} ${unidade} (${massasComEste} massas)`;
-          percBarra = Math.min(100, (estAtual / (usaNaReceita * 5)) * 100);
-
-          if(estAtual < usaNaReceita) {
-            corAlertaEstoque = 'text-rose-400 font-bold';
-            estoqueTexto += ' • REPOR!';
-            corBarra = 'bg-rose-500';
-          } else if(massasComEste <= 2) {
-            corAlertaEstoque = 'text-amber-400 font-semibold';
-            corBarra = 'bg-amber-500';
-          } else {
-            corAlertaEstoque = 'text-zinc-400';
-            corBarra = 'bg-emerald-500';
-          }
-        } else {
-          massasPossiveis = 0;
+        function empurrarEstadoNavegacao(viewName) {
+            try {
+                history.pushState({ priscilaApp: true, view: viewName }, '', window.location.href);
+            } catch (e) {}
         }
 
-        h += `
-          <div class="bg-zinc-900/80 p-3 rounded-xl border border-zinc-800/80">
-            <div class="flex justify-between items-center text-xs mb-1.5">
-              <div>
-                <div class="font-extrabold text-white uppercase">${nomesInsumos[key]}</div>
-                <div class="text-[10px] ${corAlertaEstoque} mt-0.5">${estoqueTexto}</div>
-              </div>
-              <div class="text-right">
-                <div class="font-black text-amber-400">R$ ${precoFracaoReceita.toFixed(2)}</div>
-                <div class="text-[9px] text-zinc-500">Usa ${usaNaReceita}${unidade}/massa</div>
-              </div>
-            </div>
-            <div class="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-              <div class="h-full ${corBarra} rounded-full transition-all" style="width: ${percBarra}%"></div>
-            </div>
-          </div>`;
-      });
-
-      container.innerHTML = h;
-
-      const custoPorBandeja = totalCustoMassa / 4;
-      const lucroPorBandeja = PRECO_BANDEJA - custoPorBandeja;
-      const margem = PRECO_BANDEJA > 0 ? ((lucroPorBandeja / PRECO_BANDEJA) * 100) : 0;
-      const capFinal = (!temAlgumInsumo || massasPossiveis === Infinity) ? 0 : massasPossiveis;
-
-      document.getElementById('custo-massa-total').innerText = `R$ ${totalCustoMassa.toFixed(2)}`;
-      document.getElementById('lucro-bandeja-total').innerText = `R$ ${lucroPorBandeja.toFixed(2)}`;
-      document.getElementById('margem-lucro-badge').innerText = `Margem ${margem.toFixed(0)}%`;
-      document.getElementById('capacidade-massas-display').innerText = `${capFinal} massas`;
-      document.getElementById('capacidade-bandejas-sub').innerText = `${capFinal * 4} bandejas`;
-    }
-
-    function openModal(id) {
-      selecionadoId = id;
-      atualizarTelaModal();
-      renderExtratoCliente(id);
-      document.getElementById('modal-detalhes').classList.remove('hidden');
-      empurrarEstadoNavegacao('modal-detalhes');
-    }
-
-    function closeModal(fromPopstate = false) {
-      document.getElementById('modal-detalhes').classList.add('hidden');
-      selecionadoId = null;
-      document.getElementById('pagamento-valor').value = "";
-      if(!fromPopstate && history.state && history.state.view === 'modal-detalhes') {
-        ignorarPopstate = true;
-        history.back();
-      }
-    }
-
-    function atualizarTelaModal() {
-      const c = clientes.find(x => x.id === selecionadoId);
-      if(!c) return closeModal();
-
-      document.getElementById('edit-nome').value = c.nome;
-      document.getElementById('edit-tel').value = c.tel || "";
-      document.getElementById('modal-saldo').innerText = `R$ ${(c.saldo || 0).toFixed(2)}`;
-      document.getElementById('modal-historico-total').innerText = `R$ ${(c.totalComprado || 0).toFixed(2)}`;
-
-      let exibirAlerta45 = false;
-      if(c.ultimaCompra) {
-        const dias = Math.floor((new Date() - new Date(c.ultimaCompra.seconds * 1000)) / (1000 * 60 * 60 * 24));
-        if(dias >= 45 && c.saldo > 0) exibirAlerta45 = true;
-      }
-
-      const btn45 = document.getElementById('btn-cobranca-45');
-      if(exibirAlerta45) { btn45.classList.remove('opacity-40'); btn45.style.pointerEvents = 'auto'; }
-      else { btn45.classList.add('opacity-40'); btn45.style.pointerEvents = 'none'; }
-    }
-
-    function preencherValorTotalPagamento() {
-      const c = clientes.find(x => x.id === selecionadoId);
-      if(!c || (c.saldo || 0) <= 0) return showToast("Cliente não possui saldo devedor.", "info");
-      document.getElementById('pagamento-valor').value = c.saldo.toFixed(2);
-    }
-
-    async function salvarEdicao() {
-      if(!selecionadoId) return;
-      const novoNome = document.getElementById('edit-nome').value.toUpperCase().trim();
-      const novoTel = document.getElementById('edit-tel').value.replace(/\D/g, '');
-      if(!novoNome) return showToast("O nome é obrigatório!", "error");
-
-      await db.collection('clientes').doc(selecionadoId).update({ nome: novoNome, tel: novoTel });
-      showToast("Dados do cliente atualizados!", "success");
-    }
-
-    // Função reutilizável para dar baixa/pagamento (usada pela ficha e pelo Assistente IA)
-    async function executarPagamentoNoBanco(clienteId, valor) {
-      const c = clientes.find(x => x.id === clienteId);
-      if(!c || !valor || valor <= 0) throw new Error("Cliente ou valor inválido.");
-
-      const batch = db.batch();
-      const cRef = db.collection('clientes').doc(clienteId);
-      const novoSaldo = Math.max(0, (c.saldo || 0) - valor);
-      batch.update(cRef, { saldo: novoSaldo });
-
-      const vRef = db.collection('vendas').doc();
-      batch.set(vRef, {
-        clienteId: clienteId,
-        clienteNome: c.nome,
-        valor: valor,
-        data: firebase.firestore.FieldValue.serverTimestamp(),
-        tipo: 'pagamento'
-      });
-
-      await batch.commit();
-      showToast(`Pagamento de R$ ${valor.toFixed(2)} registrado!`, "success");
-      return { cliente: c, valor, novoSaldo };
-    }
-
-    async function confirmarPagamento() {
-      const valor = parseFloat(document.getElementById('pagamento-valor').value);
-      if(!valor || valor <= 0 || !selecionadoId) return showToast("Digite um valor válido para baixar.", "error");
-      try {
-        await executarPagamentoNoBanco(selecionadoId, valor);
-        document.getElementById('pagamento-valor').value = "";
-      } catch (e) {
-        showToast(e.message || "Erro ao registrar pagamento.", "error");
-      }
-    }
-
-    async function estornarMovimentacao(movId) {
-      const mov = historicoCompleto.find(h => h.id === movId);
-      if(!mov || !selecionadoId) return;
-      const c = clientes.find(x => x.id === selecionadoId);
-      if(!c) return;
-
-      const desc = mov.tipo === 'venda'
-        ? `Deseja estornar a venda de ${mov.qtd} bandeja(s) (R$ ${mov.valor.toFixed(2)})? O saldo do cliente será recalculado.`
-        : `Deseja cancelar o pagamento de R$ ${mov.valor.toFixed(2)}? O valor voltará ao saldo devedor.`;
-
-      const ok = await pedirConfirmacao("Estornar Lançamento", desc);
-      if(!ok) return;
-
-      const batch = db.batch();
-      const cRef = db.collection('clientes').doc(selecionadoId);
-
-      if(mov.tipo === 'venda') {
-        const abaterSaldo = mov.pagoNaHora ? 0 : mov.valor;
-        batch.update(cRef, {
-          saldo: Math.max(0, (c.saldo || 0) - abaterSaldo),
-          totalComprado: Math.max(0, (c.totalComprado || 0) - mov.valor)
-        });
-      } else {
-        batch.update(cRef, {
-          saldo: (c.saldo || 0) + mov.valor
-        });
-      }
-
-      batch.delete(db.collection('vendas').doc(movId));
-      await batch.commit();
-      showToast("Lançamento estornado com sucesso!", "info");
-    }
-
-    function renderExtratoCliente(cid) {
-      const container = document.getElementById('extrato-linha-tempo');
-      const filtrados = historicoCompleto.filter(h => h.clienteId === cid);
-      let h = '';
-
-      filtrados.forEach(i => {
-        const dataStr = i.data ? new Date(i.data.seconds * 1000).toLocaleDateString('pt-BR') : 'Agora';
-        if(i.tipo === 'venda') {
-          const badgeAvista = i.pagoNaHora ? '<span class="text-[8px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded ml-1">PAGO NA HORA</span>' : '';
-          h += `
-            <div class="bg-zinc-900 border border-zinc-800 border-l-4 border-l-rose-500 p-2.5 rounded-xl flex justify-between items-center">
-              <div>
-                <div class="text-xs font-extrabold text-white">🥟 ${i.qtd} BANDEJA(S) ${badgeAvista}</div>
-                <div class="text-[10px] text-zinc-500 mt-0.5">${dataStr} • <span class="text-rose-400 font-bold">R$ ${i.valor.toFixed(2)}</span></div>
-              </div>
-              <button onclick="estornarMovimentacao('${i.id}')" class="text-zinc-600 hover:text-rose-400 p-1.5 text-xs" title="Estornar">🗑️</button>
-            </div>`;
-        } else {
-          h += `
-            <div class="bg-zinc-900 border border-zinc-800 border-l-4 border-l-emerald-500 p-2.5 rounded-xl flex justify-between items-center">
-              <div>
-                <div class="text-xs font-extrabold text-emerald-400">💰 PAGAMENTO RECEBIDO</div>
-                <div class="text-[10px] text-zinc-500 mt-0.5">${dataStr} • <span class="text-emerald-400 font-bold">- R$ ${i.valor.toFixed(2)}</span></div>
-              </div>
-              <button onclick="estornarMovimentacao('${i.id}')" class="text-zinc-600 hover:text-rose-400 p-1.5 text-xs" title="Estornar">🗑️</button>
-            </div>`;
+        // Sistema de Toast Profissional (Substitui alert())
+        function showToast(msg, tipo = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const icones = { success: '✅', error: '⚠️', info: '🥟', warning: '🔔' };
+            const bordas = {
+                success: 'border-emerald-500/50 text-emerald-100',
+                error: 'border-rose-500/50 text-rose-100',
+                info: 'border-amber-500/50 text-zinc-100',
+                warning: 'border-amber-500/60 text-amber-100'
+            };
+            toast.className = `toast-msg ${bordas[tipo] || bordas.info}`;
+            toast.innerHTML = `<span class="text-base">${icones[tipo] || '🥟'}</span><span class="flex-1 leading-snug">${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-10px)';
+                toast.style.transition = 'all 0.25s ease';
+                setTimeout(() => toast.remove(), 260);
+            }, 3400);
         }
-      });
-      container.innerHTML = h || '<div class="text-center py-8 text-zinc-600 text-xs font-semibold">Nenhuma movimentação registrada.</div>';
-    }
 
-    function fecharExtratoAnual(fromPopstate = false) {
-      document.getElementById('modal-extrato-anual').classList.add('hidden');
-      if(!fromPopstate && history.state && history.state.view === 'modal-extrato-anual') {
-        ignorarPopstate = true;
-        history.back();
-      }
-    }
+        // Modal de Confirmação Customizado (Substitui confirm())
+        function pedirConfirmacao(titulo, descricao) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('modal-confirm');
+                document.getElementById('confirm-title').innerText = titulo;
+                document.getElementById('confirm-desc').innerText = descricao;
+                modal.classList.remove('hidden');
 
-    function abrirExtratoAnual() {
-      const anoAtual = new Date().getFullYear();
-      const hoje = new Date();
-      const fmt = d => d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
-      const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+                const btnOk = document.getElementById('confirm-ok');
+                const btnCancel = document.getElementById('confirm-cancel');
 
-      const ciclos = [];
-      for(let m = 0; m < 12; m++) {
-        const inicio = new Date(anoAtual, m, 7);
-        const fim = new Date(anoAtual, m + 1, 6, 23, 59, 59);
-        if(inicio > hoje) break;
-        ciclos.push({ inicio, fim, label: `${meses[m]}/${anoAtual}` });
-      }
-      ciclos.reverse();
+                const limpar = () => {
+                    modal.classList.add('hidden');
+                    btnOk.onclick = null;
+                    btnCancel.onclick = null;
+                };
 
-      let totalAnual = 0;
-      let html = '';
-      ciclos.forEach(c => {
-        const valor = historicoCompleto
-          .filter(h => h.tipo === 'venda' && h.data &&
-                  new Date(h.data.seconds * 1000) >= c.inicio &&
-                  new Date(h.data.seconds * 1000) <= c.fim)
-          .reduce((acc, v) => acc + (v.valor || 0), 0);
-        totalAnual += valor;
-        const isCicloAtual = c.inicio <= hoje && hoje <= c.fim;
-        html += `
-          <div class="flex items-center justify-between py-3.5 border-b border-zinc-800/80">
-            <div>
-              <div class="text-white font-extrabold text-xs uppercase flex items-center gap-2">
-                <span>${c.label}</span>
-                ${isCicloAtual ? '<span class="bg-amber-500/20 text-amber-400 text-[9px] px-2 py-0.5 rounded-full">Ciclo Atual</span>' : ''}
-              </div>
-              <div class="text-zinc-500 text-[10px] font-medium mt-0.5">${fmt(c.inicio)} até ${fmt(c.fim)}</div>
-            </div>
-            <div class="text-emerald-400 font-black text-sm">${valor > 0 ? 'R$ ' + valor.toFixed(2) : '<span class="text-zinc-700">R$ 0,00</span>'}</div>
-          </div>`;
-      });
-
-      html += `<div class="flex items-center justify-between py-4 mt-2 bg-zinc-900 px-3.5 rounded-2xl border border-zinc-800">
-        <div class="text-amber-400 font-black text-xs uppercase">Total Acumulado ${anoAtual}</div>
-        <div class="text-amber-400 font-black text-base">R$ ${totalAnual.toFixed(2)}</div>
-      </div>`;
-
-      document.getElementById('extrato-anual-titulo').innerText = `Ciclos de ${anoAtual} (Dia 07 a Dia 06)`;
-      document.getElementById('extrato-anual-lista').innerHTML = html;
-      document.getElementById('modal-extrato-anual').classList.remove('hidden');
-      empurrarEstadoNavegacao('modal-extrato-anual');
-    }
-
-    function editarMetaMensal() {
-      const atual = metaMensal;
-      const novaStr = window.prompt("Defina sua meta de faturamento mensal (R$):", atual);
-      if(novaStr !== null) {
-        const val = parseFloat(novaStr.replace(',', '.'));
-        if(val && val > 0) {
-          metaMensal = val;
-          localStorage.setItem('priscila_meta_mensal', metaMensal);
-          updateRelatorios();
-          showToast("Meta mensal atualizada!", "success");
+                btnOk.onclick = () => { limpar(); resolve(true); };
+                btnCancel.onclick = () => { limpar(); resolve(false); };
+            });
         }
-      }
-    }
 
-    function updateRelatorios() {
-      const anoAtual = new Date().getFullYear();
-      const fatAnual = historicoCompleto
-        .filter(h => h.tipo === 'venda' && h.data && new Date(h.data.seconds * 1000).getFullYear() === anoAtual)
-        .reduce((acc, v) => acc + (v.valor || 0), 0);
-      document.getElementById('rep-faturamento-total').innerText = `R$ ${fatAnual.toFixed(2)}`;
+        // Controle Local de Massa Inteligente
+        let controleProducaoDia = {
+            data: new Date().toLocaleDateString('pt-BR'),
+            saldoBandejas: 0
+        };
 
-      const hoje = new Date();
-      let inicioMensal, fimMensal;
-      if(hoje.getDate() >= 7) {
-        inicioMensal = new Date(hoje.getFullYear(), hoje.getMonth(), 7);
-        fimMensal = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 6, 23, 59, 59);
-      } else {
-        inicioMensal = new Date(hoje.getFullYear(), hoje.getMonth() - 1, 7);
-        fimMensal = new Date(hoje.getFullYear(), hoje.getMonth(), 6, 23, 59, 59);
-      }
-      const fatMensal = historicoCompleto
-        .filter(h => h.tipo === 'venda' && h.data && new Date(h.data.seconds * 1000) >= inicioMensal && new Date(h.data.seconds * 1000) <= fimMensal)
-        .reduce((acc, v) => acc + (v.valor || 0), 0);
-      const fmt = d => d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
-      document.getElementById('rep-faturamento-mensal').innerText = `R$ ${fatMensal.toFixed(2)}`;
-      document.getElementById('rep-faturamento-mensal-periodo').innerText = `${fmt(inicioMensal)} – ${fmt(fimMensal)}`;
+        if(localStorage.getItem('controleProducaoDia')) {
+            try {
+                const salvo = JSON.parse(localStorage.getItem('controleProducaoDia'));
+                if(salvo.data === new Date().toLocaleDateString('pt-BR')) {
+                    controleProducaoDia = salvo;
+                } else {
+                    localStorage.setItem('controleProducaoDia', JSON.stringify(controleProducaoDia));
+                }
+            } catch(e) {}
+        }
 
-      const percMeta = Math.min(100, Math.round((fatMensal / metaMensal) * 100));
-      document.getElementById('meta-progresso-texto').innerText = `R$ ${fatMensal.toFixed(2)} / R$ ${metaMensal.toFixed(2)}`;
-      document.getElementById('meta-porcentagem-texto').innerText = `${percMeta}%`;
-      document.getElementById('meta-barra-progresso').style.width = `${percMeta}%`;
+        function ajustarSaldoBancada(delta) {
+            controleProducaoDia.data = new Date().toLocaleDateString('pt-BR');
+            controleProducaoDia.saldoBandejas = Math.max(0, (controleProducaoDia.saldoBandejas || 0) + delta);
+            localStorage.setItem('controleProducaoDia', JSON.stringify(controleProducaoDia));
+            document.getElementById('saldo-bandejas-display').innerText = controleProducaoDia.saldoBandejas;
+        }
 
-      const top = [...clientes].sort((a,b) => (b.totalComprado || 0) - (a.totalComprado || 0))[0];
-      if(top && top.totalComprado > 0) {
-        document.getElementById('rep-top-cliente').innerText = `${top.nome}`;
-        document.getElementById('rep-top-valor').innerText = `R$ ${top.totalComprado.toFixed(2)} em compras`;
-      } else {
-        document.getElementById('rep-top-cliente').innerText = '--';
-        document.getElementById('rep-top-valor').innerText = 'R$ 0,00';
-      }
+        async function init() {
+            document.getElementById('saldo-bandejas-display').innerText = controleProducaoDia.saldoBandejas;
 
-      const agora = new Date();
-      const ordenadosPorInatividade = [...clientes].filter(c => c.ultimaCompra).sort((a,b) => a.ultimaCompra.seconds - b.ultimaCompra.seconds);
+            db.collection('clientes').orderBy('nome').onSnapshot(snap => {
+                clientes = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
+                renderClientes();
+                updateSelects();
+                updateRelatorios();
+                calcTotalGeral();
+                if(selecionadoId) atualizarTelaModal();
+            });
 
-      const containerSumidos = document.getElementById('rep-sumidos');
-      if(containerSumidos) {
-        containerSumidos.innerHTML = '';
-        ordenadosPorInatividade.forEach(c => {
-          const dias = Math.floor((agora - new Date(c.ultimaCompra.seconds * 1000)) / (1000 * 60 * 60 * 24));
-          if(dias >= 1) {
-            const itemDiv = document.createElement('div');
-            itemDiv.className = "flex justify-between items-center bg-zinc-900 p-3 rounded-xl border border-zinc-800/80";
-            itemDiv.innerHTML = `
-              <div>
-                <div class="font-extrabold text-xs text-white uppercase">${c.nome}</div>
-                <div class="text-[10px] text-amber-400 font-semibold mt-0.5">Há ${dias} dia(s) sem pedir</div>
-              </div>
-            `;
+            db.collection('vendas').orderBy('data', 'desc').onSnapshot(snap => {
+                historicoCompleto = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
+                updateRelatorios();
+                if(selecionadoId) renderExtratoCliente(selecionadoId);
+            });
 
-            const btnChamar = document.createElement('button');
-            btnChamar.className = "text-[10px] bg-amber-500 font-extrabold text-zinc-950 px-3 py-2 rounded-xl uppercase active:scale-95";
-            btnChamar.innerText = "💬 Chamar";
-            btnChamar.onclick = function() {
-              enviarMensagemSaudadeDireto(c.nome, c.tel || '', dias);
+            db.collection('estoque').onSnapshot(snap => {
+                estoqueInsumos = {};
+                snap.docs.forEach(doc => { estoqueInsumos[doc.id] = doc.data(); });
+                renderEstoqueECustos();
+            });
+
+            selecionarInsumoPreDefinido();
+        }
+
+        async function puxarContatoAgenda(target) {
+            if (!('contacts' in navigator && 'ContactsManager' in window)) {
+                showToast("Seu navegador não suporta importação direta da agenda.", "warning");
+                return;
+            }
+            try {
+                const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: false });
+                if (contacts && contacts.length > 0) {
+                    const contact = contacts[0];
+                    const nomeOriginal = (contact.name && contact.name[0]) ? contact.name[0] : "";
+                    const telOriginal = (contact.tel && contact.tel[0]) ? contact.tel[0] : "";
+                    
+                    const nomeFormatado = nomeOriginal.toUpperCase().trim();
+                    const telFormatado = telOriginal.replace(/\D/g, '');
+                    
+                    if (target === 'novo') {
+                        document.getElementById('novo-cliente-nome').value = nomeFormatado;
+                        document.getElementById('novo-cliente-tel').value = telFormatado;
+                    } else if (target === 'edit') {
+                        document.getElementById('edit-nome').value = nomeFormatado;
+                        document.getElementById('edit-tel').value = telFormatado;
+                    }
+                    showToast("Contato importado da agenda!", "success");
+                }
+            } catch (err) {
+                console.error("Erro ao selecionar contato:", err);
+            }
+        }
+
+        function showTab(t, fromPopstate = false) {
+            abaAtual = t;
+            ['clientes', 'vendas', 'custos', 'relatorios'].forEach(id => {
+                const el = document.getElementById('tab-'+id);
+                const btn = document.getElementById('btn-'+id);
+                if(el) el.classList.toggle('hidden', id !== t);
+                if(btn) btn.classList.toggle('active', id === t);
+            });
+            if(t === 'vendas') {
+                document.getElementById('venda-cliente-select').value = "";
+                document.getElementById('venda-qtd').value = 1;
+                setModoVenda('pendura');
+                updateVendaTotal();
+            }
+            if(!fromPopstate && t !== 'clientes') {
+                empurrarEstadoNavegacao('tab-' + t);
+            }
+        }
+
+        function calcTotalGeral() {
+            const total = clientes.reduce((acc, c) => acc + (c.saldo || 0), 0);
+            document.getElementById('resumo-total').innerText = `R$ ${total.toFixed(2)}`;
+        }
+
+        async function addCliente() {
+            const nome = document.getElementById('novo-cliente-nome').value.toUpperCase().trim();
+            const tel = document.getElementById('novo-cliente-tel').value.replace(/\D/g, '');
+            if(!nome) return showToast("Digite o nome do cliente para cadastrar.", "error");
+            
+            const jaExiste = clientes.some(c => c.nome === nome);
+            if(jaExiste) {
+                const ok = await pedirConfirmacao("Cliente já cadastrado", `Já existe um cliente chamado "${nome}". Deseja cadastrar mesmo assim?`);
+                if(!ok) return;
+            }
+
+            const docRef = await db.collection('clientes').add({
+                nome, tel, saldo: 0, ultimaCompra: null, totalComprado: 0
+            });
+            
+            document.getElementById('novo-cliente-nome').value = "";
+            document.getElementById('novo-cliente-tel').value = "";
+            showToast(`Cliente ${nome} cadastrado com sucesso!`, "success");
+            
+            setTimeout(() => {
+                const sel = document.getElementById('venda-cliente-select');
+                if(sel) sel.value = docRef.id;
+            }, 300);
+        }
+
+        function setFiltroCliente(filtro) {
+            filtroClienteAtual = filtro;
+            ['todos', 'devedores', 'atrasados', 'quitados'].forEach(f => {
+                const btn = document.getElementById('filtro-' + f);
+                if(btn) btn.classList.toggle('active', f === filtro);
+            });
+            renderClientes();
+        }
+
+        function renderClientes() {
+            const busca = document.getElementById('search-g').value.toUpperCase().trim();
+            const lista = document.getElementById('list-clientes');
+            
+            let countTodos = clientes.length;
+            let countDevedores = 0;
+            let countAtrasados = 0;
+
+            clientes.forEach(c => {
+                if((c.saldo || 0) > 0) countDevedores++;
+                if(c.ultimaCompra && (c.saldo || 0) > 0) {
+                    const dias = Math.floor((new Date() - new Date(c.ultimaCompra.seconds * 1000)) / (1000 * 60 * 60 * 24));
+                    if(dias >= 45) countAtrasados++;
+                }
+            });
+
+            document.getElementById('count-todos').innerText = countTodos;
+            document.getElementById('count-devedores').innerText = countDevedores;
+            document.getElementById('count-atrasados').innerText = countAtrasados;
+
+            const filtrados = clientes.filter(c => {
+                const matchBusca = c.nome.includes(busca) || (c.tel && c.tel.includes(busca));
+                if(!matchBusca) return false;
+
+                if(filtroClienteAtual === 'devedores') return (c.saldo || 0) > 0;
+                if(filtroClienteAtual === 'quitados') return (c.saldo || 0) <= 0;
+                if(filtroClienteAtual === 'atrasados') {
+                    if(!c.ultimaCompra || (c.saldo || 0) <= 0) return false;
+                    const dias = Math.floor((new Date() - new Date(c.ultimaCompra.seconds * 1000)) / (1000 * 60 * 60 * 24));
+                    return dias >= 45;
+                }
+                return true;
+            });
+            
+            let h = '';
+            filtrados.forEach(c => {
+                let statusTempo = 'Sem pedidos ainda';
+                let alertar45 = false;
+                
+                if(c.ultimaCompra) {
+                    const dias = Math.floor((new Date() - new Date(c.ultimaCompra.seconds * 1000)) / (1000 * 60 * 60 * 24));
+                    statusTempo = dias === 0 ? 'Pediu hoje' : `Último pedido há ${dias}d`;
+                    if(dias >= 45 && c.saldo > 0) alertar45 = true;
+                }
+
+                const iniciais = c.nome.split(' ').slice(0,2).map(n => n[0]).join('');
+                
+                h += `
+                <div class="card-pro p-3.5 mb-0 flex justify-between items-center cursor-pointer active:scale-[0.99] transition-transform ${alertar45 ? 'border-rose-500/40 bg-rose-950/10' : ''}" onclick="openModal('${c.id}')">
+                    <div class="flex items-center gap-3 min-w-0 flex-1 pr-2">
+                        <div class="w-10 h-10 rounded-full ${alertar45 ? 'bg-rose-500/20 text-rose-400 border-rose-500/30' : 'bg-zinc-800 text-zinc-300 border-zinc-700'} border flex items-center justify-center font-black text-xs flex-shrink-0">
+                            ${iniciais}
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="text-sm font-extrabold uppercase text-white truncate">${c.nome}</div>
+                            <div class="text-[10px] font-medium text-zinc-400 mt-0.5 flex items-center gap-1.5 flex-wrap">
+                                ${alertar45 ? '<span class="text-rose-400 font-extrabold bg-rose-500/10 px-1.5 py-0.2 rounded">⚠️ 45+ DIAS</span>' : ''}
+                                <span>${statusTempo}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        <span class="text-[9px] font-bold uppercase block ${c.saldo > 0 ? 'text-rose-400/80' : 'text-emerald-400/80'}">${c.saldo > 0 ? 'Em aberto' : 'Em dia'}</span>
+                        <div class="text-base font-black ${c.saldo > 0 ? 'text-rose-400' : 'text-emerald-400'}">R$ ${(c.saldo || 0).toFixed(2)}</div>
+                    </div>
+                </div>`;
+            });
+            lista.innerHTML = h || '<div class="text-center py-12 text-zinc-500 font-semibold text-xs">Nenhum cliente encontrado neste filtro.</div>';
+        }
+
+        function updateSelects() {
+            const sel = document.getElementById('venda-cliente-select');
+            if(!sel) return;
+            const valAtual = sel.value;
+            let h = '<option value="">Selecione o cliente...</option>';
+            clientes.forEach(c => h += `<option value="${c.id}">${c.nome} — Saldo: R$ ${(c.saldo || 0).toFixed(2)}</option>`);
+            sel.innerHTML = h;
+            if(valAtual) sel.value = valAtual;
+        }
+
+        function setModoVenda(modo) {
+            modoVendaAtual = modo;
+            const btnPendura = document.getElementById('modo-pendura');
+            const btnAvista = document.getElementById('modo-avista');
+            const btnSubmit = document.getElementById('btn-registrar-venda');
+
+            if(modo === 'pendura') {
+                btnPendura.className = "py-2.5 px-3 rounded-xl border border-amber-500 bg-amber-500/15 text-amber-400 font-extrabold text-xs uppercase transition-all";
+                btnAvista.className = "py-2.5 px-3 rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-400 font-extrabold text-xs uppercase transition-all";
+                btnSubmit.innerHTML = "<span>📝 Lançar na Pendura</span>";
+            } else {
+                btnAvista.className = "py-2.5 px-3 rounded-xl border border-emerald-500 bg-emerald-500/15 text-emerald-400 font-extrabold text-xs uppercase transition-all";
+                btnPendura.className = "py-2.5 px-3 rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-400 font-extrabold text-xs uppercase transition-all";
+                btnSubmit.innerHTML = "<span>💸 Registrar Venda Paga</span>";
+            }
+            updateVendaTotal();
+        }
+
+        function ajustarQtdVenda(delta) {
+            const input = document.getElementById('venda-qtd');
+            const novo = Math.max(1, (parseInt(input.value) || 1) + delta);
+            input.value = novo;
+            updateVendaTotal();
+        }
+
+        function setQtdVenda(qtd) {
+            document.getElementById('venda-qtd').value = qtd;
+            updateVendaTotal();
+        }
+
+        function updateVendaTotal() {
+            const cid = document.getElementById('venda-cliente-select').value;
+            const qtd = parseInt(document.getElementById('venda-qtd').value) || 0;
+            const total = qtd * PRECO_BANDEJA;
+            document.getElementById('venda-total-display').innerText = `R$ ${total.toFixed(2)}`;
+            document.getElementById('venda-esfihas-count').innerText = `${qtd * 5} esfihas fechadas (${qtd} band.)`;
+            
+            const c = clientes.find(x => x.id === cid);
+            const elAlerta = document.getElementById('alerta-limite');
+            if(modoVendaAtual === 'pendura' && c && ((c.saldo || 0) + total) >= 100) {
+                elAlerta.classList.remove('hidden');
+            } else {
+                elAlerta.classList.add('hidden');
+            }
+        }
+
+        async function registrarVenda() {
+            const cid = document.getElementById('venda-cliente-select').value;
+            const qtd = parseInt(document.getElementById('venda-qtd').value);
+            if(!cid || !qtd || qtd <= 0) return showToast("Selecione um cliente e uma quantidade válida.", "error");
+            
+            const hojeStr = new Date().toLocaleDateString('pt-BR');
+            if(controleProducaoDia.data !== hojeStr) {
+                controleProducaoDia.data = hojeStr;
+                controleProducaoDia.saldoBandejas = 0;
+            }
+
+            let bandejasNecessarias = qtd;
+            let massasABater = 0;
+
+            if (controleProducaoDia.saldoBandejas < bandejasNecessarias) {
+                let falta = bandejasNecessarias - controleProducaoDia.saldoBandejas;
+                massasABater = Math.ceil(falta / 4);
+                controleProducaoDia.saldoBandejas += (massasABater * 4);
+            }
+
+            controleProducaoDia.saldoBandejas -= bandejasNecessarias;
+            localStorage.setItem('controleProducaoDia', JSON.stringify(controleProducaoDia));
+            document.getElementById('saldo-bandejas-display').innerText = controleProducaoDia.saldoBandejas;
+
+            const total = qtd * PRECO_BANDEJA;
+            const c = clientes.find(x => x.id === cid);
+            const batch = db.batch();
+            
+            const cRef = db.collection('clientes').doc(cid);
+            const acrescimoSaldo = modoVendaAtual === 'pendura' ? total : 0;
+
+            batch.update(cRef, {
+                saldo: (c.saldo || 0) + acrescimoSaldo,
+                totalComprado: (c.totalComprado || 0) + total,
+                ultimaCompra: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            const vRef = db.collection('vendas').doc();
+            batch.set(vRef, {
+                clienteId: cid,
+                clienteNome: c.nome,
+                qtd,
+                valor: total,
+                data: firebase.firestore.FieldValue.serverTimestamp(),
+                tipo: 'venda',
+                pagoNaHora: modoVendaAtual === 'avista',
+                massasProduzidas: massasABater
+            });
+
+            // Se foi pago na hora, também registra o pagamento no histórico financeiro
+            if(modoVendaAtual === 'avista') {
+                const pRef = db.collection('vendas').doc();
+                batch.set(pRef, {
+                    clienteId: cid,
+                    clienteNome: c.nome,
+                    valor: total,
+                    data: firebase.firestore.FieldValue.serverTimestamp(),
+                    tipo: 'pagamento',
+                    origemAvista: true
+                });
+            }
+            
+            if(massasABater > 0) {
+                Object.keys(receitaProporcao).forEach(key => {
+                    if(estoqueInsumos[key]) {
+                        const gastoTotalIngrediente = receitaProporcao[key] * massasABater;
+                        const estoqueAtual = estoqueInsumos[key].estoqueAtual || 0;
+                        const novoEstoque = Math.max(0, estoqueAtual - gastoTotalIngrediente);
+                        
+                        const estRef = db.collection('estoque').doc(key);
+                        batch.update(estRef, { estoqueAtual: novoEstoque });
+                    }
+                });
+            }
+            
+            await batch.commit();
+            const msgMassa = massasABater > 0 ? ` (${massasABater} massa abatida)` : ` (usou saldo do dia)`;
+            showToast(`Pedido registrado com sucesso!${msgMassa}`, "success");
+            
+            document.getElementById('venda-cliente-select').value = "";
+            document.getElementById('venda-qtd').value = 1;
+            setModoVenda('pendura');
+            updateVendaTotal();
+            showTab('clientes');
+        }
+
+        function selecionarInsumoPreDefinido() {
+            const tipo = document.getElementById('insumo-select').value;
+            const tamPacote = document.getElementById('insumo-tamanho-pacote');
+            const unMedida = document.getElementById('insumo-unidade');
+            const precoPacote = document.getElementById('insumo-preco-pacote');
+            
+            const defaults = {
+                farinha: ["1000", "g", "5.50"],
+                ovos: ["30", "un", "18.00"],
+                leite: ["1000", "ml", "4.80"],
+                margarina: ["500", "g", "6.50"],
+                oleo: ["900", "ml", "7.00"],
+                acucar: ["1000", "g", "4.20"],
+                sal: ["1000", "g", "3.00"],
+                fermento: ["150", "g", "14.00"],
+                carne: ["1000", "g", "38.00"]
             };
 
-            itemDiv.appendChild(btnChamar);
-            containerSumidos.appendChild(itemDiv);
-          }
-        });
-
-        if(containerSumidos.innerHTML === '') {
-          containerSumidos.innerHTML = '<div class="text-center py-6 text-zinc-600 text-xs font-semibold">Todos os clientes estão ativos!</div>';
+            if(defaults[tipo]) {
+                tamPacote.value = defaults[tipo][0];
+                unMedida.value = defaults[tipo][1];
+                precoPacote.value = estoqueInsumos[tipo]?.precoPacote || defaults[tipo][2];
+            }
         }
-      }
 
-      const pagamentos = historicoCompleto
-        .filter(h => h.tipo === 'pagamento')
-        .sort((a,b) => (b.data ? b.data.seconds : 0) - (a.data ? a.data.seconds : 0))
-        .slice(0, 15);
+        async function salvarInsumoEstoque() {
+            const tipo = document.getElementById('insumo-select').value;
+            const tamanhoPacote = parseFloat(document.getElementById('insumo-tamanho-pacote').value);
+            const unidade = document.getElementById('insumo-unidade').value;
+            const precoPacote = parseFloat(document.getElementById('insumo-preco-pacote').value);
+            const qtdComprada = parseInt(document.getElementById('insumo-qtd-comprada').value) || 1;
 
-      const pagamentosContainer = document.getElementById('rep-pagamentos');
-      if(pagamentosContainer) {
-        let pagamentosHtml = '';
-        pagamentos.forEach(p => {
-          const dataPg = p.data ? new Date(p.data.seconds * 1000).toLocaleDateString('pt-BR') : 'Hoje';
-          pagamentosHtml += `
-            <div class="flex justify-between items-center bg-zinc-900 p-3 rounded-xl border border-zinc-800/80">
-              <div>
-                <div class="font-extrabold text-xs text-white uppercase">${p.clienteNome}</div>
-                <div class="text-[10px] text-emerald-400 font-bold mt-0.5">+ R$ ${p.valor.toFixed(2)}</div>
-              </div>
-              <div class="text-[10px] text-zinc-500 font-bold uppercase">${dataPg}</div>
-            </div>`;
-        });
-        pagamentosContainer.innerHTML = pagamentosHtml || '<div class="text-center py-6 text-zinc-600 text-xs font-semibold">Nenhum pagamento registrado.</div>';
-      }
-    }
+            if(!tamanhoPacote || !precoPacote || tamanhoPacote <= 0 || precoPacote <= 0) {
+                return showToast("Preencha tamanho e valor válidos!", "error");
+            }
 
-    function exportarBackupCSV() {
-      if(clientes.length === 0) return showToast("Não há dados para exportar.", "warning");
-      let csv = "Nome;WhatsApp;Saldo Devedor;Total Comprado\n";
-      clientes.forEach(c => {
-        csv += `"${c.nome}";"${c.tel || ''}";"${(c.saldo || 0).toFixed(2).replace('.', ',')}";"${(c.totalComprado || 0).toFixed(2).replace('.', ',')}"\n`;
-      });
-      const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `backup_priscila_esfihas_${new Date().toISOString().slice(0,10)}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast("Planilha de backup baixada!", "success");
-    }
+            const totalInjetadoEstoque = tamanhoPacote * qtdComprada;
+            const custoPorUnidadeMedida = precoPacote / tamanhoPacote;
 
-    function enviarMensagemSaudadeDireto(nome, tel, dias) {
-      if(!tel || tel.trim() === "") return showToast("Este cliente não possui WhatsApp cadastrado.", "error");
-      const texto = `Oi, ${nome}! Tudo bem? Bateu saudade daquela esfiha fechada quentinha! 🥟\n\nNotamos que já faz uns ${dias} dias desde o seu último pedido. A Priscila está preparando uma fornada fresca hoje. Gostaria de garantir uma bandeja com 5 unidades?\n\nSe quiser, só me avisar por aqui!`;
-      window.open(`https://api.whatsapp.com/send?phone=55${tel}&text=${encodeURIComponent(texto)}`, '_blank');
-    }
+            const dadosExistentes = estoqueInsumos[tipo] || { estoqueAtual: 0 };
+            const novoEstoqueAtual = (dadosExistentes.estoqueAtual || 0) + totalInjetadoEstoque;
 
-    function enviarExtratoZap() {
-      const c = clientes.find(x => x.id === selecionadoId);
-      if(!c) return;
-      if(!c.tel) return showToast("Cadastre o WhatsApp deste cliente primeiro.", "error");
+            await db.collection('estoque').doc(tipo).set({
+                nome: nomesInsumos[tipo],
+                tamanhoPacote,
+                unidade,
+                precoPacote,
+                custoPorUnidadeMedida,
+                estoqueAtual: novoEstoqueAtual,
+                ultimaCompra: firebase.firestore.FieldValue.serverTimestamp()
+            });
 
-      const filtrados = historicoCompleto.filter(h => h.clienteId === c.id);
-      const ultimoPgto = filtrados
-        .filter(h => h.tipo === 'pagamento')
-        .sort((a, b) => (b.data ? b.data.seconds : 0) - (a.data ? a.data.seconds : 0))[0];
-
-      const segDe = h => h.data ? h.data.seconds : Date.now() / 1000;
-      const recentes = ultimoPgto
-        ? filtrados.filter(h => segDe(h) >= segDe(ultimoPgto))
-        : filtrados;
-      const vendasDepois = recentes.filter(h => h.tipo === 'venda' && !h.pagoNaHora).reduce((acc, v) => acc + (v.valor || 0), 0);
-      const saldoAnterior = ultimoPgto ? Math.round(((c.saldo || 0) - vendasDepois) * 100) / 100 : 0;
-
-      let texto = `*Fala, ${c.nome}!* Segue o extrato das esfihas da Priscila:\n\n`;
-
-      if(ultimoPgto) {
-        const dataPgtoStr = ultimoPgto.data ? new Date(ultimoPgto.data.seconds * 1000).toLocaleDateString('pt-BR') : '';
-        texto += `*Último pagamento:* ${dataPgtoStr} - R$ ${ultimoPgto.valor.toFixed(2)} ✅\n\n`;
-      }
-
-      const pendentes = recentes.filter(h => h.tipo === 'venda' && !h.pagoNaHora).reverse();
-      if(pendentes.length === 0 && saldoAnterior <= 0.009) {
-        if(!ultimoPgto) texto += `Sem movimentações em aberto.\n`;
-      } else {
-        if(saldoAnterior > 0.009) {
-          texto += `• Saldo anterior pendente: R$ ${saldoAnterior.toFixed(2)}\n`;
+            showToast(`${nomesInsumos[tipo]} atualizado no estoque!`, "success");
+            document.getElementById('insumo-qtd-comprada').value = "1";
         }
-        pendentes.forEach(i => {
-          const dataStr = i.data ? new Date(i.data.seconds * 1000).toLocaleDateString('pt-BR') : '';
-          texto += `• ${dataStr}: Pegou ${i.qtd} band. (R$ ${i.valor.toFixed(2)})\n`;
-        });
-      }
 
-      texto += `\n*Total Pendente: R$ ${(c.saldo || 0).toFixed(2)}*\n\n`;
-      if((c.saldo || 0) > 0) {
-        const pixLink = window.location.origin + window.location.pathname + '?pix';
-        texto += `👆 Toque no link abaixo para copiar a chave Pix:\n${pixLink}`;
-      }
+        function renderEstoqueECustos() {
+            let totalCustoMassa = 0;
+            let container = document.getElementById('lista-estoque-status');
+            let h = '';
+            let massasPossiveis = Infinity;
+            let temAlgumInsumo = false;
 
-      window.open(`https://api.whatsapp.com/send?phone=55${c.tel}&text=${encodeURIComponent(texto)}`, '_blank');
-    }
+            Object.keys(receitaProporcao).forEach(key => {
+                const usaNaReceita = receitaProporcao[key];
+                const insumo = estoqueInsumos[key];
+                
+                let precoFracaoReceita = 0;
+                let estoqueTexto = 'Não cadastrado';
+                let unidade = key === 'ovos' ? 'un' : (key === 'leite' || key === 'oleo' ? 'ml' : 'g');
+                let corAlertaEstoque = 'text-zinc-500';
+                let percBarra = 0;
+                let corBarra = 'bg-zinc-700';
 
-    function enviarCobranca45() {
-      const c = clientes.find(x => x.id === selecionadoId);
-      if(!c) return;
-      if(!c.tel) return showToast("Cadastre o WhatsApp deste cliente primeiro.", "error");
+                if(insumo) {
+                    temAlgumInsumo = true;
+                    precoFracaoReceita = insumo.custoPorUnidadeMedida * usaNaReceita;
+                    totalCustoMassa += precoFracaoReceita;
+                    unidade = insumo.unidade;
+                    
+                    const estAtual = insumo.estoqueAtual || 0;
+                    const massasComEste = Math.floor(estAtual / usaNaReceita);
+                    if(massasComEste < massasPossiveis) massasPossiveis = massasComEste;
 
-      const pixLink = window.location.origin + window.location.pathname + '?pix';
-      const texto = `Olá, ${c.nome}! Tudo bem?\n\nPassando para lembrar do acerto das esfihas da Priscila. Temos em aberto o valor de *R$ ${(c.saldo || 0).toFixed(2)}*.\n\n👆 Toque no link abaixo para copiar a chave Pix:\n${pixLink}\n\nMuito obrigado! 🙏`;
+                    estoqueTexto = `${estAtual.toFixed(0)} ${unidade} (${massasComEste} massas)`;
+                    percBarra = Math.min(100, (estAtual / (usaNaReceita * 5)) * 100);
+                    
+                    if(estAtual < usaNaReceita) {
+                        corAlertaEstoque = 'text-rose-400 font-bold';
+                        estoqueTexto += ' • REPOR!';
+                        corBarra = 'bg-rose-500';
+                    } else if(massasComEste <= 2) {
+                        corAlertaEstoque = 'text-amber-400 font-semibold';
+                        corBarra = 'bg-amber-500';
+                    } else {
+                        corAlertaEstoque = 'text-zinc-400';
+                        corBarra = 'bg-emerald-500';
+                    }
+                } else {
+                    massasPossiveis = 0;
+                }
 
-      window.open(`https://api.whatsapp.com/send?phone=55${c.tel}&text=${encodeURIComponent(texto)}`, '_blank');
-    }
+                h += `
+                <div class="bg-zinc-900/80 p-3 rounded-xl border border-zinc-800/80">
+                    <div class="flex justify-between items-center text-xs mb-1.5">
+                        <div>
+                            <div class="font-extrabold text-white uppercase">${nomesInsumos[key]}</div>
+                            <div class="text-[10px] ${corAlertaEstoque} mt-0.5">${estoqueTexto}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-black text-amber-400">R$ ${precoFracaoReceita.toFixed(2)}</div>
+                            <div class="text-[9px] text-zinc-500">Usa ${usaNaReceita}${unidade}/massa</div>
+                        </div>
+                    </div>
+                    <div class="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                        <div class="h-full ${corBarra} rounded-full transition-all" style="width: ${percBarra}%"></div>
+                    </div>
+                </div>`;
+            });
 
-    function copiarChavePix() {
-      const chave = document.getElementById('pix-key-display').innerText;
-      const el = document.createElement('textarea');
-      el.value = chave;
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand('copy');
-      document.body.removeChild(el);
+            container.innerHTML = h;
 
-      const btn = document.getElementById('btn-copiar-pix');
-      const confirm = document.getElementById('pix-copiado');
-      btn.innerText = '✅ Chave Copiada!';
-      btn.style.background = '#10b981';
-      confirm.classList.remove('hidden');
-      setTimeout(() => {
-        btn.innerText = '📋 Copiar Chave Pix';
-        btn.style.background = '';
-        confirm.classList.add('hidden');
-      }, 3000);
-    }
+            const custoPorBandeja = totalCustoMassa / 4;
+            const lucroPorBandeja = PRECO_BANDEJA - custoPorBandeja;
+            const margem = PRECO_BANDEJA > 0 ? ((lucroPorBandeja / PRECO_BANDEJA) * 100) : 0;
+            const capFinal = (!temAlgumInsumo || massasPossiveis === Infinity) ? 0 : massasPossiveis;
 
-    // =========================================================================
-    // ASSISTENTE GEMINI EMBUTIDO (CONSULTAS, BAIXAS, VENDAS & VOZ BIDIRECIONAL)
-    // =========================================================================
-    function abrirAssistenteIA() {
-      document.getElementById('modal-assistente').classList.remove('hidden');
-      empurrarEstadoNavegacao('modal-assistente');
+            document.getElementById('custo-massa-total').innerText = `R$ ${totalCustoMassa.toFixed(2)}`;
+            document.getElementById('lucro-bandeja-total').innerText = `R$ ${lucroPorBandeja.toFixed(2)}`;
+            document.getElementById('margem-lucro-badge').innerText = `Margem ${margem.toFixed(0)}%`;
+            document.getElementById('capacidade-massas-display').innerText = `${capFinal} massas`;
+            document.getElementById('capacidade-bandejas-sub').innerText = `${capFinal * 4} bandejas`;
+        }
 
-      const chat = document.getElementById('ai-chat-history');
-      if (chat.children.length === 0) {
-        if (!geminiApiKey) {
-          adicionarMensagemChatIA(
-            "Olá! Para começarmos, toque na chave 🔑 acima e cole sua chave de API do Gemini (pode testar a antiga que você já criou). Depois é só falar ou digitar!",
-            false
-          );
-          abrirConfigApiKey();
+        function openModal(id) {
+            selecionadoId = id;
+            atualizarTelaModal();
+            renderExtratoCliente(id);
+            document.getElementById('modal-detalhes').classList.remove('hidden');
+            empurrarEstadoNavegacao('modal-detalhes');
+        }
+
+        function closeModal(fromPopstate = false) {
+            document.getElementById('modal-detalhes').classList.add('hidden');
+            selecionadoId = null;
+            document.getElementById('pagamento-valor').value = "";
+            if(!fromPopstate && history.state && history.state.view === 'modal-detalhes') {
+                ignorarPopstate = true;
+                history.back();
+            }
+        }
+
+        function atualizarTelaModal() {
+            const c = clientes.find(x => x.id === selecionadoId);
+            if(!c) return closeModal();
+            
+            document.getElementById('edit-nome').value = c.nome;
+            document.getElementById('edit-tel').value = c.tel || "";
+            document.getElementById('modal-saldo').innerText = `R$ ${(c.saldo || 0).toFixed(2)}`;
+            document.getElementById('modal-historico-total').innerText = `R$ ${(c.totalComprado || 0).toFixed(2)}`;
+            
+            let exibirAlerta45 = false;
+            if(c.ultimaCompra) {
+                const dias = Math.floor((new Date() - new Date(c.ultimaCompra.seconds * 1000)) / (1000 * 60 * 60 * 24));
+                if(dias >= 45 && c.saldo > 0) exibirAlerta45 = true;
+            }
+            
+            const btn45 = document.getElementById('btn-cobranca-45');
+            if(exibirAlerta45) { btn45.classList.remove('opacity-40'); btn45.style.pointerEvents = 'auto'; }
+            else { btn45.classList.add('opacity-40'); btn45.style.pointerEvents = 'none'; }
+        }
+
+        function preencherValorTotalPagamento() {
+            const c = clientes.find(x => x.id === selecionadoId);
+            if(!c || (c.saldo || 0) <= 0) return showToast("Cliente não possui saldo devedor.", "info");
+            document.getElementById('pagamento-valor').value = c.saldo.toFixed(2);
+        }
+
+        async function salvarEdicao() {
+            if(!selecionadoId) return;
+            const novoNome = document.getElementById('edit-nome').value.toUpperCase().trim();
+            const novoTel = document.getElementById('edit-tel').value.replace(/\D/g, '');
+            if(!novoNome) return showToast("O nome é obrigatório!", "error");
+            
+            await db.collection('clientes').doc(selecionadoId).update({ nome: novoNome, tel: novoTel });
+            showToast("Dados do cliente atualizados!", "success");
+        }
+
+        async function confirmarPagamento() {
+            const valor = parseFloat(document.getElementById('pagamento-valor').value);
+            if(!valor || valor <= 0 || !selecionadoId) return showToast("Digite um valor válido para baixar.", "error");
+            
+            const c = clientes.find(x => x.id === selecionadoId);
+            const batch = db.batch();
+            const cRef = db.collection('clientes').doc(selecionadoId);
+            const novoSaldo = Math.max(0, (c.saldo || 0) - valor);
+            batch.update(cRef, { saldo: novoSaldo });
+            
+            const vRef = db.collection('vendas').doc();
+            batch.set(vRef, {
+                clienteId: selecionadoId,
+                clienteNome: c.nome,
+                valor: valor,
+                data: firebase.firestore.FieldValue.serverTimestamp(),
+                tipo: 'pagamento'
+            });
+            
+            await batch.commit();
+            document.getElementById('pagamento-valor').value = "";
+            showToast(`Pagamento de R$ ${valor.toFixed(2)} registrado!`, "success");
+        }
+
+        // Estorno Inteligente de Lançamentos (Novidade Enterprise)
+        async function estornarMovimentacao(movId) {
+            const mov = historicoCompleto.find(h => h.id === movId);
+            if(!mov || !selecionadoId) return;
+            const c = clientes.find(x => x.id === selecionadoId);
+            if(!c) return;
+
+            const desc = mov.tipo === 'venda'
+                ? `Deseja estornar a venda de ${mov.qtd} bandeja(s) (R$ ${mov.valor.toFixed(2)})? O saldo do cliente será recalculado.`
+                : `Deseja cancelar o pagamento de R$ ${mov.valor.toFixed(2)}? O valor voltará ao saldo devedor.`;
+
+            const ok = await pedirConfirmacao("Estornar Lançamento", desc);
+            if(!ok) return;
+
+            const batch = db.batch();
+            const cRef = db.collection('clientes').doc(selecionadoId);
+
+            if(mov.tipo === 'venda') {
+                const abaterSaldo = mov.pagoNaHora ? 0 : mov.valor;
+                batch.update(cRef, {
+                    saldo: Math.max(0, (c.saldo || 0) - abaterSaldo),
+                    totalComprado: Math.max(0, (c.totalComprado || 0) - mov.valor)
+                });
+            } else {
+                batch.update(cRef, {
+                    saldo: (c.saldo || 0) + mov.valor
+                });
+            }
+
+            batch.delete(db.collection('vendas').doc(movId));
+            await batch.commit();
+            showToast("Lançamento estornado com sucesso!", "info");
+        }
+
+        function renderExtratoCliente(cid) {
+            const container = document.getElementById('extrato-linha-tempo');
+            const filtrados = historicoCompleto.filter(h => h.clienteId === cid);
+            let h = '';
+            
+            filtrados.forEach(i => {
+                const dataStr = i.data ? new Date(i.data.seconds * 1000).toLocaleDateString('pt-BR') : 'Agora';
+                if(i.tipo === 'venda') {
+                    const badgeAvista = i.pagoNaHora ? '<span class="text-[8px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded ml-1">PAGO NA HORA</span>' : '';
+                    h += `
+                    <div class="bg-zinc-900 border border-zinc-800 border-l-4 border-l-rose-500 p-2.5 rounded-xl flex justify-between items-center">
+                        <div>
+                            <div class="text-xs font-extrabold text-white">🥟 ${i.qtd} BANDEJA(S) ${badgeAvista}</div>
+                            <div class="text-[10px] text-zinc-500 mt-0.5">${dataStr} • <span class="text-rose-400 font-bold">R$ ${i.valor.toFixed(2)}</span></div>
+                        </div>
+                        <button onclick="estornarMovimentacao('${i.id}')" class="text-zinc-600 hover:text-rose-400 p-1.5 text-xs" title="Estornar">🗑️</button>
+                    </div>`;
+                } else {
+                    h += `
+                    <div class="bg-zinc-900 border border-zinc-800 border-l-4 border-l-emerald-500 p-2.5 rounded-xl flex justify-between items-center">
+                        <div>
+                            <div class="text-xs font-extrabold text-emerald-400">💰 PAGAMENTO RECEBIDO</div>
+                            <div class="text-[10px] text-zinc-500 mt-0.5">${dataStr} • <span class="text-emerald-400 font-bold">- R$ ${i.valor.toFixed(2)}</span></div>
+                        </div>
+                        <button onclick="estornarMovimentacao('${i.id}')" class="text-zinc-600 hover:text-rose-400 p-1.5 text-xs" title="Estornar">🗑️</button>
+                    </div>`;
+                }
+            });
+            container.innerHTML = h || '<div class="text-center py-8 text-zinc-600 text-xs font-semibold">Nenhuma movimentação registrada.</div>';
+        }
+
+        function fecharExtratoAnual(fromPopstate = false) {
+            document.getElementById('modal-extrato-anual').classList.add('hidden');
+            if(!fromPopstate && history.state && history.state.view === 'modal-extrato-anual') {
+                ignorarPopstate = true;
+                history.back();
+            }
+        }
+
+        function abrirExtratoAnual() {
+            const anoAtual = new Date().getFullYear();
+            const hoje = new Date();
+            const fmt = d => d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+            const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+            const ciclos = [];
+            for(let m = 0; m < 12; m++) {
+                const inicio = new Date(anoAtual, m, 7);
+                const fim    = new Date(anoAtual, m + 1, 6, 23, 59, 59);
+                if(inicio > hoje) break;
+                ciclos.push({ inicio, fim, label: `${meses[m]}/${anoAtual}` });
+            }
+            ciclos.reverse();
+
+            let totalAnual = 0;
+            let html = '';
+            ciclos.forEach(c => {
+                const valor = historicoCompleto
+                    .filter(h => h.tipo === 'venda' && h.data &&
+                        new Date(h.data.seconds * 1000) >= c.inicio &&
+                        new Date(h.data.seconds * 1000) <= c.fim)
+                    .reduce((acc, v) => acc + (v.valor || 0), 0);
+                totalAnual += valor;
+                const isCicloAtual = c.inicio <= hoje && hoje <= c.fim;
+                html += `
+                    <div class="flex items-center justify-between py-3.5 border-b border-zinc-800/80">
+                        <div>
+                            <div class="text-white font-extrabold text-xs uppercase flex items-center gap-2">
+                                <span>${c.label}</span>
+                                ${isCicloAtual ? '<span class="bg-amber-500/20 text-amber-400 text-[9px] px-2 py-0.5 rounded-full">Ciclo Atual</span>' : ''}
+                            </div>
+                            <div class="text-zinc-500 text-[10px] font-medium mt-0.5">${fmt(c.inicio)} até ${fmt(c.fim)}</div>
+                        </div>
+                        <div class="text-emerald-400 font-black text-sm">${valor > 0 ? 'R$ ' + valor.toFixed(2) : '<span class="text-zinc-700">R$ 0,00</span>'}</div>
+                    </div>`;
+            });
+
+            html += `<div class="flex items-center justify-between py-4 mt-2 bg-zinc-900 px-3.5 rounded-2xl border border-zinc-800">
+                        <div class="text-amber-400 font-black text-xs uppercase">Total Acumulado ${anoAtual}</div>
+                        <div class="text-amber-400 font-black text-base">R$ ${totalAnual.toFixed(2)}</div>
+                     </div>`;
+
+            document.getElementById('extrato-anual-titulo').innerText = `Ciclos de ${anoAtual} (Dia 07 a Dia 06)`;
+            document.getElementById('extrato-anual-lista').innerHTML = html;
+            document.getElementById('modal-extrato-anual').classList.remove('hidden');
+            empurrarEstadoNavegacao('modal-extrato-anual');
+        }
+
+        function editarMetaMensal() {
+            const atual = metaMensal;
+            const novaStr = window.prompt("Defina sua meta de faturamento mensal (R$):", atual);
+            if(novaStr !== null) {
+                const val = parseFloat(novaStr.replace(',', '.'));
+                if(val && val > 0) {
+                    metaMensal = val;
+                    localStorage.setItem('priscila_meta_mensal', metaMensal);
+                    updateRelatorios();
+                    showToast("Meta mensal atualizada!", "success");
+                }
+            }
+        }
+
+        function updateRelatorios() {
+            const anoAtual = new Date().getFullYear();
+            const fatAnual = historicoCompleto
+                .filter(h => h.tipo === 'venda' && h.data && new Date(h.data.seconds * 1000).getFullYear() === anoAtual)
+                .reduce((acc, v) => acc + (v.valor || 0), 0);
+            document.getElementById('rep-faturamento-total').innerText = `R$ ${fatAnual.toFixed(2)}`;
+
+            const hoje = new Date();
+            let inicioMensal, fimMensal;
+            if(hoje.getDate() >= 7) {
+                inicioMensal = new Date(hoje.getFullYear(), hoje.getMonth(), 7);
+                fimMensal    = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 6, 23, 59, 59);
+            } else {
+                inicioMensal = new Date(hoje.getFullYear(), hoje.getMonth() - 1, 7);
+                fimMensal    = new Date(hoje.getFullYear(), hoje.getMonth(), 6, 23, 59, 59);
+            }
+            const fatMensal = historicoCompleto
+                .filter(h => h.tipo === 'venda' && h.data && new Date(h.data.seconds * 1000) >= inicioMensal && new Date(h.data.seconds * 1000) <= fimMensal)
+                .reduce((acc, v) => acc + (v.valor || 0), 0);
+            const fmt = d => d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+            document.getElementById('rep-faturamento-mensal').innerText = `R$ ${fatMensal.toFixed(2)}`;
+            document.getElementById('rep-faturamento-mensal-periodo').innerText = `${fmt(inicioMensal)} – ${fmt(fimMensal)}`;
+
+            // Atualiza Barra de Meta
+            const percMeta = Math.min(100, Math.round((fatMensal / metaMensal) * 100));
+            document.getElementById('meta-progresso-texto').innerText = `R$ ${fatMensal.toFixed(2)} / R$ ${metaMensal.toFixed(2)}`;
+            document.getElementById('meta-porcentagem-texto').innerText = `${percMeta}%`;
+            document.getElementById('meta-barra-progresso').style.width = `${percMeta}%`;
+            
+            const top = [...clientes].sort((a,b) => (b.totalComprado || 0) - (a.totalComprado || 0))[0];
+            if(top && top.totalComprado > 0) {
+                document.getElementById('rep-top-cliente').innerText = `${top.nome}`;
+                document.getElementById('rep-top-valor').innerText = `R$ ${top.totalComprado.toFixed(2)} em compras`;
+            } else {
+                document.getElementById('rep-top-cliente').innerText = '--';
+                document.getElementById('rep-top-valor').innerText = 'R$ 0,00';
+            }
+            
+            const agora = new Date();
+            const ordenadosPorInatividade = [...clientes].filter(c => c.ultimaCompra).sort((a,b) => a.ultimaCompra.seconds - b.ultimaCompra.seconds);
+            
+            const containerSumidos = document.getElementById('rep-sumidos');
+            if(containerSumidos) {
+                containerSumidos.innerHTML = '';
+                ordenadosPorInatividade.forEach(c => {
+                    const dias = Math.floor((agora - new Date(c.ultimaCompra.seconds * 1000)) / (1000 * 60 * 60 * 24));
+                    if(dias >= 1) {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = "flex justify-between items-center bg-zinc-900 p-3 rounded-xl border border-zinc-800/80";
+                        itemDiv.innerHTML = `
+                            <div>
+                                <div class="font-extrabold text-xs text-white uppercase">${c.nome}</div>
+                                <div class="text-[10px] text-amber-400 font-semibold mt-0.5">Há ${dias} dia(s) sem pedir</div>
+                            </div>
+                        `;
+
+                        const btnChamar = document.createElement('button');
+                        btnChamar.className = "text-[10px] bg-amber-500 font-extrabold text-zinc-950 px-3 py-2 rounded-xl uppercase active:scale-95";
+                        btnChamar.innerText = "💬 Chamar";
+                        btnChamar.onclick = function() {
+                            enviarMensagemSaudadeDireto(c.nome, c.tel || '', dias);
+                        };
+
+                        itemDiv.appendChild(btnChamar);
+                        containerSumidos.appendChild(itemDiv);
+                    }
+                });
+
+                if(containerSumidos.innerHTML === '') {
+                    containerSumidos.innerHTML = '<div class="text-center py-6 text-zinc-600 text-xs font-semibold">Todos os clientes estão ativos!</div>';
+                }
+            }
+
+            const pagamentos = historicoCompleto
+                .filter(h => h.tipo === 'pagamento')
+                .sort((a,b) => (b.data ? b.data.seconds : 0) - (a.data ? a.data.seconds : 0))
+                .slice(0, 15);
+
+            const pagamentosContainer = document.getElementById('rep-pagamentos');
+            if(pagamentosContainer) {
+                let pagamentosHtml = '';
+                pagamentos.forEach(p => {
+                    const dataPg = p.data ? new Date(p.data.seconds * 1000).toLocaleDateString('pt-BR') : 'Hoje';
+                    pagamentosHtml += `
+                    <div class="flex justify-between items-center bg-zinc-900 p-3 rounded-xl border border-zinc-800/80">
+                        <div>
+                            <div class="font-extrabold text-xs text-white uppercase">${p.clienteNome}</div>
+                            <div class="text-[10px] text-emerald-400 font-bold mt-0.5">+ R$ ${p.valor.toFixed(2)}</div>
+                        </div>
+                        <div class="text-[10px] text-zinc-500 font-bold uppercase">${dataPg}</div>
+                    </div>`;
+                });
+                pagamentosContainer.innerHTML = pagamentosHtml || '<div class="text-center py-6 text-zinc-600 text-xs font-semibold">Nenhum pagamento registrado.</div>';
+            }
+        }
+
+        function exportarBackupCSV() {
+            if(clientes.length === 0) return showToast("Não há dados para exportar.", "warning");
+            let csv = "Nome;WhatsApp;Saldo Devedor;Total Comprado\n";
+            clientes.forEach(c => {
+                csv += `"${c.nome}";"${c.tel || ''}";"${(c.saldo || 0).toFixed(2).replace('.', ',')}";"${(c.totalComprado || 0).toFixed(2).replace('.', ',')}"\n`;
+            });
+            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_priscila_esfihas_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast("Planilha de backup baixada!", "success");
+        }
+
+        function enviarMensagemSaudadeDireto(nome, tel, dias) {
+            if(!tel || tel.trim() === "") return showToast("Este cliente não possui WhatsApp cadastrado.", "error");
+            const texto = `Oi, ${nome}! Tudo bem? Bateu saudade daquela esfiha fechada quentinha! 🥟\n\nNotamos que já faz uns ${dias} dias desde o seu último pedido. A Priscila está preparando uma fornada fresca hoje. Gostaria de garantir uma bandeja com 5 unidades?\n\nSe quiser, só me avisar por aqui!`;
+            window.open(`https://api.whatsapp.com/send?phone=55${tel}&text=${encodeURIComponent(texto)}`, '_blank');
+        }
+
+        function enviarExtratoZap() {
+            const c = clientes.find(x => x.id === selecionadoId);
+            if(!c) return;
+            if(!c.tel) return showToast("Cadastre o WhatsApp deste cliente primeiro.", "error");
+            
+            const filtrados = historicoCompleto.filter(h => h.clienteId === c.id);
+            const ultimoPgto = filtrados
+                .filter(h => h.tipo === 'pagamento')
+                .sort((a, b) => (b.data ? b.data.seconds : 0) - (a.data ? a.data.seconds : 0))[0];
+
+            const segDe = h => h.data ? h.data.seconds : Date.now() / 1000;
+            const recentes = ultimoPgto
+                ? filtrados.filter(h => segDe(h) >= segDe(ultimoPgto))
+                : filtrados;
+            const vendasDepois = recentes.filter(h => h.tipo === 'venda' && !h.pagoNaHora).reduce((acc, v) => acc + (v.valor || 0), 0);
+            const saldoAnterior = ultimoPgto ? Math.round(((c.saldo || 0) - vendasDepois) * 100) / 100 : 0;
+            
+            let texto = `*Fala, ${c.nome}!* Segue o extrato das esfihas da Priscila:\n\n`;
+            
+            if(ultimoPgto) {
+                const dataPgtoStr = ultimoPgto.data ? new Date(ultimoPgto.data.seconds * 1000).toLocaleDateString('pt-BR') : '';
+                texto += `*Último pagamento:* ${dataPgtoStr} - R$ ${ultimoPgto.valor.toFixed(2)} ✅\n\n`;
+            }
+            
+            const pendentes = recentes.filter(h => h.tipo === 'venda' && !h.pagoNaHora).reverse();
+            if(pendentes.length === 0 && saldoAnterior <= 0.009) {
+                if(!ultimoPgto) texto += `Sem movimentações em aberto.\n`;
+            } else {
+                if(saldoAnterior > 0.009) {
+                    texto += `• Saldo anterior pendente: R$ ${saldoAnterior.toFixed(2)}\n`;
+                }
+                pendentes.forEach(i => {
+                    const dataStr = i.data ? new Date(i.data.seconds * 1000).toLocaleDateString('pt-BR') : '';
+                    texto += `• ${dataStr}: Pegou ${i.qtd} band. (R$ ${i.valor.toFixed(2)})\n`;
+                });
+            }
+            
+            texto += `\n*Total Pendente: R$ ${(c.saldo || 0).toFixed(2)}*\n\n`;
+            if((c.saldo || 0) > 0) {
+                const pixLink = window.location.origin + window.location.pathname + '?pix';
+                texto += `👆 Toque no link abaixo para copiar a chave Pix:\n${pixLink}`;
+            }
+            
+            window.open(`https://api.whatsapp.com/send?phone=55${c.tel}&text=${encodeURIComponent(texto)}`, '_blank');
+        }
+
+        function enviarCobranca45() {
+            const c = clientes.find(x => x.id === selecionadoId);
+            if(!c) return;
+            if(!c.tel) return showToast("Cadastre o WhatsApp deste cliente primeiro.", "error");
+            
+            const pixLink = window.location.origin + window.location.pathname + '?pix';
+            const texto = `Olá, ${c.nome}! Tudo bem?\n\nPassando para lembrar do acerto das esfihas da Priscila. Temos em aberto o valor de *R$ ${(c.saldo || 0).toFixed(2)}*.\n\n👆 Toque no link abaixo para copiar a chave Pix:\n${pixLink}\n\nMuito obrigado! 🙏`;
+            
+            window.open(`https://api.whatsapp.com/send?phone=55${c.tel}&text=${encodeURIComponent(texto)}`, '_blank');
+        }
+
+        function copiarChavePix() {
+            const chave = document.getElementById('pix-key-display').innerText;
+            const el = document.createElement('textarea');
+            el.value = chave;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+
+            const btn = document.getElementById('btn-copiar-pix');
+            const confirm = document.getElementById('pix-copiado');
+            btn.innerText = '✅ Chave Copiada!';
+            btn.style.background = '#10b981';
+            confirm.classList.remove('hidden');
+            setTimeout(() => {
+                btn.innerText = '📋 Copiar Chave Pix';
+                btn.style.background = '';
+                confirm.classList.add('hidden');
+            }, 3000);
+        }
+
+        if(new URLSearchParams(window.location.search).has('pix')) {
+            document.getElementById('pix-page').classList.remove('hidden');
+            document.getElementById('main-app').classList.add('hidden');
         } else {
-          adicionarMensagemChatIA(
-            "Oi! Estou conectada aos dados da Priscila Esfihas. Pode perguntar quanto um cliente deve, pedir para dar baixa ou lançar venda. Posso ouvir e falar com você!",
-            false
-          );
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js'); });
+            }
+            inicializarProtecaoVoltar();
+            init();
         }
-      }
-    }
-
-    function fecharAssistenteIA(fromPopstate = false) {
-      pararEscutaVoz();
-      if ('speechSynthesis' in window) {
-        try { window.speechSynthesis.cancel(); } catch (e) {}
-      }
-      document.getElementById('modal-assistente').classList.add('hidden');
-      if (!fromPopstate && history.state && history.state.view === 'modal-assistente') {
-        ignorarPopstate = true;
-        history.back();
-      }
-    }
-
-    function abrirConfigApiKey() {
-      document.getElementById('input-gemini-api-key').value = geminiApiKey;
-      document.getElementById('ai-config-panel').classList.remove('hidden');
-    }
-
-    function fecharConfigApiKey() {
-      document.getElementById('ai-config-panel').classList.add('hidden');
-    }
-
-    async function salvarApiKeyGemini() {
-      const chave = document.getElementById('input-gemini-api-key').value.trim();
-      if (!chave) return showToast("Cole uma chave de API válida.", "error");
-      geminiApiKey = chave;
-      localStorage.setItem('priscila_gemini_api_key', chave);
-      fecharConfigApiKey();
-      showToast("Chave salva! Testando conexão com o Gemini...", "info");
-      await processarComandoIA("Responda apenas em uma frase curta: conexão testada com sucesso.", true);
-    }
-
-    function atualizarBotaoTTS() {
-      const btn = document.getElementById('btn-toggle-tts');
-      if (!btn) return;
-      btn.innerText = vozAtiva ? "🔊 Voz ON" : "🔇 Voz OFF";
-      btn.className = vozAtiva
-        ? "bg-zinc-900 border border-amber-500/40 text-amber-400 text-[10px] font-bold px-2.5 py-2 rounded-xl"
-        : "bg-zinc-900 border border-zinc-800 text-zinc-500 text-[10px] font-bold px-2.5 py-2 rounded-xl";
-    }
-
-    function toggleVozResposta() {
-      vozAtiva = !vozAtiva;
-      localStorage.setItem('priscila_ai_voz_ativa', vozAtiva ? 'true' : 'false');
-      if (!vozAtiva && 'speechSynthesis' in window) {
-        try { window.speechSynthesis.cancel(); } catch (e) {}
-      }
-      atualizarBotaoTTS();
-      showToast(vozAtiva ? "Leitura por voz ativada" : "Leitura por voz silenciada", "info");
-    }
-
-    function falarTexto(texto, aoTerminar = null) {
-      if (!vozAtiva || !('speechSynthesis' in window)) {
-        if (typeof aoTerminar === 'function') aoTerminar();
-        return;
-      }
-      try {
-        window.speechSynthesis.cancel();
-        const limpo = texto.replace(/[*#_`🥟💸📝📊⚠️✅🔑🎤🎙️]/g, '');
-        const utter = new SpeechSynthesisUtterance(limpo);
-        utter.lang = 'pt-BR';
-        utter.rate = 1.05;
-        utter.onend = () => {
-          if (typeof aoTerminar === 'function') aoTerminar();
-        };
-        utter.onerror = () => {
-          if (typeof aoTerminar === 'function') aoTerminar();
-        };
-        window.speechSynthesis.speak(utter);
-      } catch (e) {
-        if (typeof aoTerminar === 'function') aoTerminar();
-      }
-    }
-
-    function adicionarMensagemChatIA(texto, ehUsuario = false) {
-      const chat = document.getElementById('ai-chat-history');
-      const div = document.createElement('div');
-      div.className = ehUsuario
-        ? "bg-amber-500/15 border border-amber-500/30 text-amber-100 rounded-2xl rounded-br-sm p-3 text-xs font-semibold ml-8"
-        : "bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-2xl rounded-bl-sm p-3 text-xs leading-relaxed mr-8";
-      div.innerText = texto;
-      chat.appendChild(div);
-      chat.scrollTop = chat.scrollHeight;
-    }
-
-    function normalizarTexto(str) {
-      return (str || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
-    }
-
-    function encontrarClientePorNome(nomeBuscado) {
-      if (!nomeBuscado) return null;
-      const alvo = normalizarTexto(nomeBuscado);
-      if (!alvo) return null;
-
-      let match = clientes.find(c => normalizarTexto(c.nome) === alvo);
-      if (match) return match;
-
-      match = clientes.find(c => normalizarTexto(c.nome).includes(alvo) || alvo.includes(normalizarTexto(c.nome)));
-      if (match) return match;
-
-      const partes = alvo.split(/\s+/).filter(p => p.length > 2);
-      if (partes.length > 0) {
-        match = clientes.find(c => {
-          const nCli = normalizarTexto(c.nome);
-          return partes.every(p => nCli.includes(p));
-        });
-      }
-      return match || null;
-    }
-
-    function montarResumoDadosParaIA() {
-      const resumoClientes = clientes.map(c => ({
-        id: c.id,
-        nome: c.nome,
-        saldoDevedor: Number((c.saldo || 0).toFixed(2)),
-        totalComprado: Number((c.totalComprado || 0).toFixed(2)),
-        telefone: c.tel || ''
-      }));
-
-      const totalAReceber = Number(clientes.reduce((acc, c) => acc + (c.saldo || 0), 0).toFixed(2));
-      const ultimasMov = historicoCompleto.slice(0, 20).map(h => ({
-        cliente: h.clienteNome,
-        tipo: h.tipo,
-        qtd: h.qtd || null,
-        valor: Number((h.valor || 0).toFixed(2)),
-        pagoNaHora: !!h.pagoNaHora
-      }));
-
-      return {
-        precoBandeja: PRECO_BANDEJA,
-        totalAReceber,
-        saldoBandejasHoje: controleProducaoDia.saldoBandejas || 0,
-        clientes: resumoClientes,
-        ultimasMovimentacoes: ultimasMov
-      };
-    }
-
-    async function chamarGeminiAPI(promptUsuario) {
-      if (!geminiApiKey) {
-        throw new Error("Nenhuma chave API configurada. Toque no ícone 🔑 para adicionar sua chave.");
-      }
-
-      const contexto = montarResumoDadosParaIA();
-      const systemPrompt = `Você é a assistente inteligente embutida no app "Priscila Esfihas".
-Responda SEMPRE em português do Brasil, de forma direta, simpática e natural para ser ouvida em voz alta.
-Preço fixo de 1 bandeja: R$ 25,00 (5 esfihas).
-
-Dados atuais do sistema (JSON):
-${JSON.stringify(contexto)}
-
-Sua missão é interpretar o comando do usuário e retornar ESTRITAMENTE um objeto JSON válido (sem markdown \`\`\`json, apenas o JSON puro) com esta estrutura:
-{
-  "intent": "consulta" | "pagamento" | "venda" | "conversa",
-  "respostaFalada": "Texto curto e natural que será falado e exibido ao usuário",
-  "acao": {
-    "tipo": "nenhuma" | "registrar_pagamento" | "registrar_venda",
-    "clienteNome": "nome exato ou aproximado do cliente se aplicável",
-    "valor": 0,
-    "qtdBandejas": 0,
-    "modoVenda": "pendura" | "avista",
-    "descricaoConfirmacao": "Pergunta clara para o usuário confirmar a ação por voz, ex: Você confirma dar baixa de R$ 25,00 no saldo de JOÃO?"
-  }
-}
-
-Regras importantes:
-1. Se o usuário perguntar quanto alguém deve, quem está devendo, total a receber ou resumo, use intent="consulta" e acao.tipo="nenhuma".
-2. Se o usuário pedir para dar baixa, registrar pagamento ou quitar valor de um cliente, preencha acao.tipo="registrar_pagamento", clienteNome e valor (se disser "tudo" ou "quitar", coloque o saldoDevedor do cliente). Nunca execute sem confirmação prévia!
-3. Se o usuário pedir para lançar ou registrar venda/bandeja para um cliente, preencha acao.tipo="registrar_venda", clienteNome, qtdBandejas (padrão 1 se não informar) e modoVenda ("avista" se disser pago na hora/pix/dinheiro, senão "pendura"). Nunca execute sem confirmação prévia!`;
-
-      const modelos = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
-      let ultimoErro = null;
-
-      for (const modelo of modelos) {
-        try {
-          const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent?key=${encodeURIComponent(geminiApiKey)}`;
-          const resp = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [
-                { role: "user", parts: [{ text: systemPrompt + "
-
-Comando do usuário: " + promptUsuario }] }
-              ],
-              generationConfig: {
-                temperature: 0.2,
-                responseMimeType: "application/json"
-              }
-            })
-          });
-
-          const data = await resp.json();
-          if (!resp.ok) {
-            ultimoErro = data?.error?.message || `Erro HTTP ${resp.status}`;
-            continue;
-          }
-
-          const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-          const jsonMatch = rawText.replace(/```json|```/gi, '').trim();
-          return JSON.parse(jsonMatch);
-        } catch (err) {
-          ultimoErro = err.message || "Falha de rede";
-        }
-      }
-
-      throw new Error(ultimoErro || "Não foi possível conectar ao Gemini. Verifique sua chave API.");
-    }
-
-    function exibirCartaoConfirmacaoIA(acao) {
-      acaoPendenteIA = acao;
-      const card = document.getElementById('ai-confirm-card');
-      document.getElementById('ai-confirm-texto').innerText = acao.descricaoConfirmacao || "Deseja confirmar esta operação?";
-      card.classList.remove('hidden');
-
-      const perguntaVoz = (acao.descricaoConfirmacao || "Deseja confirmar?") + " Diga sim para confirmar ou não para cancelar.";
-      falarTexto(perguntaVoz, () => {
-        if (acaoPendenteIA) {
-          iniciarEscutaVoz(true);
-        }
-      });
-    }
-
-    function esconderCartaoConfirmacaoIA() {
-      acaoPendenteIA = null;
-      modoEscutaConfirmacao = false;
-      document.getElementById('ai-confirm-card').classList.add('hidden');
-    }
-
-    async function executarAcaoPendenteIA() {
-      if (!acaoPendenteIA) return;
-      const acao = { ...acaoPendenteIA };
-      esconderCartaoConfirmacaoIA();
-
-      const cliente = encontrarClientePorNome(acao.clienteNome);
-      if (!cliente) {
-        const msgErro = `Não encontrei nenhum cliente chamado "${acao.clienteNome || ''}".`;
-        adicionarMensagemChatIA(msgErro, false);
-        falarTexto(msgErro);
-        return;
-      }
-
-      try {
-        if (acao.tipo === 'registrar_pagamento') {
-          const valor = parseFloat(acao.valor);
-          if (!valor || valor <= 0) throw new Error("Valor de pagamento inválido.");
-          const res = await executarPagamentoNoBanco(cliente.id, valor);
-          const msgOk = `Pronto! Baixei R$ ${valor.toFixed(2)} para ${res.cliente.nome}. Novo saldo: R$ ${res.novoSaldo.toFixed(2)}.`;
-          adicionarMensagemChatIA(msgOk, false);
-          falarTexto(msgOk);
-        } else if (acao.tipo === 'registrar_venda') {
-          const qtd = parseInt(acao.qtdBandejas) || 1;
-          const modo = acao.modoVenda === 'avista' ? 'avista' : 'pendura';
-          const res = await executarVendaNoBanco(cliente.id, qtd, modo, false);
-          const msgOk = `Feito! Registrei ${qtd} bandeja(s) (${modo === 'avista' ? 'pago na hora' : 'na pendura'}) no total de R$ ${res.total.toFixed(2)} para ${res.cliente.nome}.`;
-          adicionarMensagemChatIA(msgOk, false);
-          falarTexto(msgOk);
-        }
-      } catch (err) {
-        const msgErr = `Ops, não deu para concluir: ${err.message}`;
-        adicionarMensagemChatIA(msgErr, false);
-        falarTexto(msgErr);
-      }
-    }
-
-    function cancelarAcaoPendenteIA() {
-      if (!acaoPendenteIA) return;
-      esconderCartaoConfirmacaoIA();
-      const msgCanc = "Ok, operação cancelada.";
-      adicionarMensagemChatIA(msgCanc, false);
-      falarTexto(msgCanc);
-    }
-
-    function interpretarRespostaConfirmacaoPorVoz(fala) {
-      const limpo = normalizarTexto(fala);
-      const afirmativos = ['sim', 'confirmo', 'confirmar', 'pode confirmar', 'isso', 'manda ver', 'beleza', 'ok', 'pode fazer', 'claro'];
-      const negativos = ['nao', 'não', 'cancela', 'cancelar', 'nao confirma', 'não confirma', 'deixa quieto', 'erra', 'volta'];
-
-      if (negativos.some(n => limpo === n || limpo.startsWith(n + ' ') || limpo.includes(' cancelar'))) {
-        cancelarAcaoPendenteIA();
-        return true;
-      }
-      if (afirmativos.some(a => limpo === a || limpo.startsWith(a + ' ') || limpo.includes('confirm'))) {
-        executarAcaoPendenteIA();
-        return true;
-      }
-      return false;
-    }
-
-    async function processarComandoIA(texto, silenciosoNoChat = false) {
-      if (!texto || !texto.trim()) return;
-      const comando = texto.trim();
-
-      if (!silenciosoNoChat) {
-        adicionarMensagemChatIA(comando, true);
-      }
-
-      if (acaoPendenteIA && interpretarRespostaConfirmacaoPorVoz(comando)) {
-        return;
-      }
-
-      const badge = document.getElementById('ai-status-badge');
-      badge.innerText = "PENSANDO...";
-      badge.className = "text-[9px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full";
-
-      try {
-        const resultado = await chamarGeminiAPI(comando);
-        const resposta = resultado.respostaFalada || "Entendido.";
-        adicionarMensagemChatIA(resposta, false);
-
-        if (resultado.acao && resultado.acao.tipo !== 'nenhuma') {
-          exibirCartaoConfirmacaoIA(resultado.acao);
-        } else {
-          falarTexto(resposta);
-        }
-      } catch (err) {
-        const msgErro = `Erro: ${err.message}`;
-        adicionarMensagemChatIA(msgErro, false);
-        falarTexto("Tive um problema ao falar com o Gemini. Confira sua chave de API.");
-      } finally {
-        badge.innerText = "PRONTO";
-        badge.className = "text-[9px] font-extrabold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full";
-      }
-    }
-
-    function enviarComandoTextoIA() {
-      const input = document.getElementById('ai-text-input');
-      const val = input.value.trim();
-      if (!val) return;
-      input.value = "";
-      processarComandoIA(val);
-    }
-
-    function pararEscutaVoz() {
-      estaOuvindo = false;
-      modoEscutaConfirmacao = false;
-      const btnMic = document.getElementById('btn-ai-mic');
-      const fab = document.getElementById('fab-assistente');
-      const liveBox = document.getElementById('ai-live-transcript');
-      if (btnMic) btnMic.classList.remove('listening');
-      if (fab) fab.classList.remove('listening');
-      if (liveBox) liveBox.classList.add('hidden');
-      if (recognition) {
-        try { recognition.stop(); } catch (e) {}
-      }
-    }
-
-    function iniciarEscutaVoz(paraConfirmacao = false) {
-      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRec) {
-        showToast("Seu navegador não suporta reconhecimento de voz. Use o campo de texto!", "warning");
-        return;
-      }
-
-      if ('speechSynthesis' in window) {
-        try { window.speechSynthesis.cancel(); } catch (e) {}
-      }
-
-      if (estaOuvindo) {
-        pararEscutaVoz();
-        return;
-      }
-
-      modoEscutaConfirmacao = !!paraConfirmacao;
-      recognition = new SpeechRec();
-      recognition.lang = 'pt-BR';
-      recognition.interimResults = true;
-      recognition.maxAlternatives = 1;
-
-      const btnMic = document.getElementById('btn-ai-mic');
-      const fab = document.getElementById('fab-assistente');
-      const liveBox = document.getElementById('ai-live-transcript');
-
-      estaOuvindo = true;
-      btnMic.classList.add('listening');
-      fab.classList.add('listening');
-      liveBox.classList.remove('hidden');
-      liveBox.innerText = paraConfirmacao ? "🎤 Ouvindo sua confirmação (diga SIM ou NÃO)..." : "🎤 Ouvindo você falar...";
-
-      let transcricaoFinal = "";
-
-      recognition.onresult = (event) => {
-        let intermediario = "";
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const t = event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-            transcricaoFinal += t;
-          } else {
-            intermediario += t;
-          }
-        }
-        liveBox.innerText = `🎤 "${transcricaoFinal || intermediario}"`;
-      };
-
-      recognition.onerror = (event) => {
-        console.warn("SpeechRecognition error:", event.error);
-        pararEscutaVoz();
-        if (event.error !== 'no-speech' && event.error !== 'aborted') {
-          showToast("Não consegui captar o microfone. Tente novamente.", "warning");
-        }
-      };
-
-      recognition.onend = () => {
-        const textoCapturado = transcricaoFinal.trim();
-        pararEscutaVoz();
-        if (textoCapturado) {
-          processarComandoIA(textoCapturado);
-        }
-      };
-
-      try {
-        recognition.start();
-      } catch (e) {
-        pararEscutaVoz();
-        showToast("Permita o acesso ao microfone para falar com a assistente.", "error");
-      }
-    }
-
-    if(new URLSearchParams(window.location.search).has('pix')) {
-      document.getElementById('pix-page').classList.remove('hidden');
-      document.getElementById('main-app').classList.add('hidden');
-    } else {
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js'); });
-      }
-      inicializarProtecaoVoltar();
-      init();
-    }
-  </script>
+    </script>
 </body>
-</html>
+</html> 
